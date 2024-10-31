@@ -3,47 +3,23 @@
     <el-col :span="12" class="bg"></el-col>
     <el-col :span="6" :offset="3" class="form">
       <!-- 注册表单 -->
-      <el-form
-          ref="registerForm"
-          size="large"
-          autocomplete="off"
-          v-if="isRegister"
-          :rules="registerRules"
-          :model="registerData"
-      >
+      <el-form ref="registerForm" size="large" autocomplete="off" v-if="isRegister" :rules="registerRules"
+        :model="registerData">
         <el-form-item>
           <h1>注册</h1>
         </el-form-item>
         <el-form-item prop="username">
-          <el-input
-              :prefix-icon="User"
-              placeholder="请输入用户名"
-              v-model="registerData.username"
-          ></el-input>
+          <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input
-              :prefix-icon="Lock"
-              type="password"
-              placeholder="请输入密码"
-              v-model="registerData.password"
-          ></el-input>
+          <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="registerData.password"></el-input>
         </el-form-item>
         <el-form-item prop="rePassword">
-          <el-input
-              :prefix-icon="Lock"
-              type="password"
-              placeholder="请再次输入密码"
-              v-model="registerData.rePassword"
-          ></el-input>
+          <el-input :prefix-icon="Lock" type="password" placeholder="请再次输入密码"
+            v-model="registerData.rePassword"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button
-              class="button"
-              type="primary"
-              auto-insert-space
-              @click="register"
-          >
+          <el-button class="button" type="primary" auto-insert-space @click="register">
             注册
           </el-button>
         </el-form-item>
@@ -55,40 +31,20 @@
       </el-form>
 
       <!-- 登录表单 -->
-      <el-form
-          ref="loginForm"
-          size="large"
-          autocomplete="off"
-          v-else
-          :rules="loginRules"
-          :model="loginData"
-      >
+      <el-form ref="loginForm" size="large" autocomplete="off" v-else :rules="loginRules" :model="loginData">
         <el-form-item>
           <h1>登录</h1>
         </el-form-item>
         <el-form-item prop="username">
-          <el-input
-              :prefix-icon="User"
-              placeholder="请输入用户名"
-              v-model="loginData.username"
-          ></el-input>
+          <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="loginData.username"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input
-              name="password"
-              :prefix-icon="Lock"
-              type="password"
-              placeholder="请输入密码"
-              v-model="loginData.password"
-          ></el-input>
+          <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码"
+            v-model="loginData.password"></el-input>
         </el-form-item>
         <el-form-item prop="captcha">
-          <el-input
-              placeholder="请输入验证码"
-              v-model="loginData.captcha"
-          ></el-input>
-          <!-- 点击图片刷新验证码 -->
-          <img :src="captchaImg" @click="getCaptcha" alt="captcha" style="cursor: pointer"/>
+          <el-input placeholder="请输入验证码" v-model="loginData.captcha"></el-input>
+          <img :src="captchaImg" @click="getCaptcha" alt="captcha" style="cursor: pointer" />
         </el-form-item>
         <el-form-item>
           <div class="flex">
@@ -97,12 +53,7 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button
-              class="button"
-              type="primary"
-              auto-insert-space
-              @click="login"
-          >
+          <el-button class="button" type="primary" auto-insert-space @click="login">
             登录
           </el-button>
         </el-form-item>
@@ -117,89 +68,83 @@
 </template>
 
 <script setup>
-import {Lock, User} from '@element-plus/icons-vue'
-import { ElNotification } from 'element-plus'
-import {onMounted, ref} from 'vue'
-import {getCaptchaService, userLoginService, userRegisterService} from '@/api/login'
+import { Lock, User } from '@element-plus/icons-vue';
+import { ElNotification } from 'element-plus';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useTokenStore } from '@/stores/token.js';
+import { useUserInfoStore } from '@/stores/userinfo.js';
+import { getCaptchaService, userLoginService, userRegisterService } from '@/api/login';
+import { getUserInfo } from '@/api/user'
 
-// 控制表单显示状态，默认显示登录表单
-const isRegister = ref(false)
-
-// 注册表单数据模型
+const tokenStore = useTokenStore();
+const userInfoStore = useUserInfoStore();
+const isRegister = ref(false);
 const registerData = ref({
   username: '',
   password: '',
   rePassword: ''
-})
-
-// 登录表单数据模型
+});
 const loginData = ref({
   username: '',
   password: '',
   captcha: ''
-})
+});
+const captchaImg = ref('');
+const captchaKey = ref('');
+const router = useRouter();
 
-// 验证码相关变量
-const captchaImg = ref('')
-const captchaKey = ref('')
-
-// 获取验证码
 const getCaptcha = async () => {
   try {
-    const data = await getCaptchaService(); // 调用服务获取验证码
-    captchaImg.value = data.data.image; // 假设返回的数据中包含image字段
-    captchaKey.value = data.data.key; // 存储captchaKey
+    const data = await getCaptchaService();
+    captchaImg.value = data.data.image;
+    captchaKey.value = data.data.key;
   } catch (error) {
     console.error('获取验证码失败:', error);
   }
-}
+};
 
-// 组件挂载时获取验证码
 onMounted(() => {
-  getCaptcha()
-})
+  getCaptcha();
+});
 
-// 验证两次密码输入是否一致
 const checkRePassword = (rule, value, callback) => {
   if (value === '') {
-    callback(new Error('请再次输入密码'))
+    callback(new Error('请再次输入密码'));
   } else if (value !== registerData.value.password) {
-    callback(new Error('两次输入的密码不一致'))
+    callback(new Error('两次输入的密码不一致'));
   } else {
-    callback()
+    callback();
   }
-}
+};
 
-// 注册表单的验证规则
 const registerRules = {
   username: [
-    {required: true, message: '请输入用户名', trigger: 'blur'},
-    {min: 5, max: 16, message: '请输入5-16位用户名', trigger: 'blur'}
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 5, max: 16, message: '请输入5-16位用户名', trigger: 'blur' }
   ],
   password: [
-    {required: true, message: '请输入密码', trigger: 'blur'},
-    {min: 5, max: 16, message: '请输入5-16位密码', trigger: 'blur'}
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 5, max: 16, message: '请输入5-16位密码', trigger: 'blur' }
   ],
   rePassword: [
-    {required: true, message: '请再次输入密码', trigger: 'blur'},
-    {validator: checkRePassword, trigger: 'blur'}
+    { required: true, message: '请再次输入密码', trigger: 'blur' },
+    { validator: checkRePassword, trigger: 'blur' }
   ]
-}
+};
 
-// 登录表单的验证规则
 const loginRules = {
   username: [
-    {required: true, message: '请输入用户名', trigger: 'blur'},
-    {min: 5, max: 16, message: '请输入5-16位用户名', trigger: 'blur'}
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 5, max: 16, message: '请输入5-16位用户名', trigger: 'blur' }
   ],
   password: [
-    {required: true, message: '请输入密码', trigger: 'blur'},
-    {min: 5, max: 16, message: '请输入5-16位密码', trigger: 'blur'}
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 5, max: 16, message: '请输入5-16位密码', trigger: 'blur' }
   ],
-  captcha: [{required: true, message: '请输入验证码', trigger: 'blur'}]
-}
+  captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
+};
 
-// 注册处理函数
 const register = async () => {
   try {
     const registerPayload = {
@@ -208,54 +153,64 @@ const register = async () => {
       rePassword: registerData.value.rePassword
     };
 
-    const result = await userRegisterService(registerPayload) // 调用注册服务
+    const result = await userRegisterService(registerPayload);
     if (result.code === 200) {
-      ElNotification.success(result.message ? result.message : '注册成功')
+      ElNotification.success(result.message ? result.message : '注册成功');
     } else {
-      ElNotification.error(result.message ? result.message : '注册失败')
+      ElNotification.error(result.message ? result.message : '注册失败');
     }
   } catch (error) {
     console.error('注册失败:', error);
   }
-}
+};
 
-// 登录处理函数
 const login = async () => {
   try {
     const loginPayload = {
       username: loginData.value.username,
       password: loginData.value.password,
-      captchaKey: captchaKey.value,  // 使用保存的验证码key
+      captchaKey: captchaKey.value,
       captchaCode: loginData.value.captcha
     };
 
-    const result = await userLoginService(loginPayload); // 调用登录服务
+    const result = await userLoginService(loginPayload);
     if (result.code === 200) {
-      ElNotification.success(result.message ? result.message : '登录成功');
+      const tokenValue = result.data.data.tokenValue;
+      tokenStore.setToken(tokenValue);
+  
+
+      // 获取当前登录用户的信息
+      const userInfoResult = await getUserInfo();
+      if (userInfoResult.code === 200) {
+        userInfoStore.setUserInfo(userInfoResult.data); // 存储用户信息
+        console.log('当前登录用户信息:', userInfoResult.data);
+        
+      }
+
+      ElNotification.success('登录成功');
+      router.push('/');
     } else {
-      ElNotification.error(result.message ? result.message : '登录失败');
-      await getCaptcha(); // 登录失败时重新获取验证码
+      ElNotification.error('登录失败');
+      await getCaptcha();
     }
   } catch (error) {
     console.error('登录失败:', error);
   }
-}
+};
 
-// 清除注册表单数据
 const clearRegisterData = () => {
   registerData.value = {
     username: '',
     password: '',
     rePassword: ''
-  }
-}
+  };
+};
 
-// 切换表单显示状态
 const toggleForm = () => {
-  isRegister.value = !isRegister.value
-  clearRegisterData()
-  getCaptcha()
-}
+  isRegister.value = !isRegister.value;
+  clearRegisterData();
+  getCaptcha();
+};
 </script>
 
 <style lang="scss" scoped>
@@ -265,8 +220,8 @@ const toggleForm = () => {
   background-color: #fff;
 
   .bg {
-    background: url('@/assets/logo2.png') no-repeat 60% center / 240px auto,
-    url('@/assets/login_bg.jpg') no-repeat center / cover;
+    background: url('@/assets/logo.png') no-repeat 60% center / 240px auto,
+      url('@/assets/login_bg.jpg') no-repeat center / cover;
     border-radius: 0 20px 20px 0;
   }
 
