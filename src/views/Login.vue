@@ -19,7 +19,7 @@
             v-model="registerData.rePassword"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button class="button" type="primary" auto-insert-space @click="register">
+          <el-button class="button" type="primary" @click="register">
             注册
           </el-button>
         </el-form-item>
@@ -53,7 +53,7 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button class="button" type="primary" auto-insert-space @click="login">
+          <el-button class="button" type="primary" @click="login">
             登录
           </el-button>
         </el-form-item>
@@ -75,11 +75,11 @@ import { useRouter } from 'vue-router';
 import { useTokenStore } from '@/stores/token.js';
 import { useUserInfoStore } from '@/stores/userinfo.js';
 import { getCaptchaService, userLoginService, userRegisterService } from '@/api/login';
-import { getUserInfo } from '@/api/user'
+import { getUserInfo } from '@/api/user';
 
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
-const isRegister = ref(false);
+const isRegister = ref(false); // 控制表单状态
 const registerData = ref({
   username: '',
   password: '',
@@ -155,9 +155,11 @@ const register = async () => {
 
     const result = await userRegisterService(registerPayload);
     if (result.code === 200) {
-      ElNotification.success(result.message ? result.message : '注册成功');
+      ElNotification.success(result.message || '注册成功');
+      isRegister.value = false; // 注册成功后返回登录界面
+      getCaptcha(); // 获取新的验证码
     } else {
-      ElNotification.error(result.message ? result.message : '注册失败');
+      ElNotification.error(result.message || '注册失败');
     }
   } catch (error) {
     console.error('注册失败:', error);
@@ -177,14 +179,10 @@ const login = async () => {
     if (result.code === 200) {
       const tokenValue = result.data.data.tokenValue;
       tokenStore.setToken(tokenValue);
-  
 
-      // 获取当前登录用户的信息
       const userInfoResult = await getUserInfo();
       if (userInfoResult.code === 200) {
-        userInfoStore.setUserInfo(userInfoResult.data); // 存储用户信息
-        console.log('当前登录用户信息:', userInfoResult.data);
-        
+        userInfoStore.setUserInfo(userInfoResult.data);
       }
 
       ElNotification.success('登录成功');
@@ -208,13 +206,20 @@ const clearRegisterData = () => {
 
 const toggleForm = () => {
   isRegister.value = !isRegister.value;
-  clearRegisterData();
-  getCaptcha();
+  if (isRegister.value) {
+    clearRegisterData(); // 切换到注册时清空注册数据
+  } else {
+    loginData.value = {
+      username: '',
+      password: '',
+      captcha: ''
+    }; // 切换到登录时清空登录数据
+  }
+  getCaptcha(); // 获取验证码
 };
 </script>
 
 <style lang="scss" scoped>
-/* 样式 */
 .login-page {
   height: 100vh;
   background-color: #fff;
@@ -230,10 +235,6 @@ const toggleForm = () => {
     flex-direction: column;
     justify-content: center;
     user-select: none;
-
-    .title {
-      margin: 0 auto;
-    }
 
     .button {
       width: 100%;

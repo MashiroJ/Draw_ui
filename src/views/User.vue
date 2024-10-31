@@ -10,22 +10,19 @@
     <!-- 搜索表单 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" label-width="68px">
       <el-form-item label="用户名" prop="username">
-        <el-input
-          v-model="queryParams.username"
-          placeholder="请输入用户名"
-          clearable
-          style="width: 240px"
-          @keyup.enter="getUsers"
-        />
+        <el-input v-model="queryParams.username" placeholder="请输入用户名" clearable style="width: 240px"
+          @keyup.enter="getUsers" />
       </el-form-item>
       <el-form-item label="手机号码" prop="phone">
-        <el-input
-          v-model="queryParams.phone"
-          placeholder="请输入手机号码"
-          clearable
-          style="width: 240px"
-          @keyup.enter="getUsers"
-        />
+        <el-input v-model="queryParams.phone" placeholder="请输入手机号码" clearable style="width: 240px"
+          @keyup.enter="getUsers" />
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="用户状态" clearable style="width: 240px"
+          @change="handleStatusChange">
+          <el-option label="正常" value="正常"></el-option>
+          <el-option label="禁用" value="禁用"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="getUsers">搜索</el-button>
@@ -41,36 +38,22 @@
       <el-table-column label="手机号码" align="center" prop="phone" width="120" />
       <el-table-column label="状态" align="center">
         <template #default="{ row }">
-          <el-switch
-            v-model="row.status"
-            active-value="正常"
-            inactive-value="禁用"
-            @change="handleStatusChange(row)"
-          ></el-switch>
+          <el-switch v-model="row.status" active-value="正常" inactive-value="禁用" @change="handleStatusChange(row)" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="200" class="small-padding fixed-width">
         <template #default="{ row }">
           <el-button :icon="Edit" circle plain type="primary" @click="handleEdit(row)" />
           <el-button :icon="Delete" circle plain type="danger" @click="handleDelete(row)" />
-          <!-- 分配角色按钮 -->
           <el-button :icon="User" circle plain type="success" @click="handleAssignRole(row)" />
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination
-      v-model:current-page="pageNum"
-      v-model:page-size="pageSize"
-      :page-sizes="[5, 10, 15, 20]"
-      layout="total, sizes, prev, pager, next"
-      background
-      :total="total"
-      @size-change="onSizeChange"
-      @current-change="onCurrentChange"
-      style="margin-top: 20px; justify-content: flex-end"
-    />
+    <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+      layout="total, sizes, prev, pager, next" background :total="total" @size-change="onSizeChange"
+      @current-change="onCurrentChange" style="margin-top: 20px; justify-content: flex-end" />
 
     <!-- 新增/修改用户对话框 -->
     <el-dialog :title="formTitle" v-model="dialogVisible" width="500px">
@@ -78,7 +61,6 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名" />
         </el-form-item>
-        <!-- 密码输入框（仅在新增时显示） -->
         <el-form-item label="密码" prop="password" v-if="isAdd">
           <el-input v-model="form.password" placeholder="请输入密码" show-password />
         </el-form-item>
@@ -120,7 +102,6 @@
 import { Edit, Delete, User } from '@element-plus/icons-vue';
 import { ref, reactive, nextTick } from 'vue';
 import { ElNotification, ElMessageBox } from 'element-plus';
-
 import {
   getUserList,
   updateUserStatus,
@@ -137,30 +118,19 @@ import { getRoleList } from '@/api/role';
 const users = ref([]);
 
 // 分页数据模型
-const pageNum = ref(1); // 当前页
-const pageSize = ref(5); // 每页条数
-const total = ref(0); // 总条数
+const pageNum = ref(1);
+const pageSize = ref(5);
+const total = ref(0);
 
 // 搜索参数
 const queryParams = reactive({
   username: '',
-  phone: ''
+  phone: '',
+  status: null // 添加状态
 });
 
 // 加载状态
 const loading = ref(false);
-
-// 分页大小改变时触发
-const onSizeChange = (size) => {
-  pageSize.value = size;
-  getUsers();
-};
-
-// 当前页改变时触发
-const onCurrentChange = (num) => {
-  pageNum.value = num;
-  getUsers();
-};
 
 // 获取用户列表
 const getUsers = async () => {
@@ -168,14 +138,14 @@ const getUsers = async () => {
     current: pageNum.value,
     size: pageSize.value,
     username: queryParams.username || null,
-    phone: queryParams.phone || null
+    phone: queryParams.phone || null,
+    status: queryParams.status || null // 传入状态
   };
   try {
     loading.value = true; // 开始加载
     const result = await getUserList(params);
-    users.value = result.data.records || []; // 确保返回数组
+    users.value = result.data.records || [];
     total.value = result.data.total || 0;
-    // ElNotification.success('获取用户数据成功'); // 可以省略，以减少干扰
   } catch (error) {
     ElNotification.error('获取用户数据失败');
   } finally {
@@ -187,12 +157,8 @@ const getUsers = async () => {
 const resetQuery = () => {
   queryParams.username = '';
   queryParams.phone = '';
+  queryParams.status = null; // 重置状态
   getUsers();
-};
-
-// 处理表格选择事件
-const handleSelectionChange = (selection) => {
-  // 处理选择的行数据
 };
 
 // 处理状态切换
@@ -213,7 +179,7 @@ const formTitle = ref('');
 const form = reactive({
   id: null,
   username: '',
-  password: '', // 新增密码字段
+  password: '',
   phone: ''
 });
 
@@ -231,7 +197,7 @@ const handleAdd = () => {
   formTitle.value = '新增用户';
   form.id = null;
   form.username = '';
-  form.password = ''; // 清空密码
+  form.password = '';
   form.phone = '';
   dialogVisible.value = true;
 };
@@ -252,7 +218,6 @@ const submitForm = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
       if (isAdd.value) {
-        // 新增用户
         try {
           await addUser(form);
           ElNotification.success('新增用户成功');
@@ -262,7 +227,6 @@ const submitForm = () => {
           ElNotification.error('新增用户失败');
         }
       } else {
-        // 修改用户
         try {
           await updateUser(form);
           ElNotification.success('修改用户成功');
@@ -272,154 +236,78 @@ const submitForm = () => {
           ElNotification.error('修改用户失败');
         }
       }
-    } else {
-      return false;
     }
   });
 };
 
 // 处理删除用户
-const handleDelete = (row) => {
-  ElMessageBox.confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-    confirmButtonText: '确定',
+const handleDelete = async (row) => {
+  await ElMessageBox.confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+    confirmButtonText: '继续',
     cancelButtonText: '取消',
     type: 'warning'
-  })
-    .then(async () => {
-      try {
-        await deleteUser(row.id);
-        ElNotification.success('用户删除成功');
-        getUsers();
-      } catch (error) {
-        ElNotification.error('删除失败');
-      }
-    })
-    .catch(() => {
-      // 用户取消操作
-    });
+  }).then(async () => {
+    try {
+      await deleteUser(row.id);
+      ElNotification.success('删除成功');
+      getUsers();
+    } catch (error) {
+      ElNotification.error('删除失败');
+    }
+  });
 };
 
-// 分配角色对话框的可见性
+// 分配角色相关
 const assignRoleDialogVisible = ref(false);
-
-// 分配角色表单数据
 const assignRoleForm = reactive({
   username: '',
-  userId: null,
-  role: null // 初始化为 null
+  role: null
 });
-
-// 所有角色列表
 const allRoles = ref([]);
 
-// 获取所有角色
-const fetchAllRoles = async () => {
-  try {
-    const result = await getRoleList();
-    allRoles.value = result.data.map((role) => ({
-      id: String(role.id), // 确保角色ID为字符串
-      name: role.name
-    }));
-    console.log('All Roles:', allRoles.value);
-  } catch (error) {
-    ElNotification.error('获取角色列表失败');
-  }
-};
-
-// 获取用户已分配的角色
-const fetchUserRole = async (userId) => {
-  try {
-    const result = await getUserRoles(userId);
-    console.log('User Roles:', result.data);
-    // 如果 result.data 是角色名称字符串
-    if (result.data) {
-      // 在 allRoles 中查找匹配的角色
-      const role = allRoles.value.find((r) => r.name === result.data);
-      if (role) {
-        assignRoleForm.role = role.id; // 赋值角色 ID
-      } else {
-        assignRoleForm.role = null;
-      }
-    } else {
-      assignRoleForm.role = null;
-    }
-    console.log('Assigned Role:', assignRoleForm.role);
-  } catch (error) {
-    ElNotification.error('获取用户角色失败');
-  }
-};
-
-// 处理分配角色按钮点击事件
-const handleAssignRole = async (row) => {
-  assignRoleDialogVisible.value = false; // 先关闭对话框
+// 打开分配角色对话框
+const handleAssignRole = (row) => {
+  assignRoleDialogVisible.value = true;
   assignRoleForm.username = row.username;
-  assignRoleForm.userId = row.id;
-  await fetchAllRoles();
-  await fetchUserRole(row.id);
-  await nextTick();
-  assignRoleDialogVisible.value = true; // 再打开对话框
+  getRoleList().then(result => {
+    allRoles.value = result.data || [];
+  });
 };
 
-// 提交分配角色的更改
+// 提交分配角色
 const submitAssignRole = async () => {
   try {
-    const userId = assignRoleForm.userId;
-    const newRole = assignRoleForm.role;
-
-    // 获取用户原有的角色名称
-    const oldRoleResult = await getUserRoles(userId);
-    let oldRoleId = null;
-    if (oldRoleResult.data) {
-      // 在 allRoles 中查找对应的角色 ID
-      const oldRole = allRoles.value.find((r) => r.name === oldRoleResult.data);
-      if (oldRole) {
-        oldRoleId = oldRole.id;
-      }
-    }
-
-    console.log('Old Role ID:', oldRoleId);
-    console.log('New Role ID:', newRole);
-
-    if (newRole !== oldRoleId) {
-      // 如果有旧角色，先删除旧角色
-      if (oldRoleId) {
-        await deleteUserRole(userId, oldRoleId);
-      }
-      // 分配新角色
-      if (newRole) {
-        await grantUserRole(userId, newRole);
-      }
-    }
-
-    ElNotification.success('用户角色更新成功');
+    await grantUserRole(assignRoleForm.username, assignRoleForm.role);
+    ElNotification.success('角色分配成功');
     assignRoleDialogVisible.value = false;
-    getUsers(); // 重新加载用户列表
   } catch (error) {
-    ElNotification.error('用户角色更新失败');
+    ElNotification.error('角色分配失败');
   }
 };
 
-// 初始化时获取用户数据
+// 分页变化
+const onSizeChange = (size) => {
+  pageSize.value = size;
+  getUsers();
+};
+
+const onCurrentChange = (page) => {
+  pageNum.value = page;
+  getUsers();
+};
+
+// 初次加载用户列表
 getUsers();
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .page-container {
-  min-height: 100%;
-  box-sizing: border-box;
+  padding: 20px;
+}
 
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .small-padding .el-button {
-    padding: 2px 5px;
-  }
-
-  .fixed-width {
-    width: 200px;
-  }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

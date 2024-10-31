@@ -22,7 +22,7 @@ import avatar from '@/assets/default.png'
           <el-icon>
             <Management />
           </el-icon>
-          <span >主页</span>
+          <span>主页</span>
         </el-menu-item>
         <el-sub-menu>
           <template #title>
@@ -70,6 +70,12 @@ import avatar from '@/assets/default.png'
             <span>图生图</span>
           </el-menu-item>
         </el-sub-menu>
+        <el-menu-item index="/Gallery">
+          <el-icon>
+            <Management />
+          </el-icon>
+          <span>画廊</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <!-- 右侧主区域 -->
