@@ -136,11 +136,11 @@ const registerRules = {
 const loginRules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 5, max: 16, message: '请输入5-16位用户名', trigger: 'blur' }
+    { min: 4, max: 16, message: '请输入5-16位用户名', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 5, max: 16, message: '请输入5-16位密码', trigger: 'blur' }
+    { min: 4, max: 16, message: '请输入5-16位密码', trigger: 'blur' }
   ],
   captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 };
@@ -183,6 +183,7 @@ const login = async () => {
       const userInfoResult = await getUserInfo();
       if (userInfoResult.code === 200) {
         userInfoStore.setUserInfo(userInfoResult.data);
+        console.log(userInfoResult.data);
       }
 
       ElNotification.success('登录成功');

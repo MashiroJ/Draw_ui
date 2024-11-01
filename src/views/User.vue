@@ -31,8 +31,9 @@
     </el-form>
 
     <!-- 用户列表 -->
-    <el-table v-loading="loading" :data="users" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="50" align="center" />
+    <el-table v-loading="loading" :data="users">
+      <!-- 已移除选择列 -->
+      <!-- <el-table-column type="selection" width="50" align="center" /> -->
       <el-table-column label="用户编号" align="center" prop="id" />
       <el-table-column label="用户名" align="center" prop="username" :show-overflow-tooltip="true" />
       <el-table-column label="手机号码" align="center" prop="phone" width="120" />
@@ -100,7 +101,7 @@
 
 <script setup>
 import { Edit, Delete, User } from '@element-plus/icons-vue';
-import { ref, reactive, nextTick } from 'vue';
+import { ref, reactive } from 'vue';
 import { ElNotification, ElMessageBox } from 'element-plus';
 import {
   getUserList,
@@ -108,9 +109,7 @@ import {
   deleteUser,
   addUser,
   updateUser,
-  getUserRoles,
-  grantUserRole,
-  deleteUserRole
+  grantUserRole
 } from '@/api/user';
 import { getRoleList } from '@/api/role';
 

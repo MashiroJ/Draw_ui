@@ -11,9 +11,11 @@
     "@element-plus/icons-vue": "^2.3.1",
     "axios": "^1.7.7",
     "element-plus": "^2.8.6",
+    "lodash.debounce": "^4.0.8",
     "pinia": "^2.2.5",
     "pinia-plugin-persistedstate": "^4.1.2",
     "vue": "^3.3.4",
+    "vue-cropper": "^0.6.5",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {

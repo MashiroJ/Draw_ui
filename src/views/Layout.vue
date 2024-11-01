@@ -1,3 +1,4 @@
+<!-- 你的组件文件，例如：Layout.vue -->
 <script setup>
 import {
   Management,
@@ -10,6 +11,41 @@ import {
   CaretBottom
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
+import { userLogoutService } from '@/api/login'
+import { useTokenStore } from '@/stores/token'
+import { useUserInfoStore } from '@/stores/userinfo'
+import { useRouter } from 'vue-router' // 引入路由器
+import { ElMessage } from 'element-plus' // 引入消息组件
+
+const router = useRouter() // 使用路由器实例
+const tokenStore = useTokenStore()
+const userInfoStore = useUserInfoStore()
+
+// 定义命令处理函数
+const handleCommand = async (command) => {
+  if (command === 'logout') {
+    try {
+      // 调用注销服务
+      await userLogoutService()
+      // 清除本地存储的令牌和用户信息
+      tokenStore.removeToken()
+      userInfoStore.removeUserInfo()
+      // 跳转到登录页面
+      router.push('/login')
+    } catch (error) {
+      ElMessage.error('注销失败，请稍后重试')
+    }
+  // } else if (command === 'profile') {
+  //   // 跳转到基本资料页面
+  //   router.push('/profile')
+  // } else if (command === 'avatar') {
+  //   // 跳转到更换头像页面
+  //   router.push('/avatar')
+  // } else if (command === 'password') {
+  //   // 跳转到重置密码页面
+  //   router.push('/reset-password')
+  }
+}
 </script>
 
 <template>
@@ -17,7 +53,12 @@ import avatar from '@/assets/default.png'
     <!-- 左侧菜单 -->
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
-      <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router>
+      <el-menu
+        active-text-color="#ffd04b"
+        background-color="#232323"
+        text-color="#fff"
+        router
+      >
         <el-menu-item index="/">
           <el-icon>
             <Management />
@@ -82,8 +123,8 @@ import avatar from '@/assets/default.png'
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div>用户：<strong>Mashiro</strong></div>
-        <el-dropdown placement="bottom-end">
+        <div>用户：<strong>{{ userInfoStore.username }}</strong></div>
+        <el-dropdown placement="bottom-end" @command="handleCommand">
           <span class="el-dropdown__box">
             <el-avatar :src="avatar" />
             <el-icon>
@@ -101,8 +142,8 @@ import avatar from '@/assets/default.png'
         </el-dropdown>
       </el-header>
       <!-- 中间区域 -->
-      <el-main>
-        <div style="width: auto; height: auto;border: 20px">
+      <el-main style="flex-grow: 1; padding: 0;">
+        <div style="width: 100%; height: 100%;">
           <router-view></router-view>
         </div>
       </el-main>
@@ -114,6 +155,7 @@ import avatar from '@/assets/default.png'
 
 <style lang="scss" scoped>
 .layout-container {
+  display: flex;
   height: 100vh;
 
   .el-aside {
@@ -127,6 +169,12 @@ import avatar from '@/assets/default.png'
     .el-menu {
       border-right: none;
     }
+  }
+
+  .el-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
   }
 
   .el-header {

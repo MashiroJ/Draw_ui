@@ -19,3 +19,8 @@ export const userRegisterService = (registerData) => {
 export const userLoginService = (loginData) => {
 	return request.post('/system/login', loginData);
 };
+
+// 登出服务
+export const userLogoutService = () => {
+	return request.post('/system/login/logout')
+}
