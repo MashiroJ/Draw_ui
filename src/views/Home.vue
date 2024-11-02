@@ -23,7 +23,7 @@
                     :before-upload="beforeUpload"
                   >
                     <img v-if="imgUrl" :src="imgUrl" class="avatar" />
-                    <img v-else :src="avatar" width="278" />
+                    <img v-else :src="defaultAvatar" class="avatar" />
                   </el-upload>
                   <br />
                   <div class="button-group">
@@ -90,7 +90,7 @@
                   <el-input v-model="userForm.phonenumber" maxlength="11" />
                 </el-form-item>
                 <el-form-item class="form-buttons">
-                  <el-button type="primary" @click="submitUserInfo">保存</el-button>
+                  <el-button type="primary" :loading="isSubmittingUserInfo" @click="submitUserInfo">保存</el-button>
                   <el-button @click="close">关闭</el-button>
                 </el-form-item>
               </el-form>
@@ -128,7 +128,7 @@
                   />
                 </el-form-item>
                 <el-form-item class="form-buttons">
-                  <el-button type="primary" @click="submitPwd">保存</el-button>
+                  <el-button type="primary" :loading="isSubmittingPwd" @click="submitPwd">保存</el-button>
                   <el-button @click="close">关闭</el-button>
                 </el-form-item>
               </el-form>
@@ -147,7 +147,7 @@ import { Plus, Upload as UploadIcon } from '@element-plus/icons-vue';
 import defaultAvatar from '@/assets/images/profile.jpg';
 import { useTokenStore } from '@/stores/token';
 import { useUserInfoStore } from '@/stores/userinfo';
-import { getUserRoles, updateAvatar, updateUser } from '@/api/user'; // 确保这些 API 函数已正确导入
+import { getUserRoles, updateAvatar, updateUser, updatePassword } from '@/api/user'; // 导入所有必要的 API 函数
 import { useRouter } from 'vue-router';
 
 // 获取 Pinia store 实例
@@ -189,7 +189,7 @@ const pwdRules = reactive({
   oldPassword: [{ required: true, message: '旧密码不能为空', trigger: 'blur' }],
   newPassword: [
     { required: true, message: '新密码不能为空', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' },
+    { min: 5, max: 20, message: '长度在 5 到 20 个字符', trigger: 'blur' },
     {
       pattern: /^[^<>"'|\\]+$/,
       message: '不能包含非法字符：< > " \' \\ |',
@@ -199,12 +199,11 @@ const pwdRules = reactive({
   confirmPassword: [
     { required: true, message: '确认密码不能为空', trigger: 'blur' },
     {
-      validator: (rule, value, callback) => {
+      validator: (rule, value) => {
         if (pwdForm.newPassword !== value) {
-          callback(new Error('两次输入的密码不一致'));
-        } else {
-          callback();
+          return new Error('两次输入的密码不一致');
         }
+        return true;
       },
       trigger: 'blur',
     },
@@ -214,6 +213,10 @@ const pwdRules = reactive({
 // 表单引用
 const userInfoFormRef = ref(null);
 const pwdFormRef = ref(null);
+
+// 添加加载状态
+const isSubmittingPwd = ref(false);
+const isSubmittingUserInfo = ref(false);
 
 // 获取用户信息
 const getUser = async () => {
@@ -291,6 +294,7 @@ const submitUpload = async () => {
 const submitUserInfo = () => {
   userInfoFormRef.value.validate(async (valid) => {
     if (valid) {
+      isSubmittingUserInfo.value = true;
       try {
         await updateUser(userForm);
         ElMessage.success('修改成功');
@@ -299,6 +303,8 @@ const submitUserInfo = () => {
       } catch (error) {
         ElMessage.error('修改失败，请重试');
         console.error('修改用户信息失败:', error);
+      } finally {
+        isSubmittingUserInfo.value = false;
       }
     }
   });
@@ -308,15 +314,33 @@ const submitUserInfo = () => {
 const submitPwd = () => {
   pwdFormRef.value.validate(async (valid) => {
     if (valid) {
+      isSubmittingPwd.value = true;
       try {
-        // await updateUserPwd(pwdForm.oldPassword, pwdForm.newPassword);
-        ElMessage.success('修改成功');
-        pwdForm.oldPassword = '';
-        pwdForm.newPassword = '';
-        pwdForm.confirmPassword = '';
+        const response = await updatePassword({
+          oldPassword: pwdForm.oldPassword,
+          newPassword: pwdForm.newPassword,
+          confirmPassword: pwdForm.confirmPassword,
+        });
+
+        // 根据 API 的返回结构处理响应
+        // 假设 API 返回 { code: 200, message: '成功' } 表示成功
+        if (response && response.code === 200) {
+          ElMessage.success('密码修改成功');
+          // 重置密码表单
+          pwdFormRef.value.resetFields();
+          pwdForm.oldPassword = '';
+          pwdForm.newPassword = '';
+          pwdForm.confirmPassword = '';
+        } else {
+          // 处理业务错误
+          ElMessage.error(response.message || '密码修改失败，请重试');
+        }
       } catch (error) {
-        ElMessage.error('修改失败，请检查旧密码是否正确');
+        // 处理网络或服务器错误
+        ElMessage.error(error.response?.data?.message || '修改失败，请检查旧密码是否正确');
         console.error('修改密码失败:', error);
+      } finally {
+        isSubmittingPwd.value = false;
       }
     }
   });
