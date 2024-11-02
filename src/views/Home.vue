@@ -11,36 +11,18 @@
             <div class="avatar-container">
               <el-row>
                 <el-col :span="12">
-                  <el-upload
-                    ref="uploadRef"
-                    class="avatar-uploader"
-                    :show-file-list="false"
-                    :auto-upload="true"
-                    action="/api/system/file/upload"
-                    name="file"
-                    :headers="{ satoken: tokenStore.token }"
-                    :on-success="uploadSuccess"
-                    :before-upload="beforeUpload"
-                  >
+                  <el-upload ref="uploadRef" class="avatar-uploader" :show-file-list="false" :auto-upload="true"
+                    action="/api/system/file/upload" name="file" :headers="{ satoken: tokenStore.token }"
+                    :on-success="uploadSuccess" :before-upload="beforeUpload">
                     <img v-if="imgUrl" :src="imgUrl" class="avatar" />
                     <img v-else :src="defaultAvatar" class="avatar" />
                   </el-upload>
                   <br />
                   <div class="button-group">
-                    <el-button
-                      type="primary"
-                      :icon="Plus"
-                      size="large"
-                      @click="triggerUpload"
-                    >
+                    <el-button type="primary" :icon="Plus" size="large" @click="triggerUpload">
                       选择图片
                     </el-button>
-                    <el-button
-                      type="success"
-                      :icon="UploadIcon"
-                      size="large"
-                      @click="submitUpload"
-                    >
+                    <el-button type="success" :icon="UploadIcon" size="large" @click="submitUpload">
                       上传头像
                     </el-button>
                   </div>
@@ -76,13 +58,8 @@
           </template>
           <el-tabs v-model="activeTab">
             <el-tab-pane label="基本资料" name="userinfo">
-              <el-form
-                ref="userInfoFormRef"
-                :model="userForm"
-                :rules="userRules"
-                label-width="100px"
-                class="profile-form"
-              >
+              <el-form ref="userInfoFormRef" :model="userForm" :rules="userRules" label-width="100px"
+                class="profile-form">
                 <el-form-item label="用户名称" prop="userName">
                   <el-input v-model="userForm.userName" maxlength="30" disabled />
                 </el-form-item>
@@ -91,45 +68,24 @@
                 </el-form-item>
                 <el-form-item class="form-buttons">
                   <el-button type="primary" :loading="isSubmittingUserInfo" @click="submitUserInfo">保存</el-button>
-                  <el-button @click="close">关闭</el-button>
+                  <el-button @click="close">重置</el-button>
                 </el-form-item>
               </el-form>
             </el-tab-pane>
             <el-tab-pane label="修改密码" name="resetPwd">
-              <el-form
-                ref="pwdFormRef"
-                :model="pwdForm"
-                :rules="pwdRules"
-                label-width="100px"
-                class="profile-form"
-              >
+              <el-form ref="pwdFormRef" :model="pwdForm" :rules="pwdRules" label-width="100px" class="profile-form">
                 <el-form-item label="旧密码" prop="oldPassword">
-                  <el-input
-                    v-model="pwdForm.oldPassword"
-                    placeholder="请输入旧密码"
-                    type="password"
-                    show-password
-                  />
+                  <el-input v-model="pwdForm.oldPassword" placeholder="请输入旧密码" type="password" show-password />
                 </el-form-item>
                 <el-form-item label="新密码" prop="newPassword">
-                  <el-input
-                    v-model="pwdForm.newPassword"
-                    placeholder="请输入新密码"
-                    type="password"
-                    show-password
-                  />
+                  <el-input v-model="pwdForm.newPassword" placeholder="请输入新密码" type="password" show-password />
                 </el-form-item>
                 <el-form-item label="确认密码" prop="confirmPassword">
-                  <el-input
-                    v-model="pwdForm.confirmPassword"
-                    placeholder="请确认新密码"
-                    type="password"
-                    show-password
-                  />
+                  <el-input v-model="pwdForm.confirmPassword" placeholder="请确认新密码" type="password" show-password />
                 </el-form-item>
                 <el-form-item class="form-buttons">
                   <el-button type="primary" :loading="isSubmittingPwd" @click="submitPwd">保存</el-button>
-                  <el-button @click="close">关闭</el-button>
+                  <el-button @click="close">重置</el-button>
                 </el-form-item>
               </el-form>
             </el-tab-pane>
@@ -148,12 +104,12 @@ import defaultAvatar from '@/assets/images/profile.jpg';
 import { useTokenStore } from '@/stores/token';
 import { useUserInfoStore } from '@/stores/userinfo';
 import { getUserRoles, updateAvatar, updateUser, updatePassword } from '@/api/user'; // 导入所有必要的 API 函数
-import { useRouter } from 'vue-router';
+
 
 // 获取 Pinia store 实例
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
-const router = useRouter();
+
 
 // 响应式数据
 const user = reactive({});
@@ -346,7 +302,7 @@ const submitPwd = () => {
   });
 };
 
-// 关闭并重置表单
+// 重置表单
 const close = () => {
   if (activeTab.value === 'userinfo') {
     userInfoFormRef.value.resetFields();
@@ -418,12 +374,16 @@ const close = () => {
 /* 新增的 button-group 样式 */
 .button-group {
   display: flex;
-  gap: 10px; /* 控制按钮之间的间距 */
-  justify-content: center; /* 水平居中对齐按钮 */
-  margin-top: 10px; /* 上方留出空间 */
+  gap: 10px;
+  /* 控制按钮之间的间距 */
+  justify-content: center;
+  /* 水平居中对齐按钮 */
+  margin-top: 10px;
+  /* 上方留出空间 */
 }
 
 @media (max-width: 768px) {
+
   /* 响应式设计：在较小屏幕上垂直排列按钮 */
   .button-group {
     flex-direction: column;
