@@ -10,6 +10,7 @@ import {
   SwitchButton,
   CaretBottom
 } from '@element-plus/icons-vue'
+import { ref } from 'vue'
 import avatar from '@/assets/default.png'
 import { userLogoutService } from '@/api/login'
 import { useTokenStore } from '@/stores/token'
@@ -20,6 +21,9 @@ import { ElMessage } from 'element-plus' // 引入消息组件
 const router = useRouter() // 使用路由器实例
 const tokenStore = useTokenStore()
 const userInfoStore = useUserInfoStore()
+const imgUrl = ref('');
+
+imgUrl.value = userInfoStore.userInfo.avatarUrl;
 
 // 定义命令处理函数
 const handleCommand = async (command) => {
@@ -35,15 +39,6 @@ const handleCommand = async (command) => {
     } catch (error) {
       ElMessage.error('注销失败，请稍后重试')
     }
-  // } else if (command === 'profile') {
-  //   // 跳转到基本资料页面
-  //   router.push('/profile')
-  // } else if (command === 'avatar') {
-  //   // 跳转到更换头像页面
-  //   router.push('/avatar')
-  // } else if (command === 'password') {
-  //   // 跳转到重置密码页面
-  //   router.push('/reset-password')
   }
 }
 </script>
@@ -53,12 +48,7 @@ const handleCommand = async (command) => {
     <!-- 左侧菜单 -->
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
-      <el-menu
-        active-text-color="#ffd04b"
-        background-color="#232323"
-        text-color="#fff"
-        router
-      >
+      <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router>
         <el-menu-item index="/">
           <el-icon>
             <Management />
@@ -123,19 +113,16 @@ const handleCommand = async (command) => {
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div>用户：<strong>{{ userInfoStore.username }}</strong></div>
+        <div>您好：<strong>{{ userInfoStore.userInfo.username }}</strong></div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
           <span class="el-dropdown__box">
-            <el-avatar :src="avatar" />
+            <el-avatar :src="imgUrl" />
             <el-icon>
               <CaretBottom />
             </el-icon>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="profile" :icon="User">基本资料</el-dropdown-item>
-              <el-dropdown-item command="avatar" :icon="Crop">更换头像</el-dropdown-item>
-              <el-dropdown-item command="password" :icon="EditPen">重置密码</el-dropdown-item>
               <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>

@@ -26,22 +26,24 @@
                     <img v-else :src="avatar" width="278" />
                   </el-upload>
                   <br />
-                  <el-button
-                    type="primary"
-                    :icon="Plus"
-                    size="large"
-                    @click="triggerUpload"
-                  >
-                    选择图片
-                  </el-button>
-                  <el-button
-                    type="success"
-                    :icon="UploadIcon"
-                    size="large"
-                    @click="submitUpload"
-                  >
-                    上传头像
-                  </el-button>
+                  <div class="button-group">
+                    <el-button
+                      type="primary"
+                      :icon="Plus"
+                      size="large"
+                      @click="triggerUpload"
+                    >
+                      选择图片
+                    </el-button>
+                    <el-button
+                      type="success"
+                      :icon="UploadIcon"
+                      size="large"
+                      @click="submitUpload"
+                    >
+                      上传头像
+                    </el-button>
+                  </div>
                 </el-col>
               </el-row>
             </div>
@@ -387,5 +389,25 @@ const close = () => {
 
 .form-buttons {
   text-align: right;
+}
+
+/* 新增的 button-group 样式 */
+.button-group {
+  display: flex;
+  gap: 10px; /* 控制按钮之间的间距 */
+  justify-content: center; /* 水平居中对齐按钮 */
+  margin-top: 10px; /* 上方留出空间 */
+}
+
+@media (max-width: 768px) {
+  /* 响应式设计：在较小屏幕上垂直排列按钮 */
+  .button-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .button-group .el-button {
+    width: 100%;
+  }
 }
 </style>
