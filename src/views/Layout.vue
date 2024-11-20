@@ -1,114 +1,22 @@
-<!-- 你的组件文件，例如：Layout.vue -->
-<script setup>
-import {
-  Management,
-  Promotion,
-  UserFilled,
-  User,
-  Crop,
-  EditPen,
-  SwitchButton,
-  CaretBottom
-} from '@element-plus/icons-vue'
-import { ref } from 'vue'
-import avatar from '@/assets/default.png'
-import { userLogoutService } from '@/api/login'
-import { useTokenStore } from '@/stores/token'
-import { useUserInfoStore } from '@/stores/userinfo'
-import { useRouter } from 'vue-router' // 引入路由器
-import { ElMessage } from 'element-plus' // 引入消息组件
-
-const router = useRouter() // 使用路由器实例
-const tokenStore = useTokenStore()
-const userInfoStore = useUserInfoStore()
-const imgUrl = ref('');
-
-imgUrl.value = userInfoStore.userInfo.avatarUrl;
-
-// 定义命令处理函数
-const handleCommand = async (command) => {
-  if (command === 'logout') {
-    try {
-      // 调用注销服务
-      await userLogoutService()
-      // 清除本地存储的令牌和用户信息
-      tokenStore.removeToken()
-      userInfoStore.removeUserInfo()
-      // 跳转到登录页面
-      router.push('/login')
-    } catch (error) {
-      ElMessage.error('注销失败，请稍后重试')
-    }
-  }
-}
-</script>
-
 <template>
   <el-container class="layout-container">
     <!-- 左侧菜单 -->
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
       <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router>
-        <el-menu-item index="/">
+        <el-menu-item 
+          v-for="menu in menuList" 
+          :key="menu.id" 
+          :index="menu.path"
+        >
           <el-icon>
-            <Management />
+            <component :is="getMenuIcon(menu.icon)" />
           </el-icon>
-          <span>主页</span>
-        </el-menu-item>
-        <el-sub-menu>
-          <template #title>
-            <el-icon>
-              <UserFilled />
-            </el-icon>
-            <span>系统管理</span>
-          </template>
-          <el-menu-item index="/User">
-            <el-icon>
-              <Management />
-            </el-icon>
-            <span>用户管理</span>
-          </el-menu-item>
-          <el-menu-item index="/Role">
-            <el-icon>
-              <Promotion />
-            </el-icon>
-            <span>角色管理</span>
-          </el-menu-item>
-          <el-menu-item index="/Menu">
-            <el-icon>
-              <Promotion />
-            </el-icon>
-            <span>菜单管理</span>
-          </el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu>
-          <template #title>
-            <el-icon>
-              <UserFilled />
-            </el-icon>
-            <span>绘画梦工厂</span>
-          </template>
-          <el-menu-item index="/Text2Img">
-            <el-icon>
-              <User />
-            </el-icon>
-            <span>文生图</span>
-          </el-menu-item>
-          <el-menu-item index="/Img2Img">
-            <el-icon>
-              <Crop />
-            </el-icon>
-            <span>图生图</span>
-          </el-menu-item>
-        </el-sub-menu>
-        <el-menu-item index="/Gallery">
-          <el-icon>
-            <Management />
-          </el-icon>
-          <span>画廊</span>
+          <span>{{ menu.name }}</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
+    
     <!-- 右侧主区域 -->
     <el-container>
       <!-- 头部区域 -->
@@ -128,17 +36,115 @@ const handleCommand = async (command) => {
           </template>
         </el-dropdown>
       </el-header>
+      
       <!-- 中间区域 -->
       <el-main style="flex-grow: 1; padding: 0;">
         <div style="width: 100%; height: 100%;">
           <router-view></router-view>
         </div>
       </el-main>
+      
       <!-- 底部区域 -->
       <el-footer>绘画梦工厂 ©2024 Created by Mashiro</el-footer>
     </el-container>
   </el-container>
 </template>
+
+<script setup>
+import {
+  Management,
+  Promotion,
+  UserFilled,
+  User,
+  Crop,
+  EditPen,
+  SwitchButton,
+  CaretBottom
+} from '@element-plus/icons-vue'
+import { ref, onMounted } from 'vue'
+import avatar from '@/assets/default.png'
+import { userLogoutService } from '@/api/login'
+import { useTokenStore } from '@/stores/token'
+import { useUserInfoStore } from '@/stores/userinfo'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { useMenuListService } from '@/api/menu'
+import { getUserMenus } from '@/api/user'
+
+// 路由和状态管理
+const router = useRouter()
+const tokenStore = useTokenStore()
+const userInfoStore = useUserInfoStore()
+
+// 头像处理
+const imgUrl = ref('')
+imgUrl.value = userInfoStore.userInfo.avatarUrl || avatar
+
+// 菜单图标映射
+const iconMap = {
+  'HomeFilled': Management,
+  'User': User,
+  'Promotion': Promotion,
+  'Menu': EditPen,
+  'Gallery': Management,
+  'Text': User,
+  'Image': Crop,
+  'Error': SwitchButton
+}
+
+// 菜单状态
+const menuList = ref([])
+
+// 获取动态菜单
+const fetchDynamicMenus = async () => {
+  try {
+    // 获取所有菜单
+    const allMenusResponse = await useMenuListService()
+    const allMenus = allMenusResponse.data || []
+
+    // 获取用户可访问的菜单ID
+    const userMenusResponse = await getUserMenus(userInfoStore.userInfo.id)
+    const allowedMenuIds = userMenusResponse.data.roleMenuIds || []
+
+    // 过滤并排序菜单
+    menuList.value = allMenus
+      .filter(menu => 
+        allowedMenuIds.includes(menu.id) && 
+        menu.status === 1 && 
+        menu.isVisible === 1
+      )
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+  } catch (error) {
+    console.error('获取菜单失败', error)
+    ElMessage.error('获取菜单失败，请稍后重试')
+  }
+}
+
+// 获取菜单对应的图标
+const getMenuIcon = (iconName) => {
+  return iconMap[iconName] || Management
+}
+
+// 注销处理
+const handleCommand = async (command) => {
+  if (command === 'logout') {
+    try {
+      // 调用注销服务
+      await userLogoutService()
+      // 清除本地存储的令牌和用户信息
+      tokenStore.removeToken()
+      userInfoStore.removeUserInfo()
+      // 跳转到登录页面
+      router.push('/login')
+    } catch (error) {
+      ElMessage.error('注销失败，请稍后重试')
+    }
+  }
+}
+
+// 组件挂载时获取菜单
+onMounted(fetchDynamicMenus)
+</script>
 
 <style lang="scss" scoped>
 .layout-container {

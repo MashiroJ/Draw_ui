@@ -19,7 +19,6 @@ const routes = [
       { path: '/user', component: () => import('@/views/User.vue') },
       { path: '/role', component: () => import('@/views/Role.vue') },
       { path: '/menu', component: () => import('@/views/Menu.vue') },
-      { path: '/draw', component: () => import('@/views/Draw.vue') },
       { path: '/404', component: () => import('@/views/404.vue') },
       { path: '/Text2Img', component: () => import('@/views/Text2Img.vue') },
       { path: '/Img2Img', component: () => import('@/views/Img2Img.vue') },
