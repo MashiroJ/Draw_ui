@@ -4,6 +4,10 @@ import request from '@/utils/request';
 export const getUserInfo = () => {
     return request.get('/system/user/userInfo');
 };
+// 根据Id获取用户的信息  
+export const getUserInfoById = (id) => {
+    return request.get('/system/user/userInfoById', { params: { id } });
+};
 
 // 分页查询用户信息  
 export const getUserList = (params) => {
