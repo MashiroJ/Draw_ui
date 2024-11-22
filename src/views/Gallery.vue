@@ -53,8 +53,12 @@
                   <td>{{ selectedRecord.createTime }}</td>
                 </tr>
                 <tr>
-                  <th>点赞数：</th>
-                  <td>{{ selectedRecord.likeCount || 0 }}</td>
+                  <th>点赞：</th>
+                  <td class="like-container">
+                    <span>{{ likeCount }}</span>
+                    <el-button type="danger" :icon="isLiked ? 'StarFilled' : 'Star'" circle size="small"
+                      @click.stop="handleLike" :loading="likeLoading" />
+                  </td>
                 </tr>
                 <tr>
                   <th>生成类型：</th>
@@ -72,23 +76,27 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Star, Timer } from '@element-plus/icons-vue'
+import { Star, StarFilled, Timer } from '@element-plus/icons-vue'
 import {
   listAllDrawRecords,
   listDrawRecordsByUserId,
   listDrawRecordsSortedByLikes,
   listDrawRecordsSortedByLatest
 } from '@/api/drawRecords'
+import { toggleLike, getLikeCount } from '@/api/drawLike'
 import { useUserInfoStore } from '@/stores/userinfo'
 
-// 状态定义  
+// 状态定义
 const userInfoStore = useUserInfoStore()
 const galleryType = ref('public')
 const drawRecords = ref([])
 const dialogVisible = ref(false)
 const selectedRecord = ref(null)
+const isLiked = ref(false)
+const likeCount = ref(0)
+const likeLoading = ref(false)
 
-// 监听画廊类型变化  
+// 监听画廊类型变化
 watch(galleryType, (newType) => {
   if (newType === 'public') {
     fetchPublicDrawRecords()
@@ -97,7 +105,7 @@ watch(galleryType, (newType) => {
   }
 })
 
-// 获取公共画廊数据  
+// 获取公共画廊数据
 const fetchPublicDrawRecords = async () => {
   try {
     const response = await listAllDrawRecords()
@@ -114,7 +122,7 @@ const fetchPublicDrawRecords = async () => {
   }
 }
 
-// 获取私人画廊数据  
+// 获取私人画廊数据
 const fetchPrivateDrawRecords = async () => {
   const userId = userInfoStore.userInfo.id
   if (!userId) {
@@ -139,7 +147,7 @@ const fetchPrivateDrawRecords = async () => {
   }
 }
 
-// 按点赞数排序  
+// 按点赞数排序
 const sortByLikes = async () => {
   try {
     const response = await listDrawRecordsSortedByLikes()
@@ -152,7 +160,7 @@ const sortByLikes = async () => {
   }
 }
 
-// 按最新时间排序  
+// 按最新时间排序
 const sortByLatest = async () => {
   try {
     const response = await listDrawRecordsSortedByLatest()
@@ -165,16 +173,52 @@ const sortByLatest = async () => {
   }
 }
 
-// 打开详情弹窗  
-const openDialog = (record) => {
-  selectedRecord.value = record
-  dialogVisible.value = true
+// 获取点赞信息
+const fetchLikeInfo = async (drawId) => {
+  try {
+    const response = await getLikeCount(drawId)
+    if (response.code === 200) {
+      likeCount.value = response.data
+      // 如果后端返回了用户点赞状态，可以设置 isLiked
+      // isLiked.value = response.data.isLiked
+    }
+  } catch (error) {
+    console.error('获取点赞数失败:', error)
+  }
 }
 
-// 组件挂载时获取数据  
+// 处理点赞/取消点赞
+const handleLike = async () => {
+  if (!selectedRecord.value || likeLoading.value) return
+
+  likeLoading.value = true
+  try {
+    const response = await toggleLike(selectedRecord.value.id)
+    if (response.code === 200) {
+      isLiked.value = !isLiked.value
+      likeCount.value += isLiked.value ? 1 : -1
+      ElMessage.success(isLiked.value ? '点赞成功' : '已取消点赞')
+    }
+  } catch (error) {
+    ElMessage.error('操作失败')
+    console.error('点赞操作失败:', error)
+  } finally {
+    likeLoading.value = false
+  }
+}
+
+// 打开详情弹窗
+const openDialog = async (record) => {
+  selectedRecord.value = record
+  dialogVisible.value = true
+  isLiked.value = false // 重置点赞状态
+  await fetchLikeInfo(record.id)
+}
+
+// 组件挂载时获取数据
 onMounted(() => {
   fetchPublicDrawRecords()
-})  
+})
 </script>
 
 <style lang="scss" scoped>
@@ -318,6 +362,16 @@ onMounted(() => {
 
   td {
     color: #303133;
+  }
+}
+
+.like-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .el-button {
+    padding: 8px;
   }
 }
 </style>
