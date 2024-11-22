@@ -1,27 +1,36 @@
 <template>
   <div class="gallery-main">
-    <!-- 调试信息 -->
-    <div v-if="debugInfo" class="debug-info mb-4 p-2 bg-gray-100 rounded">
-      {{ debugInfo }}
+    <!-- 画廊类型切换 -->
+    <div class="gallery-type-switch">
+      <el-radio-group v-model="galleryType" size="large">
+        <el-radio-button label="public">公共画廊</el-radio-button>
+        <el-radio-button label="private">私人画廊</el-radio-button>
+      </el-radio-group>
     </div>
 
     <!-- 排序按钮 -->
-    <div class="flex justify-end mb-4 px-4">
-      <el-button type="danger" @click="sortByLikes" class="mr-2">最热</el-button>
-      <el-button type="success" @click="sortByLatest">最新</el-button>
+    <div class="sort-buttons">
+      <el-button type="danger" @click="sortByLikes" class="mr-2">
+        <el-icon>
+          <Star />
+        </el-icon> 最热
+      </el-button>
+      <el-button type="success" @click="sortByLatest">
+        <el-icon>
+          <Timer />
+        </el-icon> 最新
+      </el-button>
     </div>
 
-    <!-- 空状态 -->
-    <div v-if="drawRecords.length === 0" class="empty text-center text-gray-500 mt-12">
-      <span>暂无绘图记录</span>
+    <!-- 空状态展示 -->
+    <div v-if="drawRecords.length === 0" class="empty-state">
+      <el-empty :description="galleryType === 'public' ? '暂无公共绘图记录' : '暂无私人绘图记录'" />
     </div>
 
-    <!-- 瀑布流布局 -->
-    <div class="masonry-container px-4">
-      <div v-for="item in drawRecords" :key="item.id"
-        class="masonry-item img-item rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all bg-white mb-4 relative group"
-        @click="openDialog(item)">
-        <img :src="item.imageUrl" :alt="item.prompt" class="w-full h-auto object-cover" />
+    <!-- 瀑布流画廊 -->
+    <div v-else class="masonry-container">
+      <div v-for="item in drawRecords" :key="item.id" class="masonry-item" @click="openDialog(item)">
+        <img :src="item.imageUrl" :alt="item.prompt" />
       </div>
     </div>
 
@@ -29,17 +38,19 @@
     <el-dialog v-model="dialogVisible" title="绘图详情" custom-class="full-screen-dialog" :close-on-click-modal="true">
       <template v-if="selectedRecord">
         <div class="dialog-content">
-          <!-- 图片展示 -->
           <div class="image-container">
-            <img :src="selectedRecord.imageUrl" :alt="selectedRecord.prompt" class="dialog-image rounded-lg" />
+            <img :src="selectedRecord.imageUrl" :alt="selectedRecord.prompt" class="dialog-image" />
           </div>
-          <!-- 信息表格 -->
           <div class="info-container">
             <table class="info-table">
               <tbody>
                 <tr>
                   <th>提示词：</th>
                   <td>{{ selectedRecord.prompt }}</td>
+                </tr>
+                <tr>
+                  <th>生成时间：</th>
+                  <td>{{ selectedRecord.createTime }}</td>
                 </tr>
                 <tr>
                   <th>点赞数：</th>
@@ -49,11 +60,6 @@
                   <th>生成类型：</th>
                   <td>{{ selectedRecord.generationType || '未知' }}</td>
                 </tr>
-                <tr>
-                  <th>用户ID：</th>
-                  <td>{{ selectedRecord.userId }}</td>
-                </tr>
-                <!-- 可根据需要添加更多信息 -->
               </tbody>
             </table>
           </div>
@@ -64,43 +70,72 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-
-// 引入API函数  
+import { Star, Timer } from '@element-plus/icons-vue'
 import {
   listAllDrawRecords,
+  listDrawRecordsByUserId,
   listDrawRecordsSortedByLikes,
-  listDrawRecordsSortedByLatest,
+  listDrawRecordsSortedByLatest
 } from '@/api/drawRecords'
+import { useUserInfoStore } from '@/stores/userinfo'
 
-// 响应式变量  
+// 状态定义  
+const userInfoStore = useUserInfoStore()
+const galleryType = ref('public')
 const drawRecords = ref([])
 const dialogVisible = ref(false)
 const selectedRecord = ref(null)
-const debugInfo = ref('')
 
-// 获取所有绘图记录  
-const fetchDrawRecords = async () => {
+// 监听画廊类型变化  
+watch(galleryType, (newType) => {
+  if (newType === 'public') {
+    fetchPublicDrawRecords()
+  } else {
+    fetchPrivateDrawRecords()
+  }
+})
+
+// 获取公共画廊数据  
+const fetchPublicDrawRecords = async () => {
   try {
     const response = await listAllDrawRecords()
-
     if (response.code === 200 && response.data) {
-      // 对图片进行预处理，确保图片加载  
-      drawRecords.value = response.data.map((record) => ({
+      drawRecords.value = response.data.map(record => ({
         ...record,
-        imageUrl: record.imageUrl || 'default-placeholder.png',
+        imageUrl: record.imageUrl || '/path/to/default-image.png'
       }))
-      // 显示成功消息  
       ElMessage.success(`成功获取 ${drawRecords.value.length} 条记录`)
-    } else {
-      debugInfo.value = response.message || '未找到数据'
-      ElMessage.warning(debugInfo.value)
     }
   } catch (error) {
-    debugInfo.value = `获取数据失败: ${error.message}`
-    ElMessage.error(debugInfo.value)
+    ElMessage.error('获取公共画廊数据失败')
     console.error('获取数据失败:', error)
+  }
+}
+
+// 获取私人画廊数据  
+const fetchPrivateDrawRecords = async () => {
+  const userId = userInfoStore.userInfo.id
+  if (!userId) {
+    ElMessage.warning('请先登录')
+    galleryType.value = 'public'
+    return
+  }
+
+  try {
+    const response = await listDrawRecordsByUserId(userId)
+    if (response.code === 200 && response.data) {
+      drawRecords.value = response.data.map(record => ({
+        ...record,
+        imageUrl: record.imageUrl || '/path/to/default-image.png'
+      }))
+      ElMessage.success(`成功获取 ${drawRecords.value.length} 条私人记录`)
+    }
+  } catch (error) {
+    ElMessage.error('获取私人画廊数据失败')
+    console.error('获取私人画廊数据失败:', error)
+    drawRecords.value = []
   }
 }
 
@@ -114,7 +149,6 @@ const sortByLikes = async () => {
     }
   } catch (error) {
     ElMessage.error('排序失败')
-    console.error('排序失败:', error)
   }
 }
 
@@ -128,177 +162,162 @@ const sortByLatest = async () => {
     }
   } catch (error) {
     ElMessage.error('排序失败')
-    console.error('排序失败:', error)
   }
 }
 
 // 打开详情弹窗  
-const openDialog = async (record) => {
+const openDialog = (record) => {
   selectedRecord.value = record
   dialogVisible.value = true
 }
 
 // 组件挂载时获取数据  
-onMounted(fetchDrawRecords)  
+onMounted(() => {
+  fetchPublicDrawRecords()
+})  
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.gallery-main {
+  padding: 20px;
+}
+
+.gallery-type-switch {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.sort-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #909399;
+  font-size: 16px;
+}
+
 .masonry-container {
   column-count: 4;
-  column-gap: 1em;
-  width: 100%;
-}
+  column-gap: 20px;
+  padding: 0 20px;
 
-.masonry-item {
-  break-inside: avoid;
-  margin-bottom: 1em;
-}
+  @media screen and (max-width: 1440px) {
+    column-count: 4;
+  }
 
-.masonry-item img {
-  width: 100%;
-  height: auto;
-}
-
-@media screen and (max-width: 1024px) {
-  .masonry-container {
+  @media screen and (max-width: 1024px) {
     column-count: 3;
   }
-}
 
-@media screen and (max-width: 768px) {
-  .masonry-container {
+  @media screen and (max-width: 768px) {
     column-count: 2;
   }
-}
 
-@media screen and (max-width: 480px) {
-  .masonry-container {
+  @media screen and (max-width: 480px) {
     column-count: 1;
   }
 }
 
-.debug-info {
-  background-color: #f0f0f0;
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 }
 
-.img-item:hover {
-  transform: scale(1.02);
-}
-
-/* 添加动画效果 */
-.group:hover .opacity-0 {
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
-}
-
-/* 全屏弹窗样式 */
-.full-screen-dialog {
-  /* 使用 ::v-deep 选择器以覆盖 ElDialog 的内部样式 */
-}
-
-.full-screen-dialog ::v-deep .el-dialog {
-  background: rgba(255, 255, 255, 0.3) !important;
-  /* 半透明背景 */
+:deep(.full-screen-dialog .el-dialog) {
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  /* 磨砂效果 */
-  border: none;
   border-radius: 12px;
-  /* 可选：稍微圆角 */
-  box-shadow: none;
-  /* 去除默认阴影 */
+  margin: 0 !important;
+  position: fixed;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+  max-width: 90vw;
+  width: 90vw;
+  max-height: 90vh;
 }
 
-.full-screen-dialog ::v-deep .el-dialog__header {
-  display: none;
-  /* 隐藏头部标题 */
-}
-
-.full-screen-dialog ::v-deep .el-dialog__body {
-  padding: 20px;
-  overflow: auto;
-  background: rgba(255, 255, 255, 0.2) !important;
-  /* 更低的透明度 */
-  backdrop-filter: blur(10px);
-  /* 磨砂效果 */
-}
-
-/* 弹窗内容布局 */
 .dialog-content {
   display: flex;
-  flex-direction: row;
-  height: 100%;
+  gap: 30px;
+  padding: 20px;
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
-/* 图片容器 */
 .image-container {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 20px;
+  align-items: flex-start;
 }
 
-/* 图片样式 */
 .dialog-image {
   max-width: 100%;
   max-height: 80vh;
-  width: auto;
-  height: auto;
+  object-fit: contain;
   border-radius: 8px;
 }
 
-/* 信息表格容器 */
 .info-container {
   flex: 1;
+  max-width: 400px;
   padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  /* 为信息区域添加轻微透明背景 */
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 8px;
+  backdrop-filter: blur(5px);
+
+  @media screen and (max-width: 768px) {
+    max-width: 100%;
+  }
 }
 
-/* 信息表格样式 */
 .info-table {
   width: 100%;
   border-collapse: collapse;
-}
 
-.info-table th,
-.info-table td {
-  padding: 10px 15px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
-  color: #333;
-  /* 调整文字颜色以提高对比度 */
-}
+  th,
+  td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ebeef5;
+  }
 
-.info-table th {
-  width: 120px;
-  background-color: rgba(255, 255, 255, 0.3);
-  /* 半透明背景 */
-}
+  th {
+    width: 100px;
+    color: #606266;
+    font-weight: 500;
+  }
 
-/* 关闭按钮样式（可选） */
-.close-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.3s;
-}
-
-.close-button:hover {
-  background: rgba(255, 255, 255, 0.8);
+  td {
+    color: #303133;
+  }
 }
 </style>
