@@ -1,15 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// 导入组件
+// 导入组件  
 import LoginVue from '@/views/Login.vue';
 import LayoutVue from '@/views/Layout.vue';
 import { useTokenStore } from '@/stores/token';
 import { ElNotification } from 'element-plus';
 
-// 定义路由关系
+// 定义路由关系  
 const routes = [
   {
     path: '/login',
     component: LoginVue,
+  },
+  {
+    path: '/404',  // 独立的404路由  
+    component: () => import('@/views/404.vue')
   },
   {
     path: '/',
@@ -19,21 +23,25 @@ const routes = [
       { path: '/user', component: () => import('@/views/User.vue') },
       { path: '/role', component: () => import('@/views/Role.vue') },
       { path: '/menu', component: () => import('@/views/Menu.vue') },
-      { path: '/404', component: () => import('@/views/404.vue') },
       { path: '/Text2Img', component: () => import('@/views/Text2Img.vue') },
       { path: '/Img2Img', component: () => import('@/views/Img2Img.vue') },
       { path: '/Gallery', component: () => import('@/views/Gallery.vue') }
     ]
+  },
+  // 添加通配符路由，匹配所有未定义的路由  
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
   }
 ];
 
-// 创建路由器
+// 创建路由器  
 const router = createRouter({
   history: createWebHistory(),
   routes: routes
 });
 
-// 在路由守卫中
+// 在路由守卫中  
 router.beforeEach((to, from, next) => {
   const tokenStore = useTokenStore();
   console.log('路由守卫检查，Token:', tokenStore.token);
@@ -44,6 +52,5 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
-
 
 export default router;
