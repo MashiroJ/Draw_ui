@@ -56,8 +56,8 @@
                   <th>点赞：</th>
                   <td class="like-container">
                     <span>{{ likeCount }}</span>
-                    <el-button type="danger" :icon="isLiked ? 'StarFilled' : 'Star'" circle size="small"
-                      @click.stop="handleLike" :loading="likeLoading" />
+                    <el-button type="danger" :icon="Star" circle size="small" @click.stop="handleLike"
+                      :loading="likeLoading" />
                   </td>
                 </tr>
                 <tr>
