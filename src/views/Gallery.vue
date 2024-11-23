@@ -250,8 +250,8 @@ onMounted(() => {
 
 .masonry-container {
   column-count: 4;
-  column-gap: 20px;
-  padding: 0 20px;
+  column-gap: 10px;
+  padding: 0 10px;
 
   @media screen and (max-width: 1440px) {
     column-count: 4;
@@ -272,7 +272,7 @@ onMounted(() => {
 
 .masonry-item {
   break-inside: avoid;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   border-radius: 8px;
   overflow: hidden;
   background-color: white;
