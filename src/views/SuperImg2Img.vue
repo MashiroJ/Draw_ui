@@ -97,7 +97,30 @@
                                     <el-option label="uni_pc" :value="28" />
                                 </el-option-group>
                                 <el-option-group label="其他">
-                                    <!-- 根据需要添加其他采样器选项 -->
+                                    <el-option label="euler_ancestral" :value="3" />
+                                    <el-option label="euler_ancestral_cfg_pp" :value="4" />
+                                    <el-option label="heun" :value="5" />
+                                    <el-option label="heunpp2" :value="6" />
+                                    <el-option label="dpm_2" :value="7" />
+                                    <el-option label="dpm_2_ancestral" :value="8" />
+                                    <el-option label="lms" :value="9" />
+                                    <el-option label="dpm_fast" :value="10" />
+                                    <el-option label="dpm_adaptive" :value="11" />
+                                    <el-option label="dpmpp_2s_ancestral" :value="12" />
+                                    <el-option label="dpmpp_2s_ancestral_cfg_pp" :value="13" />
+                                    <el-option label="dpmpp_sde_gpu" :value="15" />
+                                    <el-option label="dpmpp_2m_cfg_pp" :value="17" />
+                                    <el-option label="dpmpp_2m_sde" :value="18" />
+                                    <el-option label="dpmpp_2m_sde_gpu" :value="19" />
+                                    <el-option label="dpmpp_3m_sde" :value="20" />
+                                    <el-option label="dpmpp_3m_sde_gpu" :value="21" />
+                                    <el-option label="ddpm" :value="22" />
+                                    <el-option label="lcm" :value="23" />
+                                    <el-option label="ipndm" :value="24" />
+                                    <el-option label="ipndm_v" :value="25" />
+                                    <el-option label="deis" :value="26" />
+                                    <el-option label="ddim" :value="27" />
+                                    <el-option label="uni_pc_bh2" :value="29" />
                                 </el-option-group>
                             </el-select>
                         </div>
