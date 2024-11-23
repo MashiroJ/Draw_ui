@@ -25,6 +25,8 @@ const routes = [
       { path: '/menu', component: () => import('@/views/Menu.vue') },
       { path: '/Text2Img', component: () => import('@/views/Text2Img.vue') },
       { path: '/Img2Img', component: () => import('@/views/Img2Img.vue') },
+      { path: '/SuperText2Img', component: () => import('@/views/SuperText2Img.vue') },
+      { path: '/SuperImg2Img', component: () => import('@/views/SuperImg2Img.vue') },
       { path: '/Gallery', component: () => import('@/views/Gallery.vue') }
     ]
   },
