@@ -331,231 +331,241 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style scoped>
-.draw-form-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
+<style scoped lang="scss">  
+.draw-form-container {  
+    max-width: 1200px;  
+    margin: 0 auto;  
+    padding: 20px;  
+}  
 
-.header {
-    margin-bottom: 24px;
-}
+.header {  
+    margin-bottom: 24px;  
+}  
 
-.title {
-    font-size: 24px;
-    color: #333;
-    font-weight: 600;
-}
+.title {  
+    font-size: 24px;  
+    color: var(--text-color);  
+    font-weight: 600;  
+}  
 
-.content-wrapper {
-    display: flex;
-    gap: 24px;
-    min-height: 600px;
-}
+.content-wrapper {  
+    display: flex;  
+    gap: 24px;  
+    min-height: 600px;  
+}  
 
-.left-panel {
-    flex: 1;
-    background: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
+.left-panel {  
+    flex: 1;  
+    background: var(--bg-color);  
+    padding: 24px;  
+    border-radius: 8px;  
+    border: 1px solid var(--border-color);  
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);  
+    animation: fadeIn 0.3s ease-in-out;  
+}  
 
-.right-panel {
-    flex: 1;
-    background: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.right-panel {  
+    flex: 1;  
+    background: var(--bg-color);  
+    padding: 24px;  
+    border-radius: 8px;  
+    border: 1px solid var(--border-color);  
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+    animation: fadeIn 0.3s ease-in-out;  
+}  
 
-.form-item {
-    margin-bottom: 20px;
-}
+.form-item {  
+    margin-bottom: 20px;  
+}  
 
-.form-item label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
-}
+.form-item label {  
+    display: block;  
+    margin-bottom: 8px;  
+    font-weight: 500;  
+    color: var(--text-color);  
+}  
 
-.parameters-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-bottom: 20px;
-}
+.parameters-grid {  
+    display: grid;  
+    grid-template-columns: repeat(2, 1fr);  
+    gap: 20px;  
+    margin-bottom: 20px;  
+}  
 
-.form-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 20px;
-}
+.prompt-input {  
+    width: 100%;  
+    padding: 12px;  
+    border: 1px solid var(--border-color);  
+    border-radius: 4px;  
+    font-size: 14px;  
+    line-height: 1.5;  
+    transition: border-color 0.2s;  
+    resize: vertical;  
+    color: var(--text-color);  
+    background-color: var(--bg-color);  
+}  
 
-.switch-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+.prompt-input:focus {  
+    outline: none;  
+    border-color: var(--active-text-color);  
+}  
 
-.prompt-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #dcdfe6;
-    border-radius: 4px;
-    font-size: 14px;
-    line-height: 1.5;
-    transition: border-color 0.2s;
-    resize: vertical;
-}
+.form-actions {  
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    margin-top: 20px;  
+}  
 
-.prompt-input:focus {
-    outline: none;
-    border-color: #409eff;
-}
+.switch-item {  
+    display: flex;  
+    align-items: center;  
+    gap: 12px;  
+}  
 
-.submit-btn {
-    background-color: #409eff;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.2s;
-}
+.submit-btn {  
+    background-color: var(--button-bg-color);  
+    color: var(--button-text-color);  
+    border: none;  
+    padding: 12px 24px;  
+    border-radius: 4px;  
+    cursor: pointer;  
+    font-size: 16px;  
+    transition: background-color 0.2s, color 0.2s;  
+    margin-left: 20px;  
+}  
 
-.submit-btn:hover:not(:disabled) {
-    background-color: #66b1ff;
-}
+.submit-btn:hover:not(:disabled) {  
+    background-color: var(--button-hover-bg-color);  
+}  
 
-.submit-btn:disabled {
-    background-color: #a0cfff;
-    cursor: not-allowed;
-}
+.submit-btn:disabled {  
+    background-color: var(--button-disabled-bg-color);  
+    cursor: not-allowed;  
+}  
 
-.image-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/* 上传区域样式 */  
+.upload-area {  
+    width: 100%;  
+    height: 200px;  
+    border: 2px dashed var(--border-color);  
+    border-radius: 8px;  
+    cursor: pointer;  
+    transition: border-color 0.3s;  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+    position: relative;  
+    background: var(--bg-color);  
+}  
 
-.result-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 4px;
-}
+.upload-area:hover {  
+    border-color: var(--active-text-color);  
+}  
 
-.empty-state {
-    color: #909399;
-    font-size: 14px;
-}
+.upload-placeholder {  
+    text-align: center;  
+    color: var(--text-color);  
+}  
 
-/* 上传区域样式 */
-.upload-area {
-    width: 100%;
-    height: 200px;
-    border: 2px dashed #dcdfe6;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: border-color 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    background: #f5f7fa;
-}
+.upload-icon {  
+    font-size: 48px;  
+    margin-bottom: 10px;  
+    color: var(--text-color);  
+}  
 
-.upload-area:hover {
-    border-color: #409eff;
-}
+.upload-text {  
+    font-size: 14px;  
+    margin-bottom: 4px;  
+}  
 
-.upload-placeholder {
-    text-align: center;
-    color: #909399;
-}
+.upload-hint {  
+    font-size: 12px;  
+    color: var(--footer-color);  
+}  
 
-.upload-icon {
-    font-size: 48px;
-    margin-bottom: 10px;
-    color: #909399;
-}
+.preview-container {  
+    width: 100%;  
+    height: 100%;  
+    position: relative;  
+}  
 
-.upload-text {
-    font-size: 14px;
-    margin-bottom: 4px;
-}
+.preview-image {  
+    width: 100%;  
+    height: 100%;  
+    object-fit: contain;  
+    border-radius: 8px;  
+}  
 
-.upload-hint {
-    font-size: 12px;
-    color: #c0c4cc;
-}
+.preview-overlay {  
+    position: absolute;  
+    top: 0;  
+    left: 0;  
+    right: 0;  
+    bottom: 0;  
+    background: rgba(0, 0, 0, 0.5);  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+    opacity: 0;  
+    transition: opacity 0.3s;  
+    border-radius: 8px;  
+}  
 
-.preview-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
+.preview-container:hover .preview-overlay {  
+    opacity: 1;  
+}  
 
-.preview-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 8px;
-}
+/* Element Plus 组件样式适配 */  
+:deep(.el-select),  
+:deep(.el-input-number),  
+:deep(.el-slider) {  
+    width: 100%;  
+    color: var(--text-color);  
+    background-color: var(--bg-color);  
+    border-color: var(--border-color);  
+}  
 
-.preview-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s;
-    border-radius: 8px;
-}
+:deep(.el-select .el-input__inner),  
+:deep(.el-input-number .el-input__inner),  
+:deep(.el-slider .el-slider__input) {  
+    color: var(--text-color);  
+    background-color: var(--bg-color);  
+    border-color: var(--border-color);  
+}  
 
-.preview-container:hover .preview-overlay {
-    opacity: 1;
-}
+:deep(.el-select .el-input__inner:focus),  
+:deep(.el-input-number .el-input__inner:focus),  
+:deep(.el-slider .el-slider__input:focus) {  
+    border-color: var(--active-text-color);  
+    outline: none;  
+}  
 
-/* 深度选择器调整 */
-:deep(.el-select) {
-    width: 100%;
-}
+:deep(.el-slider__bar) {  
+    background-color: var(--active-text-color);  
+}  
 
-:deep(.el-input-number) {
-    width: 100%;
-}
+:deep(.el-slider__button) {  
+    background-color: var(--active-text-color);  
+    border-color: var(--active-text-color);  
+}  
 
-/* 添加过渡动画 */
-.left-panel,
-.right-panel {
-    animation: fadeIn 0.3s ease-in-out;
-}
+:deep(.el-slider__button:hover) {  
+    background-color: var(--button-hover-bg-color);  
+    border-color: var(--button-hover-bg-color);  
+}  
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+@keyframes fadeIn {  
+    from {  
+        opacity: 0;  
+        transform: translateY(10px);  
+    }  
+    to {  
+        opacity: 1;  
+        transform: translateY(0);  
+    }  
+}  
 </style>
