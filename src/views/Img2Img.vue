@@ -207,7 +207,7 @@ const handleSubmit = async () => {
 .content-wrapper {
     display: flex;
     gap: 24px;
-    min-height: 600px;
+    min-height: 500px;
 }
 
 .left-panel,

@@ -1,9 +1,14 @@
-<!-- src/components/DrawForm.vue -->
 <template>
     <div class="draw-form-container">
-        <div class="header">
-            <h2 class="title">文生图</h2>
-        </div>
+        <!-- 文生图标题卡片 -->
+        <el-card class="info-card welcome-card" style="margin-bottom: 20px;">
+            <div class="info-card-content welcome-content">
+                <div class="info-text welcome-text">
+                    <h2 class="welcome-title">文生图</h2>
+                    <p class="welcome-subtitle">让文字充满想象</p>
+                </div>
+            </div>
+        </el-card>
 
         <div class="content-wrapper">
             <!-- 左侧表单区域 -->
@@ -11,25 +16,15 @@
                 <form @submit.prevent="handleSubmit">
                     <div class="form-item">
                         <label for="prompt">提示词</label>
-                        <textarea
-                            id="prompt"
-                            v-model="formData.prompt"
-                            rows="13"
-                            class="prompt-input"
-                            placeholder="请输入提示词..."
-                        ></textarea>
+                        <textarea id="prompt" v-model="formData.prompt" rows="13" class="prompt-input"
+                            placeholder="请输入提示词..."></textarea>
                     </div>
 
                     <!-- 底部操作区域：包含开关和按钮 -->
                     <div class="form-actions">
                         <div class="switch-item">
-                            <el-switch
-                                v-model="formData.isPublic"
-                                :active-value="1"
-                                :inactive-value="0"
-                                active-text="公开"
-                                inactive-text="私有"
-                            />
+                            <el-switch v-model="formData.isPublic" :active-value="1" :inactive-value="0"
+                                active-text="公开" inactive-text="私有" />
                         </div>
                         <button type="submit" class="submit-btn" :disabled="loading">
                             {{ loading ? '生成中...' : '生成图像' }}
@@ -43,53 +38,51 @@
                 <div v-if="generatedImageUrl" class="image-container">
                     <img :src="generatedImageUrl" alt="生成的图片" class="result-image" />
                 </div>
-                <div v-else class="empty-state">
-                    等待生成图片...
-                </div>
+                <div v-else class="empty-state">等待生成图片...</div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { text2img } from '@/api/draw'
-import { ElMessage } from 'element-plus'
+import { ref, reactive } from 'vue';
+import { text2img } from '@/api/draw';
+import { ElMessage } from 'element-plus';
 
 // 主题存储（虽然不直接使用，但确保样式依赖CSS变量）
-import { useThemeStore } from '@/stores/theme'
-const themeStore = useThemeStore()
+import { useThemeStore } from '@/stores/theme';
+const themeStore = useThemeStore();
 
-const loading = ref(false)
-const generatedImageUrl = ref('')
+const loading = ref(false);
+const generatedImageUrl = ref('');
 const formData = reactive({
     prompt: '',
-    isPublic: 1  // 默认为公开  
-})
+    isPublic: 1, // 默认为公开
+});
 
 const handleSubmit = async () => {
     if (!formData.prompt.trim()) {
-        ElMessage.warning('请输入提示词')
-        return
+        ElMessage.warning('请输入提示词');
+        return;
     }
 
-    loading.value = true
+    loading.value = true;
     try {
-        const res = await text2img(formData)
+        const res = await text2img(formData);
         if (res.code === 200) {
-            ElMessage.success('图像生成成功')
-            generatedImageUrl.value = res.data
-            formData.prompt = ''
+            ElMessage.success('图像生成成功');
+            generatedImageUrl.value = res.data;
+            formData.prompt = '';
         } else {
-            ElMessage.error(res.message || '生成失败，请重试')
+            ElMessage.error(res.message || '生成失败，请重试');
         }
     } catch (error) {
-        console.error('Error:', error)
-        ElMessage.error('服务出错，请稍后重试')
+        console.error('Error:', error);
+        ElMessage.error('服务出错，请稍后重试');
     } finally {
-        loading.value = false
+        loading.value = false;
     }
-}
+};
 </script>
 
 <style scoped lang="scss">
@@ -99,43 +92,35 @@ const handleSubmit = async () => {
     padding: 20px;
 }
 
-.header {
-    margin-bottom: 24px;
-}
-
-.title {
-    font-size: 24px;
-    color: var(--text-color); /* 使用CSS变量 */
-    font-weight: 600;
-}
-
 .content-wrapper {
     display: flex;
     gap: 24px;
-    min-height: 600px;
+    min-height: 500px;
 }
 
 .left-panel {
     flex: 1;
-    background: var(--bg-color); /* 使用CSS变量 */
+    background: var(--bg-color);
+    /* 使用CSS变量 */
     padding: 24px;
     border-radius: 8px;
-    border: 1px solid var(--border-color); /* 使用CSS变量 */
+    border: 1px solid var(--border-color);
+    /* 使用CSS变量 */
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.3s ease-in-out;
 }
 
 .right-panel {
     flex: 1;
-    background: var(--bg-color); /* 使用CSS变量 */
+    background: var(--bg-color);
+    /* 使用CSS变量 */
     padding: 24px;
     border-radius: 8px;
-    border: 1px solid var(--border-color); /* 使用CSS变量 */
+    border: 1px solid var(--border-color);
+    /* 使用CSS变量 */
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: fadeIn 0.3s ease-in-out;
 }
 
 .form-item {
@@ -146,25 +131,28 @@ const handleSubmit = async () => {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: var(--text-color); /* 使用CSS变量 */
+    color: var(--text-color);
+    /* 使用CSS变量 */
 }
 
 .prompt-input {
     width: 100%;
     padding: 12px;
-    border: 1px solid var(--border-color); /* 使用CSS变量 */
+    border: 1px solid var(--border-color);
+    /* 使用CSS变量 */
     border-radius: 4px;
     font-size: 14px;
     line-height: 1.5;
-    transition: border-color 0.2s;
-    resize: vertical;
-    color: var(--text-color); /* 使用CSS变量 */
-    background-color: var(--bg-color); /* 使用CSS变量 */
+    color: var(--text-color);
+    /* 使用CSS变量 */
+    background-color: var(--bg-color);
+    /* 使用CSS变量 */
 }
 
 .prompt-input:focus {
     outline: none;
-    border-color: var(--active-text-color); /* 使用CSS变量 */
+    border-color: var(--active-text-color);
+    /* 使用CSS变量 */
 }
 
 .form-actions {
@@ -174,30 +162,27 @@ const handleSubmit = async () => {
     margin-top: 20px;
 }
 
-.switch-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
 .submit-btn {
-    background-color: var(--button-bg-color); /* 使用CSS变量 */
-    color: var(--button-text-color); /* 使用CSS变量 */
+    background-color: var(--button-bg-color);
+    /* 使用CSS变量 */
+    color: var(--button-text-color);
+    /* 使用CSS变量 */
     border: none;
     padding: 12px 24px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.2s, color 0.2s;
-    margin-left: 20px;
 }
 
 .submit-btn:hover:not(:disabled) {
-    background-color: var(--button-hover-bg-color); /* 使用CSS变量 */
+    background-color: var(--button-hover-bg-color);
+    /* 使用CSS变量 */
 }
 
 .submit-btn:disabled {
-    background-color: var(--button-disabled-bg-color); /* 使用CSS变量 */
+    background-color: var(--button-disabled-bg-color);
+    /* 使用CSS变量 */
     cursor: not-allowed;
 }
 
@@ -217,25 +202,42 @@ const handleSubmit = async () => {
 }
 
 .empty-state {
-    color: var(--footer-color); /* 使用CSS变量 */
+    color: var(--footer-color);
+    /* 使用CSS变量 */
     font-size: 14px;
 }
 
-/* 添加过渡动画 */
-.left-panel,
-.right-panel {
-    animation: fadeIn 0.3s ease-in-out;
+.info-card {
+    width: 100%;
+    background-color: var(--bg-color);
+    /* 使用CSS变量 */
+    border: 1px solid var(--border-color);
+    /* 使用CSS变量 */
+    border-radius: 8px;
+    padding: 10px;
+    height: 100px;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
+.info-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 3px;
+}
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.welcome-title {
+    font-size: 16px;  
+    font-weight: bold;  
+    color: var(--text-color);  
+    margin: 0;  
+    margin-bottom: 3px;  
+}
+
+.welcome-subtitle {
+    font-size: 12px;  
+    color: var(--text-color);  
+    opacity: 0.8;  
+    margin: 0;  
 }
 </style>
