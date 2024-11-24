@@ -1,14 +1,12 @@
 <template>
-  <el-container class="layout-container">
+  <el-container :class="['layout-container', isDarkTheme ? 'dark' : 'light']">
     <!-- 左侧菜单 -->
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
-      <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router>
-        <el-menu-item 
-          v-for="menu in menuList" 
-          :key="menu.id" 
-          :index="menu.path"
-        >
+      <el-menu :active-text-color="isDarkTheme ? '#ffd04b' : '#409EFF'"
+        :background-color="isDarkTheme ? '#232323' : '#ffffff'" :text-color="isDarkTheme ? '#ffffff' : '#303133'"
+        router>
+        <el-menu-item v-for="menu in menuList" :key="menu.id" :index="menu.path">
           <el-icon>
             <component :is="getMenuIcon(menu.icon)" />
           </el-icon>
@@ -16,34 +14,38 @@
         </el-menu-item>
       </el-menu>
     </el-aside>
-    
+
     <!-- 右侧主区域 -->
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div>您好：<strong>{{ userInfoStore.userInfo.username }}</strong></div>
-        <el-dropdown placement="bottom-end" @command="handleCommand">
-          <span class="el-dropdown__box">
-            <el-avatar :src="imgUrl" />
-            <el-icon>
-              <CaretBottom />
-            </el-icon>
-          </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </el-header>
-      
-      <!-- 中间区域 -->
-      <el-main style="flex-grow: 1; padding: 0;">
-        <div style="width: 100%; height: 100%;">
-          <router-view></router-view>
+        <div class="header-left">
+          <span>您好：<strong>{{ userInfoStore.userInfo.username }}</strong></span>
         </div>
+        <div class="header-right">
+          <!-- 主题切换按钮 -->
+          <el-button class="theme-toggle" :icon="isDarkTheme ? Sunny : Moon" circle @click="toggleTheme" />
+          <el-dropdown placement="bottom-end" @command="handleCommand">
+            <span class="el-dropdown__box">
+              <el-avatar :src="imgUrl" />
+              <el-icon>
+                <CaretBottom />
+              </el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+      </el-header>
+
+      <!-- 中间区域 -->
+      <el-main>
+        <router-view></router-view>
       </el-main>
-      
+
       <!-- 底部区域 -->
       <el-footer>绘画梦工厂 ©2024 Created by Mashiro</el-footer>
     </el-container>
@@ -59,9 +61,11 @@ import {
   Crop,
   EditPen,
   SwitchButton,
-  CaretBottom
+  CaretBottom,
+  Moon,
+  Sunny
 } from '@element-plus/icons-vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import avatar from '@/assets/default.png'
 import { userLogoutService } from '@/api/login'
 import { useTokenStore } from '@/stores/token'
@@ -75,6 +79,28 @@ import { getUserMenus } from '@/api/user'
 const router = useRouter()
 const tokenStore = useTokenStore()
 const userInfoStore = useUserInfoStore()
+
+// 主题状态
+const isDarkTheme = ref(false)
+
+// 初始化主题
+onMounted(() => {
+  const savedTheme = localStorage.getItem('theme')
+  isDarkTheme.value = savedTheme === 'dark'
+  document.documentElement.setAttribute('data-theme', isDarkTheme.value ? 'dark' : 'light')
+})
+
+// 切换主题
+const toggleTheme = () => {
+  isDarkTheme.value = !isDarkTheme.value
+  localStorage.setItem('theme', isDarkTheme.value ? 'dark' : 'light')
+  document.documentElement.setAttribute('data-theme', isDarkTheme.value ? 'dark' : 'light')
+}
+
+// 监听主题变化
+watch(isDarkTheme, (newVal) => {
+  document.documentElement.setAttribute('data-theme', newVal ? 'dark' : 'light')
+})
 
 // 头像处理
 const imgUrl = ref('')
@@ -98,19 +124,15 @@ const menuList = ref([])
 // 获取动态菜单
 const fetchDynamicMenus = async () => {
   try {
-    // 获取所有菜单
     const allMenusResponse = await useMenuListService()
     const allMenus = allMenusResponse.data || []
-
-    // 获取用户可访问的菜单ID
     const userMenusResponse = await getUserMenus(userInfoStore.userInfo.id)
     const allowedMenuIds = userMenusResponse.data.roleMenuIds || []
 
-    // 过滤并排序菜单
     menuList.value = allMenus
-      .filter(menu => 
-        allowedMenuIds.includes(menu.id) && 
-        menu.status === 1 && 
+      .filter(menu =>
+        allowedMenuIds.includes(menu.id) &&
+        menu.status === 1 &&
         menu.isVisible === 1
       )
       .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -129,12 +151,9 @@ const getMenuIcon = (iconName) => {
 const handleCommand = async (command) => {
   if (command === 'logout') {
     try {
-      // 调用注销服务
       await userLogoutService()
-      // 清除本地存储的令牌和用户信息
       tokenStore.removeToken()
       userInfoStore.removeUserInfo()
-      // 跳转到登录页面
       router.push('/login')
     } catch (error) {
       ElMessage.error('注销失败，请稍后重试')
@@ -146,13 +165,38 @@ const handleCommand = async (command) => {
 onMounted(fetchDynamicMenus)
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+:root {
+  // 亮色主题变量
+  --bg-color: #ffffff;
+  --text-color: #303133;
+  --border-color: #e4e7ed;
+  --header-bg: #ffffff;
+  --aside-bg: #ffffff;
+  --menu-hover: #ecf5ff;
+  --footer-color: #666666;
+}
+
+[data-theme='dark'] {
+  // 暗色主题变量
+  --bg-color: #1a1a1a;
+  --text-color: #ffffff;
+  --border-color: #363636;
+  --header-bg: #232323;
+  --aside-bg: #232323;
+  --menu-hover: #363636;
+  --footer-color: #999999;
+}
+
 .layout-container {
   display: flex;
   height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 
   .el-aside {
-    background-color: #232323;
+    background-color: var(--aside-bg);
+    border-right: 1px solid var(--border-color);
 
     &__logo {
       height: 120px;
@@ -161,6 +205,10 @@ onMounted(fetchDynamicMenus)
 
     .el-menu {
       border-right: none;
+
+      .el-menu-item:hover {
+        background-color: var(--menu-hover);
+      }
     }
   }
 
@@ -171,25 +219,47 @@ onMounted(fetchDynamicMenus)
   }
 
   .el-header {
-    background-color: #fff;
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 20px;
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .theme-toggle {
+      padding: 8px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-color);
+
+      &:hover {
+        background-color: var(--menu-hover);
+      }
+    }
 
     .el-dropdown__box {
       display: flex;
       align-items: center;
+      cursor: pointer;
 
       .el-icon {
-        color: #999;
+        color: var(--text-color);
         margin-left: 10px;
       }
-
-      &:active,
-      &:focus {
-        outline: none;
-      }
     }
+  }
+
+  .el-main {
+    background-color: var(--bg-color);
+    flex-grow: 1;
+    padding: 20px;
   }
 
   .el-footer {
@@ -197,7 +267,25 @@ onMounted(fetchDynamicMenus)
     align-items: center;
     justify-content: center;
     font-size: 14px;
-    color: #666;
+    color: var(--footer-color);
+    border-top: 1px solid var(--border-color);
+    padding: 20px 0;
+  }
+}
+
+// 暗色主题下的下拉菜单样式
+.dark {
+  .el-dropdown-menu {
+    background-color: var(--aside-bg);
+    border-color: var(--border-color);
+
+    .el-dropdown-menu__item {
+      color: var(--text-color);
+
+      &:hover {
+        background-color: var(--menu-hover);
+      }
+    }
   }
 }
 </style>
