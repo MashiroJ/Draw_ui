@@ -1,9 +1,40 @@
+/* main.scss */
+
+/* 重置样式 */
 body {
   margin: 0;
-  background-color: #f5f5f5;
+  background-color: var(--bg-color);
+  /* 使用CSS变量 */
+  color: var(--text-color);
+  /* 使用CSS变量 */
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* 可选：设置全局字体 */
 }
 
-/* fade-slide */
+/* 主题变量定义 */
+:root {
+  /* 亮色主题变量 */
+  --bg-color: #ffffff;
+  --text-color: #303133;
+  --border-color: #e4e7ed;
+  --menu-hover: #ecf5ff;
+  --header-bg: #ffffff;
+  --aside-bg: #ffffff;
+  --footer-color: #666666;
+}
+
+[data-theme='dark'] {
+  /* 暗色主题变量 */
+  --bg-color: #1a1a1a;
+  --text-color: #ffffff;
+  --border-color: #363636;
+  --menu-hover: #2a2a2a;
+  --header-bg: #232323;
+  --aside-bg: #232323;
+  --footer-color: #999999;
+}
+
+/* fade-slide 动画 */
 .fade-slide-leave-active,
 .fade-slide-enter-active {
   transition: all 0.3s;
@@ -17,4 +48,69 @@ body {
 .fade-slide-leave-to {
   transform: translateX(30px);
   opacity: 0;
+}
+
+/* 覆盖 Element Plus 的 el-pagination 样式 */
+.el-pagination {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+}
+
+.el-pagination__total,
+.el-pagination__sizes,
+.el-pagination__jump,
+.el-pagination__rightwrapper {
+  color: var(--text-color);
+}
+
+.el-pagination__button {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.el-pagination__button:hover {
+  background-color: var(--menu-hover);
+  color: var(--text-color);
+}
+
+.el-pagination__button.is-active {
+  background-color: var(--header-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.el-button {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.el-button--primary {
+  background-color: var(--header-bg);
+  border-color: var(--header-bg);
+  color: var(--text-color);
+}
+
+.el-button--primary:hover {
+  background-color: var(--menu-hover);
+  border-color: var(--menu-hover);
+  color: var(--text-color);
+}
+
+.el-descriptions {
+  --el-descriptions-item-bordered-label-background: var(--header-bg);
+  background-color: var(--bg-color);
+}
+
+.el-descriptions__title {
+  color: var(--text-color);
+}
+
+.el-descriptions__label {
+  color: var(--text-color);
+}
+
+.el-descriptions__content {
+  color: var(--text-color);
 }
