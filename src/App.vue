@@ -24,10 +24,6 @@ onMounted(() => {
 <template>
   <div id="app">
     <router-view />
-    <!-- 可选：在 App.vue 中添加全局主题切换按钮 -->
-    <button @click="toggleTheme" class="theme-toggle">
-      切换主题
-    </button>
   </div>
 </template>
 

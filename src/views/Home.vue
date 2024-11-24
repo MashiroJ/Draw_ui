@@ -1,6 +1,18 @@
 <!-- src/components/Profile.vue -->
 <template>
   <div class="app-container">
+    <!-- 欢迎卡片 -->
+    <el-card class="welcome-card" style="margin-bottom: 20px;">
+      <div class="welcome-content">
+        <div class="welcome-avatar">
+          <img :src="user.avatar || defaultAvatar" alt="用户头像" class="welcome-avatar-image">
+        </div>
+        <div class="welcome-text">
+          <h2 class="welcome-title">Hello {{ user.userName }}!</h2>
+          <p class="welcome-subtitle">欢迎使用绘画梦工厂</p>
+        </div>
+      </div>
+    </el-card>
     <el-row :gutter="20">
       <!-- 左侧个人信息 -->
       <el-col :span="8" :xs="24">
@@ -426,6 +438,7 @@ onMounted(() => {
     /* 使用CSS变量 */
     border: 1px solid var(--border-color);
     /* 使用CSS变量 */
+    height: 250px;
 
     /* 覆盖 Element Plus 的 el-card 内部样式 */
     :deep(.el-card__header) {
@@ -453,8 +466,8 @@ onMounted(() => {
     align-items: center;
 
     .avatar {
-      width: 150px;
-      height: 150px;
+      width: 125px;
+      height: 125px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid var(--border-color);
@@ -507,7 +520,7 @@ onMounted(() => {
 }
 
 .profile-card {
-  min-height: 625px;
+  min-height: 521px;
   background-color: var(--bg-color);
   /* 使用CSS变量 */
   color: var(--text-color);
@@ -537,6 +550,7 @@ onMounted(() => {
   /* 使用CSS变量 */
   color: var(--text-color);
   /* 使用CSS变量 */
+  height: 150px;
 
   .el-form-item {
     margin-bottom: 20px;
@@ -625,6 +639,7 @@ onMounted(() => {
   /* 使用CSS变量 */
   border: 1px solid var(--border-color);
   /* 使用CSS变量 */
+  height: 250px; // 设置固定高度，与个人信息卡片一致  
 
   .tech-content {
     .tech-section {
@@ -676,14 +691,14 @@ onMounted(() => {
   color: var(--text-color);
 }
 
-/* 覆盖 Element Plus 的 el-statistic 样式 */
+
 :deep(.el-statistic__content),
 :deep(.el-statistic__value),
 :deep(.el-statistic__title) {
   color: var(--text-color);
 }
 
-/* 覆盖 Element Plus 的 el-upload 样式 */
+
 :deep(.el-upload) {
   background-color: var(--bg-color);
   border: 1px dashed var(--border-color);
@@ -691,5 +706,61 @@ onMounted(() => {
 
 :deep(.el-upload__input) {
   color: var(--text-color);
+}
+
+.welcome-card {  
+  width: 100%;  
+  background-color: var(--bg-color);  
+  border: 1px solid var(--border-color);  
+  
+  :deep(.el-card__body) {  
+    padding: 10px;  
+  }  
+}  
+
+.welcome-content {  
+  display: flex;  
+  align-items: center;  
+  gap: 20px;  
+  padding: 3px;  
+}  
+
+.welcome-avatar {  
+  .welcome-avatar-image {  
+    width: 50px;  
+    height: 50px;  
+    border-radius: 50%;  
+    object-fit: cover;  
+    border: 2px solid var(--border-color);  
+  }  
+}  
+
+.welcome-text {  
+  .welcome-title {  
+    font-size: 16px;  
+    font-weight: bold;  
+    color: var(--text-color);  
+    margin: 0;  
+    margin-bottom: 3px;  
+  }  
+  
+  .welcome-subtitle {  
+    font-size: 12px;  
+    color: var(--text-color);  
+    opacity: 0.8;  
+    margin: 0;  
+  }  
+}  
+
+/* 响应式布局 */  
+@media (max-width: 768px) {  
+  .welcome-content {  
+    flex-direction: column;  
+    text-align: center;  
+  }  
+  
+  .welcome-text {  
+    margin-top: 5px;  
+  }  
 }
 </style>
