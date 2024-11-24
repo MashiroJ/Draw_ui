@@ -1,3 +1,4 @@
+<!-- src/components/Profile.vue -->
 <template>
   <div class="app-container">
     <el-row :gutter="20">
@@ -89,7 +90,6 @@
 
         <!-- 积分和技术选型模块 -->
         <el-row :gutter="20">
-
           <!-- 技术选型模块卡片 -->
           <el-col :span="12" :xs="24">
             <el-card class="box-card tech-selection-card">
@@ -156,8 +156,6 @@
               </div>
             </el-card>
           </el-col>
-
-          
         </el-row>
       </el-col>
     </el-row>
@@ -174,10 +172,14 @@ import { useUserInfoStore } from '@/stores/userinfo';
 import { getUserRoles, updateAvatar, updateUser, updatePassword } from '@/api/user';
 import { signIn as signInApi, getPoints } from '@/api/points';
 import { useRouter } from 'vue-router';
+import { useThemeStore } from '@/stores/theme';
 
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
 const router = useRouter();
+
+// 主题存储
+const themeStore = useThemeStore();
 
 const user = reactive({});
 const roleGroup = ref('');
@@ -409,7 +411,7 @@ const close = () => {
 onMounted(() => {
   getUser();
   fetchPoints(); // 获取当前积分  
-});  
+});
 </script>
 
 <style scoped lang="scss">
@@ -418,6 +420,24 @@ onMounted(() => {
 
   .box-card {
     margin-bottom: 20px;
+    background-color: var(--bg-color);
+    /* 使用CSS变量 */
+    color: var(--text-color);
+    /* 使用CSS变量 */
+    border: 1px solid var(--border-color);
+    /* 使用CSS变量 */
+
+    /* 覆盖 Element Plus 的 el-card 内部样式 */
+    :deep(.el-card__header) {
+      background-color: var(--header-bg);
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-color);
+    }
+
+    :deep(.el-card__body) {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
   }
 }
 
@@ -437,7 +457,8 @@ onMounted(() => {
       height: 150px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #ebebeb;
+      border: 2px solid var(--border-color);
+      /* 使用CSS变量 */
       cursor: pointer;
       margin-bottom: 10px; // 添加图片与按钮组之间的间距  
     }
@@ -457,11 +478,42 @@ onMounted(() => {
         width: 100%;
       }
     }
+
+    /* 覆盖 Element Plus 的 el-button 样式 */
+    .el-button {
+      background-color: var(--header-bg);
+      color: var(--text-color);
+      border-color: var(--border-color);
+    }
+
+    .el-button--primary:hover {
+      background-color: var(--menu-hover);
+      border-color: var(--menu-hover);
+      color: var(--text-color);
+    }
+
+    .el-button--success {
+      background-color: var(--header-bg);
+      color: var(--text-color);
+      border-color: var(--border-color);
+    }
+
+    .el-button--success:hover {
+      background-color: var(--menu-hover);
+      border-color: var(--menu-hover);
+      color: var(--text-color);
+    }
   }
 }
 
 .profile-card {
   min-height: 625px;
+  background-color: var(--bg-color);
+  /* 使用CSS变量 */
+  color: var(--text-color);
+  /* 使用CSS变量 */
+  border: 1px solid var(--border-color);
+  /* 使用CSS变量 */
 }
 
 .profile-descriptions {
@@ -469,25 +521,76 @@ onMounted(() => {
 
   .el-descriptions__label {
     width: 100px;
+    color: var(--text-color);
+    /* 使用CSS变量 */
+  }
+
+  .el-descriptions__content {
+    color: var(--text-color);
+    /* 使用CSS变量 */
   }
 }
 
 .profile-form {
   max-width: 500px;
+  background-color: var(--bg-color);
+  /* 使用CSS变量 */
+  color: var(--text-color);
+  /* 使用CSS变量 */
 
   .el-form-item {
     margin-bottom: 20px;
+  }
+
+  /* 覆盖 Element Plus 的 el-form-item label 和 content 颜色 */
+  :deep(.el-form-item__label) {
+    color: var(--text-color);
+    /* 使用CSS变量 */
+  }
+
+  :deep(.el-form-item__content) {
+    color: var(--text-color);
+    /* 使用CSS变量 */
   }
 }
 
 .form-buttons {
   text-align: right;
+
+  /* 覆盖 Element Plus 的 el-button 样式 */
+  .el-button {
+    background-color: var(--header-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+
+  .el-button--primary:hover {
+    background-color: var(--menu-hover);
+    border-color: var(--menu-hover);
+    color: var(--text-color);
+  }
 }
 
-/* 积分模块样式 */
 .points-card {
+  background-color: var(--bg-color);
+  /* 使用CSS变量 */
+  color: var(--text-color);
+  /* 使用CSS变量 */
+  border: 1px solid var(--border-color);
+  /* 使用CSS变量 */
+
   .el-statistic {
     margin-bottom: 80px;
+    color: var(--text-color);
+    /* 使用CSS变量 */
+
+    /* 覆盖 Element Plus 的 el-statistic 内部样式 */
+    :deep(.el-statistic__content),
+    :deep(.el-statistic__value),
+    :deep(.el-statistic__title) {
+      color: var(--text-color);
+      /* 使用CSS变量 */
+    }
   }
 
   .sign-in-section {
@@ -499,16 +602,37 @@ onMounted(() => {
   .text-center {
     text-align: center;
   }
+
+  /* 覆盖 Element Plus 的 el-button 样式 */
+  .el-button {
+    background-color: var(--header-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+
+  .el-button--primary:hover {
+    background-color: var(--menu-hover);
+    border-color: var(--menu-hover);
+    color: var(--text-color);
+  }
 }
 
 /* 技术选型模块样式 */
 .tech-selection-card {
+  background-color: var(--bg-color);
+  /* 使用CSS变量 */
+  color: var(--text-color);
+  /* 使用CSS变量 */
+  border: 1px solid var(--border-color);
+  /* 使用CSS变量 */
+
   .tech-content {
     .tech-section {
       h3 {
         margin-top: 10px;
         margin-bottom: 10px;
-        color: #409EFF;
+        color: var(--text-color);
+        /* 使用CSS变量 */
       }
 
       ul {
@@ -517,6 +641,8 @@ onMounted(() => {
 
         li {
           margin-bottom: 5px;
+          color: var(--text-color);
+          /* 使用CSS变量 */
         }
       }
     }
@@ -529,5 +655,41 @@ onMounted(() => {
   .tech-selection-card {
     margin-bottom: 20px;
   }
+}
+
+/* 覆盖 Element Plus 的 el-tabs 样式 */
+:deep(.el-tabs__header) {
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+:deep(.el-tabs__item) {
+  color: var(--text-color);
+}
+
+:deep(.el-tabs__item.is-active) {
+  color: var(--header-bg);
+}
+
+:deep(.el-tabs__content) {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* 覆盖 Element Plus 的 el-statistic 样式 */
+:deep(.el-statistic__content),
+:deep(.el-statistic__value),
+:deep(.el-statistic__title) {
+  color: var(--text-color);
+}
+
+/* 覆盖 Element Plus 的 el-upload 样式 */
+:deep(.el-upload) {
+  background-color: var(--bg-color);
+  border: 1px dashed var(--border-color);
+}
+
+:deep(.el-upload__input) {
+  color: var(--text-color);
 }
 </style>

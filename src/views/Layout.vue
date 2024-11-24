@@ -1,12 +1,13 @@
+<!-- src/components/Layout.vue -->
 <template>
   <el-container class="layout-container">
     <!-- 左侧菜单 -->
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
       <el-menu
-        :active-text-color="isDarkTheme ? '#ffd04b' : '#409EFF'"
-        :background-color="isDarkTheme ? 'var(--aside-bg)' : 'var(--bg-color)'"
-        :text-color="isDarkTheme ? 'var(--text-color)' : 'var(--text-color)'"
+        :active-text-color="activeTextColor"
+        :background-color="asideBgColor"
+        :text-color="textColor"
         router
       >
         <el-menu-item v-for="menu in menuList" :key="menu.id" :index="menu.path">
@@ -27,7 +28,7 @@
         </div>
         <div class="header-right">
           <!-- 主题切换按钮 -->
-          <el-button class="theme-toggle" :icon="isDarkTheme ? Sunny : Moon" circle @click="toggleTheme" />
+          <el-button class="theme-toggle" :icon="currentThemeIcon" circle @click="toggleTheme" />
           <el-dropdown placement="bottom-end" @command="handleCommand">
             <span class="el-dropdown__box">
               <el-avatar :src="imgUrl" />
@@ -68,7 +69,7 @@ import {
   Moon,
   Sunny
 } from '@element-plus/icons-vue';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import avatar from '@/assets/default.png';
 import { userLogoutService } from '@/api/login';
 import { useTokenStore } from '@/stores/token';
@@ -77,33 +78,15 @@ import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useMenuListService } from '@/api/menu';
 import { getUserMenus } from '@/api/user';
+import { useThemeStore } from '@/stores/theme';
 
 // 路由和状态管理
 const router = useRouter();
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
 
-// 主题状态
-const isDarkTheme = ref(false);
-
-// 初始化主题
-onMounted(() => {
-  const savedTheme = localStorage.getItem('theme');
-  isDarkTheme.value = savedTheme === 'dark';
-  document.documentElement.setAttribute('data-theme', isDarkTheme.value ? 'dark' : 'light');
-});
-
-// 切换主题
-const toggleTheme = () => {
-  isDarkTheme.value = !isDarkTheme.value;
-  localStorage.setItem('theme', isDarkTheme.value ? 'dark' : 'light');
-  document.documentElement.setAttribute('data-theme', isDarkTheme.value ? 'dark' : 'light');
-};
-
-// 监听主题变化（可选，确保样式同步）
-watch(isDarkTheme, (newVal) => {
-  document.documentElement.setAttribute('data-theme', newVal ? 'dark' : 'light');
-});
+// 主题存储
+const themeStore = useThemeStore();
 
 // 头像处理
 const imgUrl = ref('');
@@ -166,6 +149,30 @@ const handleCommand = async (command) => {
 
 // 组件挂载时获取菜单
 onMounted(fetchDynamicMenus);
+
+// 主题切换逻辑
+const toggleTheme = () => {
+  themeStore.toggleTheme();
+};
+
+// 根据当前主题动态设置图标
+const currentThemeIcon = computed(() => {
+  return themeStore.isDark ? Sunny : Moon;
+});
+
+// 根据当前主题获取激活文本颜色
+const activeTextColor = computed(() => {
+  return 'var(--active-text-color)';
+});
+
+// 获取其他CSS变量的值
+const asideBgColor = computed(() => {
+  return 'var(--aside-bg)';
+});
+
+const textColor = computed(() => {
+  return 'var(--text-color)';
+});
 </script>
 
 <style lang="scss">
@@ -177,6 +184,7 @@ onMounted(fetchDynamicMenus);
 
   .el-aside {
     background-color: var(--aside-bg) !important;
+
     .el-menu {
       background-color: var(--aside-bg) !important;
       border-right: none;

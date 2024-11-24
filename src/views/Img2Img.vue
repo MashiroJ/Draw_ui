@@ -1,3 +1,4 @@
+<!-- src/components/ImgToImg.vue -->
 <template>
     <div class="draw-form-container">
         <div class="header">
@@ -42,8 +43,13 @@
                     <!-- 底部操作区域 -->
                     <div class="form-actions">
                         <div class="switch-item">
-                            <el-switch v-model="formData.isPublic" :active-value="1" :inactive-value="0"
-                                active-text="公开" inactive-text="私有" />
+                            <el-switch
+                                v-model="formData.isPublic"
+                                :active-value="1"
+                                :inactive-value="0"
+                                active-text="公开"
+                                inactive-text="私有"
+                            />
                         </div>
                         <el-button type="primary" :loading="loading" :disabled="!uploadImage || !formData.prompt.trim()"
                             @click="handleSubmit">
@@ -74,6 +80,10 @@ import { ref, reactive } from 'vue'
 import { img2img } from '@/api/draw'
 import { ElMessage } from 'element-plus'
 import { Upload, Picture } from '@element-plus/icons-vue'
+
+// 主题存储
+import { useThemeStore } from '@/stores/theme'
+const themeStore = useThemeStore()
 
 // 响应式状态  
 const loading = ref(false)
@@ -177,7 +187,7 @@ const handleSubmit = async () => {
 }  
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .draw-form-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -190,7 +200,7 @@ const handleSubmit = async () => {
 
 .title {
     font-size: 24px;
-    color: #333;
+    color: var(--text-color); /* 使用CSS变量 */
     font-weight: 600;
 }
 
@@ -203,10 +213,12 @@ const handleSubmit = async () => {
 .left-panel,
 .right-panel {
     flex: 1;
-    background: #fff;
+    background: var(--bg-color); /* 使用CSS变量 */
     padding: 24px;
     border-radius: 8px;
+    border: 1px solid var(--border-color); /* 使用CSS变量 */
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .right-panel {
@@ -223,13 +235,13 @@ const handleSubmit = async () => {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #333;
+    color: var(--text-color); /* 使用CSS变量 */
 }
 
 .upload-area {
     width: 100%;
     height: 200px;
-    border: 2px dashed #dcdfe6;
+    border: 2px dashed var(--border-color); /* 使用CSS变量 */
     border-radius: 8px;
     cursor: pointer;
     transition: border-color 0.3s;
@@ -237,22 +249,22 @@ const handleSubmit = async () => {
     align-items: center;
     justify-content: center;
     position: relative;
-    background: #f5f7fa;
+    background: var(--input-bg-color); /* 使用CSS变量 */
 }
 
 .upload-area:hover {
-    border-color: #409eff;
+    border-color: var(--active-text-color); /* 使用CSS变量 */
 }
 
 .upload-placeholder {
     text-align: center;
-    color: #909399;
+    color: var(--text-color); /* 使用CSS变量 */
 }
 
 .upload-icon {
     font-size: 48px;
     margin-bottom: 10px;
-    color: #909399;
+    color: var(--text-color); /* 使用CSS变量 */
 }
 
 .upload-text {
@@ -262,7 +274,7 @@ const handleSubmit = async () => {
 
 .upload-hint {
     font-size: 12px;
-    color: #c0c4cc;
+    color: var(--footer-color); /* 使用CSS变量 */
 }
 
 .preview-container {
@@ -327,12 +339,116 @@ const handleSubmit = async () => {
 
 .empty-state {
     text-align: center;
-    color: #909399;
+    color: var(--footer-color); /* 使用CSS变量 */
 }
 
 .empty-icon {
     font-size: 48px;
     margin-bottom: 12px;
+}
+
+/* Element Plus 组件样式适配 */
+:deep(.el-select),
+:deep(.el-input-number),
+:deep(.el-slider),
+:deep(.el-input),
+:deep(.el-textarea),
+:deep(.el-button) {
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    border-color: var(--border-color);
+}
+
+:deep(.el-select .el-input__inner),
+:deep(.el-input-number .el-input__inner),
+:deep(.el-slider .el-slider__input),
+:deep(.el-input__inner),
+:deep(.el-textarea__inner),
+:deep(.el-button) {
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    border-color: var(--border-color);
+}
+
+:deep(.el-select .el-input__inner:focus),
+:deep(.el-input-number .el-input__inner:focus),
+:deep(.el-slider .el-slider__input:focus),
+:deep(.el-input__inner:focus),
+:deep(.el-textarea__inner:focus) {
+    border-color: var(--active-text-color); /* 使用CSS变量 */
+    outline: none;
+}
+
+:deep(.el-select-dropdown) {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+:deep(.el-select-dropdown__item) {
+    color: var(--text-color);
+}
+
+:deep(.el-select-dropdown__item:hover) {
+    background-color: var(--menu-hover); /* 使用CSS变量 */
+    color: var(--text-color);
+}
+
+:deep(.el-input-number__increase),
+:deep(.el-input-number__decrease) {
+    background-color: var(--bg-color);
+    border-color: var(--input-border-color);
+    color: var(--text-color);
+}
+
+:deep(.el-input-number__increase:hover),
+:deep(.el-input-number__decrease:hover) {
+    background-color: var(--menu-hover);
+    border-color: var(--active-text-color);
+    color: var(--text-color);
+}
+
+:deep(.el-switch__label) {
+    color: var(--text-color);
+}
+
+:deep(.el-switch__core) {
+    background-color: var(--active-text-color);
+}
+
+:deep(.el-switch__core:focus) {
+    box-shadow: 0 0 0 2px var(--active-text-color);
+}
+
+:deep(.el-switch--disabled .el-switch__core) {
+    background-color: var(--button-disabled-bg-color);
+}
+
+:deep(.el-switch--disabled .el-switch__label) {
+    color: var(--footer-color);
+}
+
+:deep(.el-slider__bar) {
+    background-color: var(--active-text-color);
+}
+
+:deep(.el-slider__button) {
+    background-color: var(--active-text-color);
+    border-color: var(--active-text-color);
+}
+
+:deep(.el-slider__button:hover) {
+    background-color: var(--button-hover-bg-color);
+    border-color: var(--button-hover-bg-color);
+}
+
+:deep(.el-slider--disabled .el-slider__bar) {
+    background-color: var(--input-border-color);
+}
+
+:deep(.el-slider--disabled .el-slider__button) {
+    background-color: var(--button-disabled-bg-color);
+    border-color: var(--button-disabled-bg-color);
 }
 
 /* 添加过渡动画 */

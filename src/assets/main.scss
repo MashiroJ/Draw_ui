@@ -1,116 +1,196 @@
-/* main.scss */
+/* src/assets/main.scss */
 
 /* 重置样式 */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-  margin: 0;
-  background-color: var(--bg-color);
-  /* 使用CSS变量 */
-  color: var(--text-color);
-  /* 使用CSS变量 */
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  /* 可选：设置全局字体 */
+    margin: 0;
+    background-color: var(--bg-color); /* 使用CSS变量 */
+    color: var(--text-color); /* 使用CSS变量 */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* 可选：设置全局字体 */
+    transition: background-color 0.3s, color 0.3s; /* 平滑过渡 */
 }
 
 /* 主题变量定义 */
 :root {
-  /* 亮色主题变量 */
-  --bg-color: #ffffff;
-  --text-color: #303133;
-  --border-color: #e4e7ed;
-  --menu-hover: #ecf5ff;
-  --header-bg: #ffffff;
-  --aside-bg: #ffffff;
-  --footer-color: #666666;
+    /* 亮色主题变量 */
+    --bg-color: #ffffff;
+    --text-color: #303133;
+    --border-color: #e4e7ed;
+    --menu-hover: #ecf5ff;
+    --header-bg: #ffffff;
+    --aside-bg: #ffffff;
+    --footer-color: #666666;
+    --active-text-color: #409EFF;
+
+    /* 按钮相关变量 */
+    --button-bg-color: var(--active-text-color); /* 按钮默认背景色 */
+    --button-text-color: #ffffff; /* 按钮文字颜色 */
+    --button-hover-bg-color: #66b1ff; /* 按钮悬停背景色 */
+    --button-disabled-bg-color: #a0cfff; /* 按钮禁用背景色 */
+
+    /* 其他变量 */
+    --link-color: var(--active-text-color); /* 链接颜色 */
+    --link-hover-color: #66b1ff; /* 链接悬停颜色 */
+    --input-bg-color: #ffffff; /* 输入框背景色 */
+    --input-text-color: #303133; /* 输入框文字颜色 */
+    --input-border-color: #dcdfe6; /* 输入框边框色 */
 }
 
+/* 暗色主题变量 */
 [data-theme='dark'] {
-  /* 暗色主题变量 */
-  --bg-color: #1a1a1a;
-  --text-color: #ffffff;
-  --border-color: #363636;
-  --menu-hover: #2a2a2a;
-  --header-bg: #232323;
-  --aside-bg: #232323;
-  --footer-color: #999999;
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --border-color: #363636;
+    --menu-hover: #2a2a2a;
+    --header-bg: #232323;
+    --aside-bg: #232323;
+    --footer-color: #999999;
+    --active-text-color: #ffd04b;
+
+    /* 按钮相关变量 */
+    --button-bg-color: var(--active-text-color); /* 按钮默认背景色 */
+    --button-text-color: #1a1a1a; /* 按钮文字颜色 */
+    --button-hover-bg-color: #ffdf80; /* 按钮悬停背景色 */
+    --button-disabled-bg-color: rgba(255, 208, 75, 0.6); /* 按钮禁用背景色 */
+
+    /* 其他变量 */
+    --link-color: var(--active-text-color); /* 链接颜色 */
+    --link-hover-color: #ffdf80; /* 链接悬停颜色 */
+    --input-bg-color: #2a2a2a; /* 输入框背景色 */
+    --input-text-color: #ffffff; /* 输入框文字颜色 */
+    --input-border-color: #4a4a4a; /* 输入框边框色 */
 }
 
-/* fade-slide 动画 */
-.fade-slide-leave-active,
-.fade-slide-enter-active {
-  transition: all 0.3s;
+/* 按钮样式 */
+button {
+    font-family: inherit; /* 继承字体 */
+    font-size: 1rem;
 }
 
-.fade-slide-enter-from {
-  transform: translateX(-30px);
-  opacity: 0;
+/* 链接样式 */
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.3s;
 }
 
-.fade-slide-leave-to {
-  transform: translateX(30px);
-  opacity: 0;
+a:hover {
+    color: var(--link-hover-color);
 }
 
-/* 覆盖 Element Plus 的 el-pagination 样式 */
-.el-pagination {
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
+/* 输入框样式 */
+input,
+textarea,
+.el-input,
+.el-textarea {
+    background-color: var(--input-bg-color);
+    color: var(--input-text-color);
+    border: 1px solid var(--input-border-color);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-.el-pagination__total,
-.el-pagination__sizes,
-.el-pagination__jump,
-.el-pagination__rightwrapper {
-  color: var(--text-color);
-}
-
-.el-pagination__button {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-}
-
-.el-pagination__button:hover {
-  background-color: var(--menu-hover);
-  color: var(--text-color);
-}
-
-.el-pagination__button.is-active {
-  background-color: var(--header-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-}
-
+/* Element Plus 组件样式覆盖 */
 .el-button {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+        background-color: var(--button-hover-bg-color);
+    }
+
+    &:disabled {
+        background-color: var(--button-disabled-bg-color);
+        cursor: not-allowed;
+    }
 }
 
-.el-button--primary {
-  background-color: var(--header-bg);
-  border-color: var(--header-bg);
-  color: var(--text-color);
+/* 表格样式 */
+.el-table {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
 }
 
-.el-button--primary:hover {
-  background-color: var(--menu-hover);
-  border-color: var(--menu-hover);
-  color: var(--text-color);
+.el-table th,
+.el-table td {
+    border-color: var(--border-color);
 }
 
-.el-descriptions {
-  --el-descriptions-item-bordered-label-background: var(--header-bg);
-  background-color: var(--bg-color);
+/* 表单项标签 */
+.el-form-item__label {
+    color: var(--text-color);
 }
 
-.el-descriptions__title {
-  color: var(--text-color);
+/* 表单项内容 */
+.el-form-item__content {
+    color: var(--text-color);
 }
 
-.el-descriptions__label {
-  color: var(--text-color);
+/* 分页组件样式 */
+.pagination :deep(.el-pagination) {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
 }
 
-.el-descriptions__content {
-  color: var(--text-color);
+.pagination :deep(.el-pagination__total),
+.pagination :deep(.el-pagination__sizes),
+.pagination :deep(.el-pagination__jump),
+.pagination :deep(.el-pagination__rightwrapper) {
+    color: var(--text-color);
+}
+
+.pagination :deep(.el-pagination__button),
+.pagination :deep(.el-pagination__prev),
+.pagination :deep(.el-pagination__next),
+.pagination :deep(.el-pagination__page-link) {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.pagination :deep(.el-pagination__button:hover),
+.pagination :deep(.el-pagination__prev:hover),
+.pagination :deep(.el-pagination__next:hover),
+.pagination :deep(.el-pagination__page-link:hover) {
+    background-color: var(--menu-hover);
+    color: var(--text-color);
+}
+
+.pagination :deep(.el-pagination__button.is-active),
+.pagination :deep(.el-pagination__prev.is-active),
+.pagination :deep(.el-pagination__next.is-active),
+.pagination :deep(.el-pagination__page-link.is-active) {
+    background-color: var(--header-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+/* 其他组件样式覆盖 */
+/* 例如 Dialog */
+.el-dialog__header,
+.el-dialog__footer {
+    background-color: var(--header-bg);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Switch 组件 */
+.el-switch {
+    --el-switch-background-color: var(--active-text-color);
+}
+
+/* 确保图片适配主题背景 */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }

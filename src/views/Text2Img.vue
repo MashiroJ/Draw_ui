@@ -1,3 +1,4 @@
+<!-- src/components/DrawForm.vue -->
 <template>
     <div class="draw-form-container">
         <div class="header">
@@ -10,15 +11,25 @@
                 <form @submit.prevent="handleSubmit">
                     <div class="form-item">
                         <label for="prompt">提示词</label>
-                        <textarea id="prompt" v-model="formData.prompt" rows="13" class="prompt-input"
-                            placeholder="请输入提示词..."></textarea>
+                        <textarea
+                            id="prompt"
+                            v-model="formData.prompt"
+                            rows="13"
+                            class="prompt-input"
+                            placeholder="请输入提示词..."
+                        ></textarea>
                     </div>
 
                     <!-- 底部操作区域：包含开关和按钮 -->
                     <div class="form-actions">
                         <div class="switch-item">
-                            <el-switch v-model="formData.isPublic" :active-value="1" :inactive-value="0"
-                                active-text="公开" inactive-text="私有" />
+                            <el-switch
+                                v-model="formData.isPublic"
+                                :active-value="1"
+                                :inactive-value="0"
+                                active-text="公开"
+                                inactive-text="私有"
+                            />
                         </div>
                         <button type="submit" class="submit-btn" :disabled="loading">
                             {{ loading ? '生成中...' : '生成图像' }}
@@ -44,6 +55,10 @@
 import { ref, reactive } from 'vue'
 import { text2img } from '@/api/draw'
 import { ElMessage } from 'element-plus'
+
+// 主题存储（虽然不直接使用，但确保样式依赖CSS变量）
+import { useThemeStore } from '@/stores/theme'
+const themeStore = useThemeStore()
 
 const loading = ref(false)
 const generatedImageUrl = ref('')
@@ -74,10 +89,10 @@ const handleSubmit = async () => {
     } finally {
         loading.value = false
     }
-}  
+}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .draw-form-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -90,7 +105,7 @@ const handleSubmit = async () => {
 
 .title {
     font-size: 24px;
-    color: #333;
+    color: var(--text-color); /* 使用CSS变量 */
     font-weight: 600;
 }
 
@@ -102,21 +117,25 @@ const handleSubmit = async () => {
 
 .left-panel {
     flex: 1;
-    background: #fff;
+    background: var(--bg-color); /* 使用CSS变量 */
     padding: 24px;
     border-radius: 8px;
+    border: 1px solid var(--border-color); /* 使用CSS变量 */
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .right-panel {
     flex: 1;
-    background: #fff;
+    background: var(--bg-color); /* 使用CSS变量 */
     padding: 24px;
     border-radius: 8px;
+    border: 1px solid var(--border-color); /* 使用CSS变量 */
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .form-item {
@@ -127,7 +146,25 @@ const handleSubmit = async () => {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #333;
+    color: var(--text-color); /* 使用CSS变量 */
+}
+
+.prompt-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color); /* 使用CSS变量 */
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+    resize: vertical;
+    color: var(--text-color); /* 使用CSS变量 */
+    background-color: var(--bg-color); /* 使用CSS变量 */
+}
+
+.prompt-input:focus {
+    outline: none;
+    border-color: var(--active-text-color); /* 使用CSS变量 */
 }
 
 .form-actions {
@@ -143,40 +180,24 @@ const handleSubmit = async () => {
     gap: 12px;
 }
 
-.prompt-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #dcdfe6;
-    border-radius: 4px;
-    font-size: 14px;
-    line-height: 1.5;
-    transition: border-color 0.2s;
-    resize: vertical;
-}
-
-.prompt-input:focus {
-    outline: none;
-    border-color: #409eff;
-}
-
 .submit-btn {
-    background-color: #409eff;
-    color: white;
+    background-color: var(--button-bg-color); /* 使用CSS变量 */
+    color: var(--button-text-color); /* 使用CSS变量 */
     border: none;
     padding: 12px 24px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
     margin-left: 20px;
 }
 
 .submit-btn:hover:not(:disabled) {
-    background-color: #66b1ff;
+    background-color: var(--button-hover-bg-color); /* 使用CSS变量 */
 }
 
 .submit-btn:disabled {
-    background-color: #a0cfff;
+    background-color: var(--button-disabled-bg-color); /* 使用CSS变量 */
     cursor: not-allowed;
 }
 
@@ -196,7 +217,7 @@ const handleSubmit = async () => {
 }
 
 .empty-state {
-    color: #909399;
+    color: var(--footer-color); /* 使用CSS变量 */
     font-size: 14px;
 }
 

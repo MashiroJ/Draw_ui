@@ -1,3 +1,4 @@
+<!-- src/components/SuperDrawForm.vue -->
 <template>
     <div class="draw-form-container">
         <div class="header">
@@ -11,17 +12,25 @@
                     <!-- 提示词输入 -->
                     <div class="form-item">
                         <label for="prompt">提示词</label>
-                        <textarea id="prompt" v-model="formData.drawDto.prompt" rows="6" class="prompt-input"
-                            placeholder="请输入提示词...">
-                        </textarea>
+                        <textarea
+                            id="prompt"
+                            v-model="formData.drawDto.prompt"
+                            rows="6"
+                            class="prompt-input"
+                            placeholder="请输入提示词..."
+                        ></textarea>
                     </div>
 
                     <!-- 反向提示词输入 -->
                     <div class="form-item">
                         <label for="negativePrompt">反向提示词</label>
-                        <textarea id="negativePrompt" v-model="formData.drawDto.negativePrompt" rows="4"
-                            class="prompt-input" placeholder="请输入反向提示词...">
-                        </textarea>
+                        <textarea
+                            id="negativePrompt"
+                            v-model="formData.drawDto.negativePrompt"
+                            rows="4"
+                            class="prompt-input"
+                            placeholder="请输入反向提示词..."
+                        ></textarea>
                     </div>
 
                     <!-- 参数设置区域 -->
@@ -140,8 +149,13 @@
                     <!-- 底部操作区域 -->
                     <div class="form-actions">
                         <div class="switch-item">
-                            <el-switch v-model="formData.drawDto.isPublic" :active-value="1" :inactive-value="0"
-                                active-text="公开" inactive-text="私有" />
+                            <el-switch
+                                v-model="formData.drawDto.isPublic"
+                                :active-value="1"
+                                :inactive-value="0"
+                                active-text="公开"
+                                inactive-text="私有"
+                            />
                         </div>
                         <button type="submit" class="submit-btn" :disabled="loading">
                             {{ loading ? '生成中...' : '生成图像' }}
@@ -167,6 +181,10 @@
 import { ref, reactive } from 'vue'
 import { superText2img } from '@/api/draw'
 import { ElMessage } from 'element-plus'
+
+// 主题存储（虽然不直接使用，但确保样式依赖CSS变量）
+import { useThemeStore } from '@/stores/theme'
+const themeStore = useThemeStore()
 
 const loading = ref(false)
 const generatedImageUrl = ref('')
@@ -243,7 +261,7 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .draw-form-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -256,7 +274,7 @@ const handleSubmit = async () => {
 
 .title {
     font-size: 24px;
-    color: #333;
+    color: var(--text-color); /* 使用CSS变量 */
     font-weight: 600;
 }
 
@@ -268,21 +286,25 @@ const handleSubmit = async () => {
 
 .left-panel {
     flex: 1;
-    background: #fff;
+    background: var(--bg-color); /* 使用CSS变量 */
     padding: 24px;
     border-radius: 8px;
+    border: 1px solid var(--border-color); /* 使用CSS变量 */
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .right-panel {
     flex: 1;
-    background: #fff;
+    background: var(--bg-color); /* 使用CSS变量 */
     padding: 24px;
     border-radius: 8px;
+    border: 1px solid var(--border-color); /* 使用CSS变量 */
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .form-item {
@@ -293,14 +315,32 @@ const handleSubmit = async () => {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #333;
+    color: var(--text-color); /* 使用CSS变量 */
 }
 
 .parameters-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
     margin-bottom: 20px;
+}
+
+.prompt-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color); /* 使用CSS变量 */
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+    resize: vertical;
+    color: var(--text-color); /* 使用CSS变量 */
+    background-color: var(--bg-color); /* 使用CSS变量 */
+}
+
+.prompt-input:focus {
+    outline: none;
+    border-color: var(--active-text-color); /* 使用CSS变量 */
 }
 
 .form-actions {
@@ -316,39 +356,24 @@ const handleSubmit = async () => {
     gap: 12px;
 }
 
-.prompt-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #dcdfe6;
-    border-radius: 4px;
-    font-size: 14px;
-    line-height: 1.5;
-    transition: border-color 0.2s;
-    resize: vertical;
-}
-
-.prompt-input:focus {
-    outline: none;
-    border-color: #409eff;
-}
-
 .submit-btn {
-    background-color: #409eff;
-    color: white;
+    background-color: var(--button-bg-color); /* 使用CSS变量 */
+    color: var(--button-text-color); /* 使用CSS变量 */
     border: none;
     padding: 12px 24px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
+    margin-left: 20px;
 }
 
 .submit-btn:hover:not(:disabled) {
-    background-color: #66b1ff;
+    background-color: var(--button-hover-bg-color); /* 使用CSS变量 */
 }
 
 .submit-btn:disabled {
-    background-color: #a0cfff;
+    background-color: var(--button-disabled-bg-color); /* 使用CSS变量 */
     cursor: not-allowed;
 }
 
@@ -368,16 +393,111 @@ const handleSubmit = async () => {
 }
 
 .empty-state {
-    color: #909399;
+    color: var(--footer-color); /* 使用CSS变量 */
     font-size: 14px;
 }
 
-:deep(.el-select) {
+/* Element Plus 组件样式适配 */
+:deep(.el-select),
+:deep(.el-input-number),
+:deep(.el-slider) {
     width: 100%;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    border-color: var(--input-border-color);
 }
 
-:deep(.el-input-number) {
-    width: 100%;
+:deep(.el-select .el-input__inner),
+:deep(.el-input-number .el-input__inner),
+:deep(.el-slider .el-slider__input) {
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    border-color: var(--input-border-color);
+}
+
+:deep(.el-select .el-input__inner:focus),
+:deep(.el-input-number .el-input__inner:focus),
+:deep(.el-slider .el-slider__input:focus) {
+    border-color: var(--active-text-color);
+    outline: none;
+}
+
+:deep(.el-slider__bar) {
+    background-color: var(--active-text-color);
+}
+
+:deep(.el-slider__button) {
+    background-color: var(--active-text-color);
+    border-color: var(--active-text-color);
+}
+
+:deep(.el-slider__button:hover) {
+    background-color: var(--button-hover-bg-color);
+    border-color: var(--button-hover-bg-color);
+}
+
+/* 针对el-select的下拉菜单样式 */
+:deep(.el-select-dropdown) {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+:deep(.el-select-dropdown__item) {
+    color: var(--text-color);
+}
+
+:deep(.el-select-dropdown__item:hover) {
+    background-color: var(--menu-hover);
+    color: var(--text-color);
+}
+
+/* 针对el-input-number的增减按钮样式 */
+:deep(.el-input-number__increase),
+:deep(.el-input-number__decrease) {
+    background-color: var(--bg-color);
+    border-color: var(--input-border-color);
+    color: var(--text-color);
+}
+
+:deep(.el-input-number__increase:hover),
+:deep(.el-input-number__decrease:hover) {
+    background-color: var(--menu-hover);
+    border-color: var(--active-text-color);
+    color: var(--text-color);
+}
+
+/* 针对el-switch的标签文字样式 */
+:deep(.el-switch__label) {
+    color: var(--text-color);
+}
+
+/* 针对el-switch的开关按钮颜色 */
+:deep(.el-switch__core) {
+    background-color: var(--active-text-color);
+}
+
+:deep(.el-switch__core:focus) {
+    box-shadow: 0 0 0 2px var(--active-text-color);
+}
+
+/* 针对el-switch的禁用状态 */
+:deep(.el-switch--disabled .el-switch__core) {
+    background-color: var(--button-disabled-bg-color);
+}
+
+:deep(.el-switch--disabled .el-switch__label) {
+    color: var(--footer-color);
+}
+
+/* 针对el-slider的禁用状态 */
+:deep(.el-slider--disabled .el-slider__bar) {
+    background-color: var(--input-border-color);
+}
+
+:deep(.el-slider--disabled .el-slider__button) {
+    background-color: var(--button-disabled-bg-color);
+    border-color: var(--button-disabled-bg-color);
 }
 
 /* 添加过渡动画 */
