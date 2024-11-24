@@ -3,7 +3,7 @@
     <template #header>
       <div class="header">
         <span>角色管理</span>
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增角色</el-button>
+        <el-button type="primary" icon="el-icon-plus" size="small" @click="handleAdd">新增角色</el-button>
       </div>
     </template>
 
