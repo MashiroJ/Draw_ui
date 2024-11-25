@@ -1,41 +1,29 @@
-<!-- src/components/User.vue -->
 <template>
   <el-card class="page-container">
     <template #header>
-      <div class="header">
-        <span>用户管理</span>
-        <el-button type="primary" icon="el-icon-plus" size="small" @click="handleAdd">新增用户</el-button>
-      </div>
+      <el-card class="info-card welcome-card" style="margin-bottom: 20px;">
+        <div class="info-card-content">
+          <div class="info-text">
+            <h2 class="welcome-title">用户管理</h2>
+            <p class="welcome-subtitle">用户分配与管理</p>
+          </div>
+          <el-button type="primary" icon="el-icon-plus" size="small" @click="handleAdd">新增用户</el-button>
+        </div>
+      </el-card>
     </template>
 
     <!-- 搜索表单 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" label-width="68px">
       <el-form-item label="用户名" prop="username">
-        <el-input
-          v-model="queryParams.username"
-          placeholder="请输入用户名"
-          clearable
-          style="width: 240px"
-          @keyup.enter="getUsers"
-        />
+        <el-input v-model="queryParams.username" placeholder="请输入用户名" clearable style="width: 240px"
+          @keyup.enter="getUsers" />
       </el-form-item>
       <el-form-item label="手机号码" prop="phone">
-        <el-input
-          v-model="queryParams.phone"
-          placeholder="请输入手机号码"
-          clearable
-          style="width: 240px"
-          @keyup.enter="getUsers"
-        />
+        <el-input v-model="queryParams.phone" placeholder="请输入手机号码" clearable style="width: 240px"
+          @keyup.enter="getUsers" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select
-          v-model="queryParams.status"
-          placeholder="用户状态"
-          clearable
-          style="width: 240px"
-          @change="getUsers"
-        >
+        <el-select v-model="queryParams.status" placeholder="用户状态" clearable style="width: 240px" @change="getUsers">
           <el-option label="正常" value="正常"></el-option>
           <el-option label="禁用" value="禁用"></el-option>
         </el-select>
@@ -53,12 +41,7 @@
       <el-table-column label="手机号码" align="center" prop="phone" width="120" />
       <el-table-column label="状态" align="center">
         <template #default="{ row }">
-          <el-switch
-            v-model="row.status"
-            active-value="正常"
-            inactive-value="禁用"
-            @change="handleStatusChange(row)"
-          />
+          <el-switch v-model="row.status" active-value="正常" inactive-value="禁用" @change="handleStatusChange(row)" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="200">
@@ -71,18 +54,9 @@
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination
-      v-model:current-page="pageNum"
-      v-model:page-size="pageSize"
-      :page-sizes="[5, 10, 15, 20]"
-      layout="total, sizes, prev, pager, next"
-      background
-      :total="total"
-      @size-change="onSizeChange"
-      @current-change="onCurrentChange"
-      class="pagination"
-      style="margin-top: 20px; justify-content: flex-end"
-    />
+    <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+      layout="total, sizes, prev, pager, next" background :total="total" @size-change="onSizeChange"
+      @current-change="onCurrentChange" class="pagination" style="margin-top: 20px; justify-content: flex-end" />
 
     <!-- 新增/修改用户对话框 -->
     <el-dialog :title="formTitle" v-model="dialogVisible" width="500px">
@@ -365,5 +339,45 @@ onMounted(() => {
   background-color: var(--header-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
+}
+
+.info-card {
+  width: 100%;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  height: 80px; // 稍微减小高度使其更紧凑  
+}
+
+.info-card-content {
+  display: flex;
+  justify-content: space-between; // 使用 space-between 来分散对齐  
+  align-items: flex-start; // 改为顶部对齐
+  height: 100%;
+  padding: 3px;
+}
+
+.info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; // 减小标题和副标题之间的间距  
+  margin-top: -5px; // 添加负的上边距使整体往上移  
+}
+
+.welcome-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.2; // 添加行高控制 
+}
+
+.welcome-subtitle {
+  font-size: 12px;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin: 0;
+  line-height: 1.2; // 添加行高控制
 }
 </style>

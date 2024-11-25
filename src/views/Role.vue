@@ -1,11 +1,16 @@
-<template>
-  <el-card class="page-container">
-    <template #header>
-      <div class="header">
-        <span>角色管理</span>
-        <el-button type="primary" icon="el-icon-plus" size="small" @click="handleAdd">新增角色</el-button>
-      </div>
-    </template>
+<template>  
+  <el-card class="page-container">  
+    <template #header>  
+      <el-card class="info-card" style="margin-bottom: 20px;">  
+        <div class="info-card-content">  
+          <div class="info-text">  
+            <h2 class="welcome-title">角色管理</h2>  
+            <p class="welcome-subtitle">权限分配与管理</p>  
+          </div>  
+          <el-button type="primary" icon="el-icon-plus" size="small" @click="handleAdd">新增角色</el-button>  
+        </div>  
+      </el-card>  
+    </template>  
 
     <!-- 角色列表 -->
     <el-table v-loading="loading" :data="roles">
@@ -230,9 +235,53 @@ getRoles();
 </script>
 
 <style scoped>
-.page-container {
-  padding: 20px;
-}
+.page-container {  
+  padding: 20px;  
+  background-color: var(--bg-color);  
+  color: var(--text-color);  
+  border-radius: 8px;  
+  box-shadow: 0 2px 12px var(--border-color);  
+}  
+
+.info-card {  
+  width: 100%;  
+  background-color: var(--bg-color);  
+  border: 1px solid var(--border-color);  
+  border-radius: 8px;  
+  padding: 10px;  
+  height: 80px;  
+}  
+
+.info-card-content {  
+  display: flex;  
+  justify-content: space-between;  
+  align-items: flex-start;  
+  height: 100%;  
+  padding: 3px;  
+}  
+
+.info-text {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2px;  
+  margin-top: -5px;  
+}  
+
+.welcome-title {  
+  font-size: 16px;  
+  font-weight: bold;  
+  color: var(--text-color);  
+  margin: 0;  
+  line-height: 1.2;  
+}  
+
+.welcome-subtitle {  
+  font-size: 12px;  
+  color: var(--text-color);  
+  opacity: 0.8;  
+  margin: 0;  
+  line-height: 1.2;  
+}  
 
 .header {
   display: flex;

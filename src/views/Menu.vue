@@ -77,16 +77,19 @@ onMounted(() => {
 });
 </script>
 
-<template>
-  <el-card class="page-container">
-    <template #header>
-      <div class="header">
-        <span>菜单管理</span>
-        <div class="extra">
-          <el-button type="primary" @click="openDialog">添加菜单</el-button>
-        </div>
-      </div>
-    </template>
+<template>  
+  <el-card class="page-container">  
+    <template #header>  
+      <el-card class="info-card" style="margin-bottom: 20px;">  
+        <div class="info-card-content">  
+          <div class="info-text">  
+            <h2 class="welcome-title">菜单管理</h2>  
+            <p class="welcome-subtitle">菜单分配与管理</p>  
+          </div>  
+          <el-button type="primary" icon="el-icon-plus" size="small" @click="openDialog">新增菜单</el-button>  
+        </div>  
+      </el-card>  
+    </template> 
 
     <el-table :data="menuList" style="width: 100%">
       <el-table-column label="菜单编号" width="100" type="index" />
@@ -127,15 +130,65 @@ onMounted(() => {
   </el-card>
 </template>
 
-<style lang="scss" scoped>
-.page-container {
-  min-height: 100%;
-  box-sizing: border-box;
+<style lang="scss" scoped>  
+.page-container {  
+  padding: 20px;  
+  background-color: var(--bg-color);  
+  color: var(--text-color);  
+  border-radius: 8px;  
+  box-shadow: 0 2px 12px var(--border-color);  
+}  
 
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-</style>
+.info-card {  
+  width: 100%;  
+  background-color: var(--bg-color);  
+  border: 1px solid var(--border-color);  
+  border-radius: 8px;  
+  padding: 10px;  
+  height: 80px;  
+}  
+
+.info-card-content {  
+  display: flex;  
+  justify-content: space-between;  
+  align-items: flex-start;  
+  height: 100%;  
+  padding: 3px;  
+}  
+
+.info-text {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2px;  
+  margin-top: -5px;  
+}  
+
+.welcome-title {  
+  font-size: 16px;  
+  font-weight: bold;  
+  color: var(--text-color);  
+  margin: 0;  
+  line-height: 1.2;  
+}  
+
+.welcome-subtitle {  
+  font-size: 12px;  
+  color: var(--text-color);  
+  opacity: 0.8;  
+  margin: 0;  
+  line-height: 1.2;  
+}  
+
+// 表格相关样式  
+.el-table {  
+  background-color: var(--bg-color);  
+  color: var(--text-color);  
+  margin-top: 20px;  
+}  
+
+// 对话框底部按钮样式  
+.dialog-footer {  
+  text-align: right;  
+  margin-top: 20px;  
+}  
+</style> 
