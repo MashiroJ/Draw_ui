@@ -1,25 +1,38 @@
 <template>
-  <div class="gallery-main">
-    <!-- 画廊类型切换 -->
-    <div class="gallery-type-switch">
-      <el-radio-group v-model="galleryType" size="large">
-        <el-radio-button label="public">公共画廊</el-radio-button>
-        <el-radio-button label="private">私人画廊</el-radio-button>
-      </el-radio-group>
+  <!-- 文生图标题卡片 -->
+  <el-card class="info-card welcome-card" style="margin-bottom: 20px;">
+    <div class="info-card-content welcome-content">
+      <div class="info-text welcome-text">
+        <h2 class="welcome-title">创艺馆</h2>
+        <p class="welcome-subtitle">洞见美学 创意无限</p>
+      </div>
     </div>
+  </el-card>
+  
+  <div class="gallery-main">
+    <!-- 控制按钮容器 -->
+    <div class="controls">
+      <!-- 画廊类型切换 -->
+      <div class="gallery-type-switch">
+        <el-radio-group v-model="galleryType" size="medium">
+          <el-radio-button label="public">公共画廊</el-radio-button>
+          <el-radio-button label="private">私人画廊</el-radio-button>
+        </el-radio-group>
+      </div>
 
-    <!-- 排序按钮 -->
-    <div class="sort-buttons">
-      <el-button type="danger" @click="sortByLikes" class="mr-2">
-        <el-icon>
-          <Star />
-        </el-icon> 最热
-      </el-button>
-      <el-button type="success" @click="sortByLatest">
-        <el-icon>
-          <Timer />
-        </el-icon> 最新
-      </el-button>
+      <!-- 排序按钮 -->
+      <div class="sort-buttons">
+        <el-button type="danger" @click="sortByLikes" class="sort-button">
+          <el-icon>
+            <Star />
+          </el-icon> 最热
+        </el-button>
+        <el-button type="success" @click="sortByLatest" class="sort-button">
+          <el-icon>
+            <Timer />
+          </el-icon> 最新
+        </el-button>
+      </div>
     </div>
 
     <!-- 空状态展示 -->
@@ -56,8 +69,14 @@
                   <th>点赞：</th>
                   <td class="like-container">
                     <span>{{ likeCount }}</span>
-                    <el-button type="danger" :icon="Star" circle size="small" @click.stop="handleLike"
-                      :loading="likeLoading" />
+                    <el-button 
+                      :type="isLiked ? 'primary' : 'danger'" 
+                      :icon="isLiked ? StarFilled : Star" 
+                      circle 
+                      size="small" 
+                      @click.stop="handleLike"
+                      :loading="likeLoading" 
+                    />
                   </td>
                 </tr>
                 <tr>
@@ -178,9 +197,8 @@ const fetchLikeInfo = async (drawId) => {
   try {
     const response = await getLikeCount(drawId)
     if (response.code === 200) {
-      likeCount.value = response.data
-      // 如果后端返回了用户点赞状态，可以设置 isLiked
-      // isLiked.value = response.data.isLiked
+      likeCount.value = response.data.count
+      isLiked.value = response.data.isLiked
     }
   } catch (error) {
     console.error('获取点赞数失败:', error)
@@ -212,6 +230,7 @@ const openDialog = async (record) => {
   selectedRecord.value = record
   dialogVisible.value = true
   isLiked.value = false // 重置点赞状态
+  likeCount.value = 0
   await fetchLikeInfo(record.id)
 }
 
@@ -226,17 +245,49 @@ onMounted(() => {
   padding: 20px;
 }
 
+/* 控制按钮容器 */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  /* 响应式调整 */
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+/* 画廊类型切换 */
 .gallery-type-switch {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  
+  /* 在较大屏幕上左对齐 */
+  @media screen and (min-width: 769px) {
+    justify-content: flex-start;
+  }
 }
 
+/* 排序按钮 */
 .sort-buttons {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 20px;
+  
+  /* 在较大屏幕上右对齐 */
+  @media screen and (min-width: 769px) {
+    justify-content: flex-end;
+  }
+}
+
+.sort-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .empty-state {
@@ -373,5 +424,39 @@ onMounted(() => {
   .el-button {
     padding: 8px;
   }
+}
+
+.info-card {
+  width: 100%;
+  background-color: var(--bg-color);
+  /* 使用CSS变量 */
+  border: 1px solid var(--border-color);
+  /* 使用CSS变量 */
+  border-radius: 8px;
+  padding: 10px;
+  height: 100px;
+}
+
+.info-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 3px;
+}
+
+.welcome-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-color);
+  margin: 0;
+  margin-bottom: 3px;
+}
+
+.welcome-subtitle {
+  font-size: 12px;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin: 0;
 }
 </style>

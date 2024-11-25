@@ -1,8 +1,14 @@
 <template>
     <div class="draw-form-container">
-        <div class="header">
-            <h2 class="title">超级图生图</h2>
-        </div>
+        <!-- 文生图标题卡片 -->
+        <el-card class="info-card welcome-card" style="margin-bottom: 20px;">
+            <div class="info-card-content welcome-content">
+                <div class="info-text welcome-text">
+                    <h2 class="welcome-title">超级图生图</h2>
+                    <p class="welcome-subtitle">一图万化 超能绽放</p>
+                </div>
+            </div>
+        </el-card>
 
         <div class="content-wrapper">
             <!-- 左侧表单区域 -->
@@ -568,4 +574,37 @@ const handleSubmit = async () => {
         transform: translateY(0);  
     }  
 }  
+.info-card {
+    width: 100%;
+    background-color: var(--bg-color);
+    /* 使用CSS变量 */
+    border: 1px solid var(--border-color);
+    /* 使用CSS变量 */
+    border-radius: 8px;
+    padding: 10px;
+    height: 100px;
+}
+
+.info-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 3px;
+}
+
+.welcome-title {
+    font-size: 16px;  
+    font-weight: bold;  
+    color: var(--text-color);  
+    margin: 0;  
+    margin-bottom: 3px;  
+}
+
+.welcome-subtitle {
+    font-size: 12px;  
+    color: var(--text-color);  
+    opacity: 0.8;  
+    margin: 0;  
+}
 </style>

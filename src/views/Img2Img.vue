@@ -1,9 +1,15 @@
 <!-- src/components/ImgToImg.vue -->
 <template>
     <div class="draw-form-container">
-        <div class="header">
-            <h2 class="title">图生图</h2>
-        </div>
+        <!-- 文生图标题卡片 -->
+        <el-card class="info-card welcome-card" style="margin-bottom: 20px;">
+            <div class="info-card-content welcome-content">
+                <div class="info-text welcome-text">
+                    <h2 class="welcome-title">图生图</h2>
+                    <p class="welcome-subtitle">让创意无限延伸</p>
+                </div>
+            </div>
+        </el-card>
 
         <div class="content-wrapper">
             <!-- 左侧表单区域 -->
@@ -43,13 +49,8 @@
                     <!-- 底部操作区域 -->
                     <div class="form-actions">
                         <div class="switch-item">
-                            <el-switch
-                                v-model="formData.isPublic"
-                                :active-value="1"
-                                :inactive-value="0"
-                                active-text="公开"
-                                inactive-text="私有"
-                            />
+                            <el-switch v-model="formData.isPublic" :active-value="1" :inactive-value="0"
+                                active-text="公开" inactive-text="私有" />
                         </div>
                         <el-button type="primary" :loading="loading" :disabled="!uploadImage || !formData.prompt.trim()"
                             @click="handleSubmit">
@@ -200,7 +201,8 @@ const handleSubmit = async () => {
 
 .title {
     font-size: 24px;
-    color: var(--text-color); /* 使用CSS变量 */
+    color: var(--text-color);
+    /* 使用CSS变量 */
     font-weight: 600;
 }
 
@@ -213,10 +215,12 @@ const handleSubmit = async () => {
 .left-panel,
 .right-panel {
     flex: 1;
-    background: var(--bg-color); /* 使用CSS变量 */
+    background: var(--bg-color);
+    /* 使用CSS变量 */
     padding: 24px;
     border-radius: 8px;
-    border: 1px solid var(--border-color); /* 使用CSS变量 */
+    border: 1px solid var(--border-color);
+    /* 使用CSS变量 */
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     animation: fadeIn 0.3s ease-in-out;
 }
@@ -235,13 +239,15 @@ const handleSubmit = async () => {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: var(--text-color); /* 使用CSS变量 */
+    color: var(--text-color);
+    /* 使用CSS变量 */
 }
 
 .upload-area {
     width: 100%;
     height: 200px;
-    border: 2px dashed var(--border-color); /* 使用CSS变量 */
+    border: 2px dashed var(--border-color);
+    /* 使用CSS变量 */
     border-radius: 8px;
     cursor: pointer;
     transition: border-color 0.3s;
@@ -249,22 +255,26 @@ const handleSubmit = async () => {
     align-items: center;
     justify-content: center;
     position: relative;
-    background: var(--input-bg-color); /* 使用CSS变量 */
+    background: var(--input-bg-color);
+    /* 使用CSS变量 */
 }
 
 .upload-area:hover {
-    border-color: var(--active-text-color); /* 使用CSS变量 */
+    border-color: var(--active-text-color);
+    /* 使用CSS变量 */
 }
 
 .upload-placeholder {
     text-align: center;
-    color: var(--text-color); /* 使用CSS变量 */
+    color: var(--text-color);
+    /* 使用CSS变量 */
 }
 
 .upload-icon {
     font-size: 48px;
     margin-bottom: 10px;
-    color: var(--text-color); /* 使用CSS变量 */
+    color: var(--text-color);
+    /* 使用CSS变量 */
 }
 
 .upload-text {
@@ -274,7 +284,8 @@ const handleSubmit = async () => {
 
 .upload-hint {
     font-size: 12px;
-    color: var(--footer-color); /* 使用CSS变量 */
+    color: var(--footer-color);
+    /* 使用CSS变量 */
 }
 
 .preview-container {
@@ -339,7 +350,8 @@ const handleSubmit = async () => {
 
 .empty-state {
     text-align: center;
-    color: var(--footer-color); /* 使用CSS变量 */
+    color: var(--footer-color);
+    /* 使用CSS变量 */
 }
 
 .empty-icon {
@@ -375,7 +387,8 @@ const handleSubmit = async () => {
 :deep(.el-slider .el-slider__input:focus),
 :deep(.el-input__inner:focus),
 :deep(.el-textarea__inner:focus) {
-    border-color: var(--active-text-color); /* 使用CSS变量 */
+    border-color: var(--active-text-color);
+    /* 使用CSS变量 */
     outline: none;
 }
 
@@ -390,7 +403,8 @@ const handleSubmit = async () => {
 }
 
 :deep(.el-select-dropdown__item:hover) {
-    background-color: var(--menu-hover); /* 使用CSS变量 */
+    background-color: var(--menu-hover);
+    /* 使用CSS变量 */
     color: var(--text-color);
 }
 
@@ -467,5 +481,39 @@ const handleSubmit = async () => {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.info-card {
+    width: 100%;
+    background-color: var(--bg-color);
+    /* 使用CSS变量 */
+    border: 1px solid var(--border-color);
+    /* 使用CSS变量 */
+    border-radius: 8px;
+    padding: 10px;
+    height: 100px;
+}
+
+.info-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 3px;
+}
+
+.welcome-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 0;
+    margin-bottom: 3px;
+}
+
+.welcome-subtitle {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin: 0;
 }
 </style>
