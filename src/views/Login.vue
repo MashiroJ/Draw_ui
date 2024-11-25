@@ -187,7 +187,7 @@ const login = async () => {
       }
 
       ElNotification.success('登录成功');
-      router.push('/');
+      router.push('/Gallery');
     } else {
       ElNotification.error('登录失败');
       await getCaptcha();
