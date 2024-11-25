@@ -1,6 +1,6 @@
-/* src/assets/main.scss */
-
-/* 重置样式 */
+/* ===========================
+   全局基础样式
+=========================== */
 *,
 *::before,
 *::after {
@@ -11,70 +11,83 @@
 
 body {
     margin: 0;
-    background-color: var(--bg-color); /* 使用CSS变量 */
-    color: var(--text-color); /* 使用CSS变量 */
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* 可选：设置全局字体 */
+    background-color: var(--bg-color); /* 页面背景色 */
+    color: var(--text-color); /* 主要文字颜色 */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* 默认字体 */
     transition: background-color 0.3s, color 0.3s; /* 平滑过渡 */
 }
 
-/* 主题变量定义 */
+/* ===========================
+   CSS变量 - 亮色主题
+=========================== */
 :root {
-    /* 亮色主题变量 */
-    --bg-color: #ffffff;
-    --text-color: #303133;
-    --border-color: #e4e7ed;
-    --menu-hover: #ecf5ff;
-    --header-bg: #ffffff;
-    --aside-bg: #ffffff;
-    --footer-color: #666666;
-    --active-text-color: #409EFF;
+    --bg-color: #ffffff; /* 页面背景 */
+    --text-color: #303133; /* 主要文字颜色 */
+    --border-color: #e4e7ed; /* 边框颜色 */
+    --menu-hover: #ecf5ff; /* 菜单悬停背景色 */
+    --header-bg: #ffffff; /* 头部背景色 */
+    --aside-bg: #ffffff; /* 侧边栏背景 */
+    --footer-color: #666666; /* 页脚文字颜色 */
+    --active-text-color: #409EFF; /* 激活状态文本 */
 
-    /* 按钮相关变量 */
-    --button-bg-color: var(--active-text-color); /* 按钮默认背景色 */
-    --button-text-color: #ffffff; /* 按钮文字颜色 */
-    --button-hover-bg-color: #66b1ff; /* 按钮悬停背景色 */
-    --button-disabled-bg-color: #a0cfff; /* 按钮禁用背景色 */
+    /* 按钮 */
+    --button-bg-color: var(--active-text-color);
+    --button-text-color: #ffffff;
+    --button-hover-bg-color: #66b1ff;
+    --button-disabled-bg-color: #a0cfff;
 
-    /* 其他变量 */
-    --link-color: var(--active-text-color); /* 链接颜色 */
-    --link-hover-color: #66b1ff; /* 链接悬停颜色 */
-    --input-bg-color: #ffffff; /* 输入框背景色 */
-    --input-text-color: #303133; /* 输入框文字颜色 */
-    --input-border-color: #dcdfe6; /* 输入框边框色 */
+    /* 链接 */
+    --link-color: var(--active-text-color);
+    --link-hover-color: #66b1ff;
+
+    /* 输入框 */
+    --input-bg-color: #ffffff;
+    --input-text-color: #303133;
+    --input-border-color: #dcdfe6;
+
+    /* 阴影 */
+    --hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --focus-shadow: 0 0 8px rgba(64, 158, 255, 0.6);
 }
 
-/* 暗色主题变量 */
+/* ===========================
+   CSS变量 - 暗色主题
+=========================== */
 [data-theme='dark'] {
-    --bg-color: #1a1a1a;
-    --text-color: #ffffff;
-    --border-color: #363636;
-    --menu-hover: #2a2a2a;
-    --header-bg: #232323;
-    --aside-bg: #232323;
-    --footer-color: #999999;
-    --active-text-color: #ffd04b;
+    --bg-color: #1a1a1a; /* 页面背景 */
+    --text-color: #ffffff; /* 主要文字颜色 */
+    --border-color: #363636; /* 边框颜色 */
+    --menu-hover: #2a2a2a; /* 菜单悬停背景 */
+    --header-bg: #232323; /* 头部背景 */
+    --aside-bg: #232323; /* 侧边栏背景 */
+    --footer-color: #999999; /* 页脚文字颜色 */
+    --active-text-color: #ffd04b; /* 激活状态文本 */
 
-    /* 按钮相关变量 */
-    --button-bg-color: var(--active-text-color); /* 按钮默认背景色 */
-    --button-text-color: #1a1a1a; /* 按钮文字颜色 */
-    --button-hover-bg-color: #ffdf80; /* 按钮悬停背景色 */
-    --button-disabled-bg-color: rgba(255, 208, 75, 0.6); /* 按钮禁用背景色 */
+    /* 按钮 */
+    --button-bg-color: var(--active-text-color);
+    --button-text-color: #1a1a1a;
+    --button-hover-bg-color: #ffdf80;
+    --button-disabled-bg-color: rgba(255, 208, 75, 0.6);
 
-    /* 其他变量 */
-    --link-color: var(--active-text-color); /* 链接颜色 */
-    --link-hover-color: #ffdf80; /* 链接悬停颜色 */
-    --input-bg-color: #2a2a2a; /* 输入框背景色 */
-    --input-text-color: #ffffff; /* 输入框文字颜色 */
-    --input-border-color: #4a4a4a; /* 输入框边框色 */
+    /* 链接 */
+    --link-color: var(--active-text-color);
+    --link-hover-color: #ffdf80;
+
+    /* 输入框 */
+    --input-bg-color: #2a2a2a;
+    --input-text-color: #ffffff;
+    --input-border-color: #4a4a4a;
+
+    /* 阴影 */
+    --hover-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    --focus-shadow: 0 0 8px rgba(255, 208, 75, 0.6);
 }
 
-/* 按钮样式 */
-button {
-    font-family: inherit; /* 继承字体 */
-    font-size: 1rem;
-}
+/* ===========================
+   常用样式
+=========================== */
 
-/* 链接样式 */
+/* 链接 */
 a {
     color: var(--link-color);
     text-decoration: none;
@@ -85,7 +98,7 @@ a:hover {
     color: var(--link-hover-color);
 }
 
-/* 输入框样式 */
+/* 输入框 */
 input,
 textarea,
 .el-input,
@@ -93,104 +106,146 @@ textarea,
     background-color: var(--input-bg-color);
     color: var(--input-text-color);
     border: 1px solid var(--input-border-color);
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    transition: all 0.3s;
 }
 
-/* Element Plus 组件样式覆盖 */
+input:focus,
+textarea:focus,
+.el-input:focus,
+.el-textarea:focus {
+    border-color: var(--active-text-color);
+    box-shadow: var(--focus-shadow);
+    outline: none;
+}
+
+/* 禁用输入框 */
+input[disabled],
+textarea[disabled],
+.el-input[disabled],
+.el-textarea[disabled] {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    border-color: var(--border-color);
+}
+
+/* 按钮 */
+button,
 .el-button {
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
     border: none;
-    transition: background-color 0.3s, color 0.3s;
-
-    &:hover {
-        background-color: var(--button-hover-bg-color);
-    }
-
-    &:disabled {
-        background-color: var(--button-disabled-bg-color);
-        cursor: not-allowed;
-    }
+    transition: all 0.3s;
 }
+
+button:hover,
+.el-button:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
+button:disabled,
+.el-button.is-disabled {
+    background-color: var(--button-disabled-bg-color);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+}
+
+/* ===========================
+   组件样式覆盖
+=========================== */
 
 /* 表格样式 */
 .el-table {
     background-color: var(--bg-color);
     color: var(--text-color);
     border: 1px solid var(--border-color);
+    transition: all 0.3s;
 }
 
 .el-table th,
 .el-table td {
+    background-color: var(--bg-color);
+    color: var(--text-color);
     border-color: var(--border-color);
+    transition: all 0.3s;
 }
 
-/* 表单项标签 */
-.el-form-item__label {
+.el-table td:hover {
+    background-color: var(--menu-hover);
+}
+
+/* 表头样式 */
+.el-table th {
+    background-color: var(--header-bg);
+    font-weight: bold;
     color: var(--text-color);
 }
 
-/* 表单项内容 */
-.el-form-item__content {
-    color: var(--text-color);
-}
-
-/* 分页组件样式 */
+/* 分页组件 */
 .pagination :deep(.el-pagination) {
     background-color: var(--bg-color);
     border: 1px solid var(--border-color);
 }
 
-.pagination :deep(.el-pagination__total),
-.pagination :deep(.el-pagination__sizes),
-.pagination :deep(.el-pagination__jump),
-.pagination :deep(.el-pagination__rightwrapper) {
-    color: var(--text-color);
+.pagination :deep(.el-pagination__button:hover),
+.pagination :deep(.el-pagination__page-link:hover) {
+    background-color: var(--menu-hover);
+    border-color: var(--active-text-color);
 }
 
-.pagination :deep(.el-pagination__button),
-.pagination :deep(.el-pagination__prev),
-.pagination :deep(.el-pagination__next),
-.pagination :deep(.el-pagination__page-link) {
+.pagination :deep(.el-pagination__button.is-active) {
+    background-color: var(--header-bg);
+    border-color: var(--active-text-color);
+}
+
+/* 对话框 */
+.el-dialog {
     background-color: var(--bg-color);
     color: var(--text-color);
     border: 1px solid var(--border-color);
+    box-shadow: var(--hover-shadow);
 }
 
-.pagination :deep(.el-pagination__button:hover),
-.pagination :deep(.el-pagination__prev:hover),
-.pagination :deep(.el-pagination__next:hover),
-.pagination :deep(.el-pagination__page-link:hover) {
-    background-color: var(--menu-hover);
-    color: var(--text-color);
-}
-
-.pagination :deep(.el-pagination__button.is-active),
-.pagination :deep(.el-pagination__prev.is-active),
-.pagination :deep(.el-pagination__next.is-active),
-.pagination :deep(.el-pagination__page-link.is-active) {
+.el-dialog__header {
     background-color: var(--header-bg);
     color: var(--text-color);
-    border: 1px solid var(--border-color);
 }
 
-/* 其他组件样式覆盖 */
-/* 例如 Dialog */
-.el-dialog__header,
-.el-dialog__footer {
-    background-color: var(--header-bg);
-    color: var(--text-color);
-    border-bottom: 1px solid var(--border-color);
-}
-
-/* Switch 组件 */
+/* Switch */
 .el-switch {
     --el-switch-background-color: var(--active-text-color);
 }
 
-/* 确保图片适配主题背景 */
-img {
-    max-width: 100%;
-    height: auto;
-    display: block;
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--active-text-color);
+}
+
+/* ===========================
+   自定义样式和调整
+=========================== */
+
+/* 页面容器 */
+.page-container {
+    padding: 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-radius: 8px;
+    box-shadow: var(--hover-shadow);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 10px;
+    }
 }
