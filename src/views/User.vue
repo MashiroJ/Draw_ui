@@ -15,15 +15,31 @@
     <!-- 搜索表单 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" label-width="68px">
       <el-form-item label="用户名" prop="username">
-        <el-input v-model="queryParams.username" placeholder="请输入用户名" clearable style="width: 240px"
-          @keyup.enter="getUsers" />
+        <el-input
+          v-model="queryParams.username"
+          placeholder="请输入用户名"
+          clearable
+          style="width: 240px"
+          @keyup.enter="getUsers"
+        />
       </el-form-item>
       <el-form-item label="手机号码" prop="phone">
-        <el-input v-model="queryParams.phone" placeholder="请输入手机号码" clearable style="width: 240px"
-          @keyup.enter="getUsers" />
+        <el-input
+          v-model="queryParams.phone"
+          placeholder="请输入手机号码"
+          clearable
+          style="width: 240px"
+          @keyup.enter="getUsers"
+        />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="用户状态" clearable style="width: 240px" @change="getUsers">
+        <el-select
+          v-model="queryParams.status"
+          placeholder="用户状态"
+          clearable
+          style="width: 240px"
+          @change="getUsers"
+        >
           <el-option label="正常" value="正常"></el-option>
           <el-option label="禁用" value="禁用"></el-option>
         </el-select>
@@ -41,7 +57,12 @@
       <el-table-column label="手机号码" align="center" prop="phone" width="120" />
       <el-table-column label="状态" align="center">
         <template #default="{ row }">
-          <el-switch v-model="row.status" active-value="正常" inactive-value="禁用" @change="handleStatusChange(row)" />
+          <el-switch
+            v-model="row.status"
+            active-value="正常"
+            inactive-value="禁用"
+            @change="handleStatusChange(row)"
+          />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="200">
@@ -54,9 +75,18 @@
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
-      layout="total, sizes, prev, pager, next" background :total="total" @size-change="onSizeChange"
-      @current-change="onCurrentChange" class="pagination" style="margin-top: 20px; justify-content: flex-end" />
+    <el-pagination
+      v-model:current-page="pageNum"
+      v-model:page-size="pageSize"
+      :page-sizes="[5, 10, 15, 20]"
+      layout="total, sizes, prev, pager, next"
+      background
+      :total="total"
+      @size-change="onSizeChange"
+      @current-change="onCurrentChange"
+      class="pagination"
+      style="margin-top: 20px; justify-content: flex-end"
+    />
 
     <!-- 新增/修改用户对话框 -->
     <el-dialog :title="formTitle" v-model="dialogVisible" width="500px">
@@ -78,6 +108,36 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 授权对话框 -->
+    <el-dialog title="分配角色" v-model="assignRoleDialogVisible" width="500px">
+      <el-form :model="assignRoleForm" ref="assignRoleFormRef" label-width="80px">
+        <el-form-item label="用户名">
+          <el-input v-model="assignRoleForm.username" disabled />
+        </el-form-item>
+        <el-form-item
+          label="角色"
+          prop="roleId"
+          :rules="[ { required: true, message: '请选择一个角色', trigger: 'change' } ]"
+        >
+          <el-select
+            ref="roleSelectRef"
+            v-model="assignRoleForm.roleId"
+            placeholder="请选择角色"
+            style="width: 100%"
+            @change="handleRoleSelectChange"
+          >
+            <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="assignRoleDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitAssignRoleForm">授权</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -91,7 +151,10 @@ import {
   deleteUser,
   addUser,
   updateUser,
+  grantUserRole,
+  getUserRoles
 } from '@/api/user';
+import { getRoleList } from '@/api/role'; // 导入获取角色列表的 API
 import { useThemeStore } from '@/stores/theme';
 
 // 用户列表数据模型
@@ -109,6 +172,22 @@ const queryParams = reactive({
 
 // 加载状态
 const loading = ref(false);
+
+// 定义表单验证规则
+const rules = {
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 3, max: 15, message: '长度在 3 到 15 个字符', trigger: 'blur' },
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, message: '密码至少6位', trigger: 'blur' },
+  ],
+  phone: [
+    { required: true, message: '请输入手机号码', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的手机号码', trigger: 'blur' },
+  ],
+};
 
 // 获取用户列表
 const getUsers = async () => {
@@ -214,15 +293,19 @@ const handleDelete = async (row) => {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
-  }).then(async () => {
-    try {
-      await deleteUser(row.id);
-      ElNotification.success('删除成功');
-      getUsers();
-    } catch (error) {
-      ElNotification.error('删除失败');
-    }
-  });
+  })
+    .then(async () => {
+      try {
+        await deleteUser(row.id);
+        ElNotification.success('删除成功');
+        getUsers();
+      } catch (error) {
+        ElNotification.error('删除失败');
+      }
+    })
+    .catch(() => {
+      // 用户取消删除操作
+    });
 };
 
 // 分页变化
@@ -236,9 +319,76 @@ const onCurrentChange = (page) => {
   getUsers();
 };
 
+// 授权对话框状态
+const assignRoleDialogVisible = ref(false);
+const assignRoleForm = reactive({
+  userId: null,
+  username: '',
+  roleId: null, // 单个角色 ID
+});
+const assignRoleFormRef = ref(null);
+
+// 角色列表（从API获取）
+const roles = ref([]);
+
+// 角色选择框的引用
+const roleSelectRef = ref(null);
+
+// 获取角色列表的方法
+const getRoles = async () => {
+  try {
+    const response = await getRoleList(); // 实现 getRoleList API
+    roles.value = response.data || [];
+  } catch (error) {
+    ElNotification.error('获取角色列表失败');
+  }
+};
+
+// 处理分配角色
+const handleAssignRole = async (row) => {
+  assignRoleForm.userId = row.id;
+  assignRoleForm.username = row.username;
+  assignRoleForm.roleId = null; // 重置已选择的角色
+  try {
+    const response = await getUserRoles(row.id); // 获取当前用户的角色
+    // 假设返回的数据是角色 ID 的数组
+    if (response.data && response.data.length > 0) {
+      assignRoleForm.roleId = response.data[0]; // 只取第一个角色作为默认选中
+    }
+  } catch (error) {
+    ElNotification.error('获取当前用户角色失败');
+  }
+  assignRoleDialogVisible.value = true;
+};
+
+// 处理角色选择后的关闭事件
+const handleRoleSelectChange = () => {
+  if (roleSelectRef.value) {
+    roleSelectRef.value.blur(); // 关闭下拉框
+  }
+};
+
+// 提交授权表单
+const submitAssignRoleForm = () => {
+  assignRoleFormRef.value.validate(async (valid) => {
+    if (valid) {
+      try {
+        // 为用户分配新的角色
+        await grantUserRole(assignRoleForm.userId, assignRoleForm.roleId);
+        ElNotification.success('授权成功');
+        assignRoleDialogVisible.value = false;
+        getUsers();
+      } catch (error) {
+        ElNotification.error('授权失败');
+      }
+    }
+  });
+};
+
 // 初始化加载数据
 onMounted(() => {
   getUsers();
+  getRoles();
 });
 </script>
 
