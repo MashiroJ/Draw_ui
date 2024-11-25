@@ -48,6 +48,10 @@ body {
     /* 阴影 */
     --hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     --focus-shadow: 0 0 8px rgba(64, 158, 255, 0.6);
+
+    /* 表格相关 */
+    --table-header-bg: var(--header-bg);
+    --table-header-text: var(--text-color);
 }
 
 /* ===========================
@@ -81,6 +85,10 @@ body {
     /* 阴影 */
     --hover-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
     --focus-shadow: 0 0 8px rgba(255, 208, 75, 0.6);
+
+    /* 表格相关 */
+    --table-header-bg: #232323; /* 暗色模式下表头背景色 */
+    --table-header-text: #ffffff; /* 暗色模式下表头文字色 */
 }
 
 /* ===========================
@@ -169,15 +177,69 @@ button:disabled,
     transition: all 0.3s;
 }
 
+/* 移除单个单元格悬停样式，避免不一致 */
 .el-table td:hover {
-    background-color: var(--menu-hover);
+    /* background-color: var(--menu-hover) !important; */ /* 移除此样式 */
 }
 
-/* 表头样式 */
-.el-table th {
-    background-color: var(--header-bg);
-    font-weight: bold;
-    color: var(--text-color);
+/* 应用悬停样式到整个行 */
+.el-table__row:hover {
+    background-color: var(--menu-hover) !important; /* 在暗色模式下为深色 */
+    color: var(--text-color) !important; /* 保持文字颜色一致 */
+}
+
+/* 确保所有单元格在悬停时背景颜色一致 */
+.el-table__row:hover td {
+    background-color: var(--menu-hover) !important;
+    color: var(--text-color) !important;
+}
+
+/* 表头样式增强 */
+.el-table__header {
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-header-text) !important;
+}
+
+.el-table__header th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-header-text) !important;
+    text-align: center;
+}
+
+/* 表体单元格文字居中 */
+.el-table__body td {
+    text-align: center;
+}
+
+/* 表头单元格悬停效果 */
+.el-table__header th:hover {
+    background-color: var(--menu-hover) !important;
+    color: var(--table-header-text) !important;
+}
+
+/* 表头排序箭头颜色 */
+.el-table__sorter {
+    color: var(--text-color) !important;
+}
+
+.el-table__sorter.asc::after,
+.el-table__sorter.desc::after {
+    border-color: var(--text-color) transparent transparent transparent !important;
+}
+
+/* 表格组件的滚动条样式 */
+.el-table::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.el-table::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+}
+
+.el-table::-webkit-scrollbar-thumb:hover {
+    background-color: var(--active-text-color);
 }
 
 /* 分页组件 */
@@ -198,36 +260,61 @@ button:disabled,
 }
 
 /* 对话框 */
-.el-dialog {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--hover-shadow);
+::v-deep .el-dialog {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--hover-shadow) !important;
 }
 
-.el-dialog__header {
-    background-color: var(--header-bg);
-    color: var(--text-color);
+::v-deep .el-dialog__header {
+    background-color: var(--header-bg) !important;
+    color: var(--text-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
 }
 
-/* Switch */
-.el-switch {
-    --el-switch-background-color: var(--active-text-color);
+::v-deep .el-dialog__body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
 }
 
-/* 滚动条样式 */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+::v-deep .el-dialog__footer {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    border-top: 1px solid var(--border-color) !important;
 }
 
-::-webkit-scrollbar-thumb {
-    background-color: var(--border-color);
-    border-radius: 4px;
+/* 对话框内表单项样式 */
+::v-deep .el-form-item {
+    color: var(--text-color) !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background-color: var(--active-text-color);
+::v-deep .el-input {
+    background-color: var(--input-bg-color) !important;
+    color: var(--input-text-color) !important;
+    border: 1px solid var(--input-border-color) !important;
+}
+
+::v-deep .el-input:hover,
+::v-deep .el-input:focus {
+    border-color: var(--active-text-color) !important;
+    box-shadow: var(--focus-shadow) !important;
+}
+
+/* 对话框按钮样式 */
+::v-deep .el-dialog .el-button {
+    background-color: var(--button-bg-color) !important;
+    color: var(--button-text-color) !important;
+    border: none !important;
+}
+
+::v-deep .el-dialog .el-button:hover {
+    background-color: var(--button-hover-bg-color) !important;
+}
+
+::v-deep .el-dialog .el-button.is-plain:hover {
+    background-color: var(--menu-hover) !important;
+    color: var(--text-color) !important;
 }
 
 /* ===========================
@@ -248,4 +335,51 @@ button:disabled,
     .page-container {
         padding: 10px;
     }
+}
+
+/* 信息卡片样式 */
+.info-card {
+    width: 100%;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    height: 80px;
+}
+
+.info-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 100%;
+    padding: 3px;
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: -5px;
+}
+
+.welcome-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.welcome-subtitle {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* 对话框底部按钮样式 */
+.dialog-footer {
+    text-align: right;
+    margin-top: 20px;
 }

@@ -1,17 +1,23 @@
 <script setup>
 import { Edit, Delete } from '@element-plus/icons-vue';
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useMenuListService, saveOrUpdateMenu, deleteMenu } from '@/api/menu.js';
 import { ElNotification, ElMessageBox } from 'element-plus';
-import { onMounted } from 'vue';
 
 const menuList = ref([]);
 
 // 获取菜单列表
 const getMenuList = async () => {
-  const result = await useMenuListService();
-  if (result && result.data) {
-    menuList.value = result.data;
+  try {
+    const result = await useMenuListService();
+    if (result && result.data) {
+      menuList.value = result.data;
+    } else {
+      ElNotification.warning('未获取到菜单数据');
+    }
+  } catch (error) {
+    ElNotification.error('获取菜单列表失败');
+    console.error(error);
   }
 };
 
@@ -25,6 +31,7 @@ const form = reactive({
 });
 const isEdit = ref(false);
 
+// 打开对话框
 const openDialog = (menu = null) => {
   if (menu) {
     isEdit.value = true;
@@ -51,24 +58,27 @@ const submitForm = async () => {
     getMenuList();
   } catch (error) {
     ElNotification.error(isEdit.value ? '菜单更新失败' : '菜单添加失败');
+    console.error(error);
   }
 };
 
 // 删除菜单
 const handleDelete = async (id) => {
-  await ElMessageBox.confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
-    confirmButtonText: '继续',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    try {
-      await deleteMenu(id);
-      ElNotification.success('菜单删除成功');
-      getMenuList();
-    } catch (error) {
+  try {
+    await ElMessageBox.confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
+      confirmButtonText: '继续',
+      cancelButtonText: '取消',
+      type: 'warning'
+    });
+    await deleteMenu(id);
+    ElNotification.success('菜单删除成功');
+    getMenuList();
+  } catch (error) {
+    if (error !== 'cancel') { // 排除用户取消的情况
       ElNotification.error('删除菜单失败');
+      console.error(error);
     }
-  });
+  }
 };
 
 // 页面加载时获取菜单列表
@@ -110,13 +120,13 @@ onMounted(() => {
     <!-- 新增/编辑菜单对话框 -->
     <el-dialog :title="isEdit ? '编辑菜单' : '新增菜单'" v-model="dialogVisible" width="500px">
       <el-form :model="form" label-width="80px">
-        <el-form-item label="菜单名称" prop="name">
+        <el-form-item label="菜单名称" prop="name" :rules="[{ required: true, message: '请输入菜单名称', trigger: 'blur' }]">
           <el-input v-model="form.name" placeholder="请输入菜单名称" />
         </el-form-item>
-        <el-form-item label="路径" prop="path">
+        <el-form-item label="路径" prop="path" :rules="[{ required: true, message: '请输入菜单路径', trigger: 'blur' }]">
           <el-input v-model="form.path" placeholder="请输入菜单路径" />
         </el-form-item>
-        <el-form-item label="权限符" prop="permission">
+        <el-form-item label="权限符" prop="permission" :rules="[{ required: true, message: '请输入权限符', trigger: 'blur' }]">
           <el-input v-model="form.permission" placeholder="请输入权限符" />
         </el-form-item>
       </el-form>
@@ -130,15 +140,19 @@ onMounted(() => {
   </el-card>
 </template>
 
-<style lang="scss" scoped>  
+<style lang="scss" scoped>
+/* 保留页面容器和信息卡片的样式，移除对 el-table 的样式覆盖 */
+
+/* 页面容器 */
 .page-container {  
   padding: 20px;  
   background-color: var(--bg-color);  
   color: var(--text-color);  
   border-radius: 8px;  
-  box-shadow: 0 2px 12px var(--border-color);  
+  box-shadow: var(--hover-shadow);  
 }  
 
+/* 信息卡片样式 */
 .info-card {  
   width: 100%;  
   background-color: var(--bg-color);  
@@ -179,16 +193,25 @@ onMounted(() => {
   line-height: 1.2;  
 }  
 
-// 表格相关样式  
-.el-table {  
-  background-color: var(--bg-color);  
-  color: var(--text-color);  
-  margin-top: 20px;  
-}  
-
-// 对话框底部按钮样式  
+/* 对话框底部按钮样式 */
 .dialog-footer {  
   text-align: right;  
   margin-top: 20px;  
-}  
-</style> 
+}
+
+/* 使用深度选择器覆盖表头样式（如果需要） */
+::v-deep .el-table__header {
+    background-color: var(--table-header-bg);
+    color: var(--table-header-text);
+}
+
+::v-deep .el-table__header th {
+    background-color: var(--table-header-bg);
+    color: var(--table-header-text);
+}
+
+::v-deep .el-table__header th:hover {
+    background-color: var(--menu-hover);
+    color: var(--table-header-text);
+}
+</style>
