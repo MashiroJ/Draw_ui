@@ -394,140 +394,220 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .page-container {
-  padding: 20px;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  border-radius: 8px;
-  box-shadow: 0 2px 12px var(--border-color);
-}
+  padding: 24px;
+  background: var(--bg-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--header-bg);
-  padding: 10px;
-  border-radius: 4px;
-}
+  /* 标题卡片美化 */
+  .info-card {
+    background: linear-gradient(135deg, var(--el-color-primary-light-7) 0%, var(--el-color-primary-light-9) 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: auto;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+    border-radius: 12px;
 
-.dialog-footer {
-  text-align: right;
-}
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
 
-.el-table {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
+    .info-card-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-/* 使用 :deep() 深入覆盖 el-pagination 的内部样式 */
-.pagination :deep(.el-pagination) {
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-}
+      .info-text {
+        .welcome-title {
+          font-size: 24px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          background: linear-gradient(45deg, var(--el-color-primary) 0%, var(--el-color-primary-light-3) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
 
-.pagination :deep(.el-pagination__total),
-.pagination :deep(.el-pagination__sizes),
-.pagination :deep(.el-pagination__jump),
-.pagination :deep(.el-pagination__rightwrapper) {
-  color: var(--text-color);
-}
+        .welcome-subtitle {
+          font-size: 14px;
+          color: var(--text-color);
+          opacity: 0.8;
+        }
+      }
+    }
+  }
 
-.pagination :deep(.el-pagination__button),
-.pagination :deep(.el-pagination__prev),
-.pagination :deep(.el-pagination__next),
-.pagination :deep(.el-pagination__page-link) {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-}
+  /* 搜索表单美化 */
+  .el-form {
+    background: var(--bg-color);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color);
 
-/* 鼠标悬停状态 */
-.pagination :deep(.el-pagination__button:hover),
-.pagination :deep(.el-pagination__prev:hover),
-.pagination :deep(.el-pagination__next:hover),
-.pagination :deep(.el-pagination__page-link:hover) {
-  background-color: var(--menu-hover);
-  color: var(--text-color);
-}
+    .el-form-item {
+      margin-bottom: 16px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
 
-/* 活动状态 */
-.pagination :deep(.el-pagination__button.is-active),
-.pagination :deep(.el-pagination__prev.is-active),
-.pagination :deep(.el-pagination__next.is-active),
-.pagination :deep(.el-pagination__page-link.is-active) {
-  background-color: var(--header-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-}
+      :deep(.el-input__inner) {
+        border-radius: 8px;
+        transition: all 0.3s ease;
 
-/* 分页中的页码文本 */
-.pagination :deep(.el-pagination__pager li) {
-  color: var(--text-color);
-}
+        &:hover, &:focus {
+          border-color: var(--el-color-primary);
+          box-shadow: 0 0 0 2px var(--el-color-primary-light-8);
+        }
+      }
 
-/* 分页中的输入框和下拉菜单 */
-.pagination :deep(.el-pagination__jump input),
-.pagination :deep(.el-pagination__sizes select) {
-  color: var(--text-color);
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-}
+      :deep(.el-select) {
+        width: 100%;
+      }
 
-/* 分页中的跳转按钮 */
-.pagination :deep(.el-pagination__jump button) {
-  color: var(--text-color);
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-}
+      .el-button {
+        padding: 8px 20px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
 
-.pagination :deep(.el-pagination__jump button:hover) {
-  background-color: var(--menu-hover);
-  color: var(--text-color);
-}
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
 
-.pagination :deep(.el-pagination__jump button.is-active) {
-  background-color: var(--header-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-}
+  /* 表格美化 */
+  .el-table {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
 
-.info-card {
-  width: 100%;
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px;
-  height: 80px; // 稍微减小高度使其更紧凑  
-}
+    :deep(th.el-table__cell) {
+      background-color: var(--el-color-primary-light-9);
+      color: var(--text-color);
+      font-weight: 600;
+    }
 
-.info-card-content {
-  display: flex;
-  justify-content: space-between; // 使用 space-between 来分散对齐  
-  align-items: flex-start; // 改为顶部对齐
-  height: 100%;
-  padding: 3px;
-}
+    :deep(.el-table__row) {
+      transition: all 0.3s ease;
 
-.info-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px; // 减小标题和副标题之间的间距  
-  margin-top: -5px; // 添加负的上边距使整体往上移  
-}
+      &:hover {
+        background-color: var(--el-color-primary-light-9) !important;
+        transform: translateY(-2px);
+      }
+    }
 
-.welcome-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--text-color);
-  margin: 0;
-  line-height: 1.2; // 添加行高控制 
-}
+    .el-button {
+      &.is-circle {
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: translateY(-2px) scale(1.1);
+        }
+      }
+    }
+  }
 
-.welcome-subtitle {
-  font-size: 12px;
-  color: var(--text-color);
-  opacity: 0.8;
-  margin: 0;
-  line-height: 1.2; // 添加行高控制
+  /* 分页器美化 */
+  .pagination {
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+
+    :deep(.el-pagination) {
+      justify-content: flex-end;
+      
+      .el-pagination__total,
+      .el-pagination__sizes,
+      .el-pagination__jump {
+        margin-right: 16px;
+      }
+
+      .el-pagination__sizes .el-input__inner {
+        border-radius: 8px;
+      }
+
+      button {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+
+      .el-pager li {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+
+        &.active {
+          background-color: var(--el-color-primary);
+          color: white;
+        }
+      }
+    }
+  }
+
+  /* 对话框美化 */
+  :deep(.el-dialog) {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    .el-dialog__header {
+      padding: 20px 24px;
+      margin: 0;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-color);
+
+      .el-dialog__title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+    }
+
+    .el-dialog__body {
+      padding: 24px;
+      background: var(--bg-color);
+
+      .el-form-item {
+        margin-bottom: 20px;
+
+        .el-input__inner {
+          border-radius: 8px;
+        }
+      }
+    }
+
+    .el-dialog__footer {
+      padding: 16px 24px;
+      background: var(--bg-color);
+      border-top: 1px solid var(--border-color);
+
+      .el-button {
+        padding: 8px 20px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
 }
 </style>
