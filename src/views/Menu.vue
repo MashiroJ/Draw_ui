@@ -141,77 +141,174 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-/* 保留页面容器和信息卡片的样式，移除对 el-table 的样式覆盖 */
+.page-container {
+  padding: 24px;
+  background: var(--bg-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 
-/* 页面容器 */
-.page-container {  
-  padding: 20px;  
-  background-color: var(--bg-color);  
-  color: var(--text-color);  
-  border-radius: 8px;  
-  box-shadow: var(--hover-shadow);  
-}  
+  /* 标题卡片美化 */
+  .info-card {
+    background: linear-gradient(135deg, var(--el-color-primary-light-7) 0%, var(--el-color-primary-light-9) 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: auto;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+    border-radius: 12px;
 
-/* 信息卡片样式 */
-.info-card {  
-  width: 100%;  
-  background-color: var(--bg-color);  
-  border: 1px solid var(--border-color);  
-  border-radius: 8px;  
-  padding: 10px;  
-  height: 80px;  
-}  
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
 
-.info-card-content {  
-  display: flex;  
-  justify-content: space-between;  
-  align-items: flex-start;  
-  height: 100%;  
-  padding: 3px;  
-}  
+    .info-card-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-.info-text {  
-  display: flex;  
-  flex-direction: column;  
-  gap: 2px;  
-  margin-top: -5px;  
-}  
+      .info-text {
+        .welcome-title {
+          font-size: 24px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          background: linear-gradient(45deg, var(--el-color-primary) 0%, var(--el-color-primary-light-3) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
 
-.welcome-title {  
-  font-size: 16px;  
-  font-weight: bold;  
-  color: var(--text-color);  
-  margin: 0;  
-  line-height: 1.2;  
-}  
+        .welcome-subtitle {
+          font-size: 14px;
+          color: var(--text-color);
+          opacity: 0.8;
+        }
+      }
+    }
+  }
 
-.welcome-subtitle {  
-  font-size: 12px;  
-  color: var(--text-color);  
-  opacity: 0.8;  
-  margin: 0;  
-  line-height: 1.2;  
-}  
+  /* 表格美化 */
+  .el-table {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
 
-/* 对话框底部按钮样式 */
-.dialog-footer {  
-  text-align: right;  
-  margin-top: 20px;  
+    :deep(th.el-table__cell) {
+      background-color: var(--el-color-primary-light-9);
+      color: var(--text-color);
+      font-weight: 600;
+      padding: 16px 0;
+    }
+
+    :deep(.el-table__row) {
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: var(--el-color-primary-light-9) !important;
+        transform: translateY(-2px);
+      }
+
+      td {
+        padding: 16px 0;
+      }
+    }
+
+    .el-button {
+      &.is-circle {
+        transition: all 0.3s ease;
+        margin: 0 4px;
+        
+        &:hover {
+          transform: translateY(-2px) scale(1.1);
+        }
+      }
+    }
+  }
+
+  /* 对话框美化 */
+  :deep(.el-dialog) {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    .el-dialog__header {
+      padding: 20px 24px;
+      margin: 0;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-color);
+
+      .el-dialog__title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+    }
+
+    .el-dialog__body {
+      padding: 24px;
+      background: var(--bg-color);
+
+      .el-form-item {
+        margin-bottom: 20px;
+
+        .el-input__inner {
+          border-radius: 8px;
+          transition: all 0.3s ease;
+
+          &:hover, &:focus {
+            border-color: var(--el-color-primary);
+            box-shadow: 0 0 0 2px var(--el-color-primary-light-8);
+          }
+        }
+      }
+    }
+
+    .el-dialog__footer {
+      padding: 16px 24px;
+      background: var(--bg-color);
+      border-top: 1px solid var(--border-color);
+
+      .el-button {
+        padding: 8px 20px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+
+  /* Empty 状态美化 */
+  :deep(.el-empty) {
+    padding: 40px 0;
+    
+    .el-empty__image {
+      width: 120px;
+      height: 120px;
+    }
+    
+    .el-empty__description {
+      margin-top: 16px;
+      color: var(--text-color);
+      font-size: 14px;
+    }
+  }
 }
 
-/* 使用深度选择器覆盖表头样式（如果需要） */
-::v-deep .el-table__header {
-    background-color: var(--table-header-bg);
-    color: var(--table-header-text);
-}
-
-::v-deep .el-table__header th {
-    background-color: var(--table-header-bg);
-    color: var(--table-header-text);
-}
-
-::v-deep .el-table__header th:hover {
-    background-color: var(--menu-hover);
-    color: var(--table-header-text);
+/* 暗色模式适配 */
+:deep(.el-table) {
+  --el-table-border-color: var(--border-color);
+  --el-table-border: 1px solid var(--border-color);
+  --el-table-text-color: var(--text-color);
+  --el-table-header-text-color: var(--text-color);
+  --el-table-row-hover-bg-color: var(--el-color-primary-light-9);
+  background-color: var(--bg-color);
+  
+  .el-table__cell {
+    background-color: var(--bg-color);
+  }
 }
 </style>
