@@ -4,12 +4,9 @@
     <!-- 欢迎卡片 -->
     <el-card class="welcome-card" style="margin-bottom: 20px;">
       <div class="welcome-content">
-        <div class="welcome-avatar">
-          <img :src="user.avatar || defaultAvatar" alt="用户头像" class="welcome-avatar-image">
-        </div>
         <div class="welcome-text">
           <h2 class="welcome-title">Hello {{ user.userName }}!</h2>
-          <p class="welcome-subtitle">欢迎使用绘画梦工厂</p>
+          <p class="welcome-subtitle">欢迎回到个人中心</p>
         </div>
       </div>
     </el-card>
@@ -127,7 +124,7 @@
                   <!-- 前端技术 -->
                   <el-col :span="12" :xs="24">
                     <div class="tech-section">
-                      <h3>前端技</h3>
+                      <h3>前端技术</h3>
                       <ul>
                         <li>Vue</li>
                         <li>Pinia</li>
@@ -450,7 +447,7 @@ onMounted(() => {
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
       transform: rotate(-45deg);
       pointer-events: none;
     }
@@ -466,22 +463,6 @@ onMounted(() => {
       display: flex;
       align-items: center;
       gap: 24px;
-
-      .welcome-avatar {
-        .welcome-avatar-image {
-          width: 64px;
-          height: 64px;
-          border-radius: 50%;
-          border: 3px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          transition: all 0.3s ease;
-
-          &:hover {
-            transform: scale(1.1);
-            border-color: white;
-          }
-        }
-      }
 
       .welcome-text {
         .welcome-title {
@@ -505,7 +486,7 @@ onMounted(() => {
   .el-row {
     display: flex;
     margin: 0 -10px;
-    
+
     .el-col {
       padding: 0 10px;
       display: flex;
@@ -605,6 +586,7 @@ onMounted(() => {
       .tech-section {
         h3 {
           color: #005bea; // 新的主题色
+
           &::before {
             background: #00c6fb; // 新的装饰条颜色
           }
@@ -625,7 +607,7 @@ onMounted(() => {
 
     .el-row {
       margin: 0;
-      
+
       .el-col {
         padding: 0;
       }
