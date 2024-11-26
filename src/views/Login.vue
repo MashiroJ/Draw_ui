@@ -46,12 +46,7 @@
           <el-input placeholder="请输入验证码" v-model="loginData.captcha"></el-input>
           <img :src="captchaImg" @click="getCaptcha" alt="captcha" style="cursor: pointer" />
         </el-form-item>
-        <el-form-item>
-          <div class="flex">
-            <el-checkbox>记住我</el-checkbox>
-            <el-link type="primary" :underline="false">忘记密码？</el-link>
-          </div>
-        </el-form-item>
+
         <el-form-item>
           <el-button class="button" type="primary" @click="login">
             登录
@@ -223,28 +218,242 @@ const toggleForm = () => {
 <style lang="scss" scoped>
 .login-page {
   height: 100vh;
-  background-color: #fff;
+  background-color: var(--bg-color);
+  display: flex;
 
+  /* 左侧背景区域优化 */
   .bg {
     background: url('@/assets/logo.png') no-repeat 60% center / 240px auto,
       url('@/assets/login_bg.jpg') no-repeat center / cover;
     border-radius: 0 20px 20px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 10px 0 20px rgba(0, 0, 0, 0.1);
+    
+    /* 移除模糊,改用渐变遮罩 */
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.2),
+        rgba(0, 0, 0, 0.1)
+      );
+      pointer-events: none;
+    }
+
+    /* 添加装饰性光效 */
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at 70% center,
+        rgba(255, 255, 255, 0.2) 0%,
+        transparent 50%
+      );
+      pointer-events: none;
+    }
   }
 
+  /* 右侧表单区域优化 */
   .form {
     display: flex;
     flex-direction: column;
     justify-content: center;
     user-select: none;
+    padding: 0 64px;
+    position: relative;
+    background: var(--bg-color);
 
-    .button {
-      width: 100%;
+    /* 表单标题 */
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 48px;
+      background: linear-gradient(45deg, var(--el-color-primary), var(--el-color-primary-light-3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      position: relative;
+
+      /* 添加装饰性下划线 */
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--el-color-primary), var(--el-color-primary-light-3));
+        border-radius: 2px;
+      }
     }
 
+    /* 表单项美化 */
+    :deep(.el-form-item) {
+      margin-bottom: 28px;
+
+      .el-input__wrapper {
+        background: var(--bg-color);
+        border: 2px solid var(--border-color);
+        box-shadow: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: var(--el-color-primary-light-5);
+          transform: translateY(-2px);
+        }
+
+        &.is-focus {
+          border-color: var(--el-color-primary);
+          box-shadow: 0 0 0 4px var(--el-color-primary-light-8);
+          transform: translateY(-2px);
+        }
+
+        .el-input__inner {
+          color: var(--text-color);
+          height: 40px;
+          font-size: 16px;
+
+          &::placeholder {
+            color: var(--el-text-color-placeholder);
+          }
+        }
+
+        .el-input__prefix {
+          font-size: 20px;
+          color: var(--el-text-color-secondary);
+        }
+      }
+    }
+
+    /* 验证码区域 */
+    .el-form-item.captcha-item {
+      :deep(.el-form-item__content) {
+        display: flex;
+        gap: 16px;
+
+        .el-input {
+          flex: 1;
+        }
+
+        img {
+          height: 44px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+          &:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+        }
+      }
+    }
+
+    /* 记住我和忘记密码 */
     .flex {
-      width: 100%;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 32px;
+      gap: 24px;
+
+      .el-link {
+        font-size: 14px;
+        color: var(--el-color-primary);
+        font-weight: 500;
+
+        &:hover {
+          color: var(--el-color-primary-light-3);
+        }
+
+        &[type="info"] {
+          color: var(--text-color);
+          opacity: 0.8;
+          
+          &:hover {
+            opacity: 1;
+            color: var(--text-color);
+          }
+        }
+      }
+    }
+
+    /* 按钮美化 */
+    .button {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(45deg, var(--el-color-primary), var(--el-color-primary-light-3));
+      border: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transform: translateX(-100%);
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(var(--el-color-primary-rgb), 0.4);
+
+        &::before {
+          transform: translateX(100%);
+          transition: transform 0.8s ease;
+        }
+      }
+    }
+
+    /* 注册链接 */
+    .el-link {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-color);
+      opacity: 0.8;
+      transition: all 0.3s ease;
+      text-align: center;
+
+      &:hover {
+        opacity: 1;
+        transform: translateX(4px);
+      }
+    }
+  }
+}
+
+/* 响应式适配 */
+@media screen and (max-width: 768px) {
+  .login-page {
+    .bg {
+      display: none;
+    }
+
+    .form {
+      width: 100%;
+      padding: 32px;
+      
+      h1 {
+        font-size: 32px;
+        margin-bottom: 40px;
+      }
     }
   }
 }
