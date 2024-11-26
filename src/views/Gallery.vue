@@ -1,15 +1,18 @@
 <template>
-  <!-- 文生图标题卡片 -->
-  <el-card class="info-card welcome-card" style="margin-bottom: 20px;">
-    <div class="info-card-content welcome-content">
-      <div class="info-text welcome-text">
-        <h2 class="welcome-title">创艺馆</h2>
-        <p class="welcome-subtitle">洞见美学 创意无限</p>
-      </div>
-    </div>
-  </el-card>
-
   <div class="gallery-main">
+    <!-- 替换后的欢迎卡片 -->
+    <el-card class="welcome-card" style="margin-bottom: 20px;">
+      <div class="welcome-content">
+        <div class="welcome-avatar">
+          <img :src="user.avatar || defaultAvatar" alt="用户头像" class="welcome-avatar-image">
+        </div>
+        <div class="welcome-text">
+          <h2 class="welcome-title">Hello {{ user.userName }}!</h2>
+          <p class="welcome-subtitle">欢迎使用绘画梦工厂</p>
+        </div>
+      </div>
+    </el-card>
+
     <!-- 控制按钮容器 -->
     <div class="controls">
       <!-- 画廊类型切换 -->
@@ -316,6 +319,11 @@ const defaultAvatar = defaultAvatarImage
 // 引入 userinfo store
 import { useUserInfoStore } from '@/stores/userinfo'
 
+// 引入 Profile.vue 中的用户信息获取逻辑
+import { reactive as vueReactive, ref as vueRef, onMounted as vueOnMounted } from 'vue';
+import defaultProfileAvatar from '@/assets/images/profile.jpg';
+import { getUserRoles, updateAvatar, updateUser, updatePassword } from '@/api/user';
+
 // 状态定义
 const galleryType = ref('public')
 const drawRecords = ref([])
@@ -330,6 +338,29 @@ const pageSize = ref(10)
 const total = ref(0)
 const replyTo = ref(null) // 存储要回复的评论信息
 const replyContent = ref('') // 回复的内容
+
+// 用户信息相关
+const userInfoStore = useUserInfoStore()
+
+const user = reactive({
+  userName: '',
+  avatar: '',
+  // 其他用户相关属性...
+})
+const defaultAvatarRef = ref(defaultAvatarImage)
+
+// 获取用户信息
+const getUser = async () => {
+  const userInfo = userInfoStore.userInfo
+  user.userName = userInfo.username || ''
+  user.avatar = userInfo.avatarUrl || defaultAvatarRef.value
+
+  // 如果需要获取用户角色，可以在此处添加逻辑
+}
+
+const fetchPoints = async () => {
+  // 如果需要获取积分，可以在此处实现
+}
 
 // 计算主评论（parentId 为 0 的评论）
 const mainComments = computed(() => {
@@ -374,9 +405,8 @@ const fetchPublicDrawRecords = async () => {
 
 // 获取私人画廊数据
 const fetchPrivateDrawRecords = async () => {
-  const userInfoStore = useUserInfoStore()
   const userId = userInfoStore.userInfo?.id
-  
+
   console.log('当前 userInfo:', userInfoStore.userInfo)
   console.log('当前用户 id:', userId)
 
@@ -405,7 +435,7 @@ const fetchPrivateDrawRecords = async () => {
     }
   } catch (error) {
     console.error('API请求失败，错误详情:', error)
-    ElMessage.error('获取廊数据失败')
+    ElMessage.error('获取画廊数据失败')
     drawRecords.value = []
   }
 }
@@ -572,7 +602,7 @@ const submitComment = async () => {
       await fetchComments(selectedRecord.value.id)
     }
   } catch (error) {
-    console.error('论失败:', error)
+    console.error('评论失败:', error)
     ElMessage.error('评论失败')
   } finally {
     commentLoading.value = false
@@ -658,140 +688,227 @@ const downloadImage = async (imageUrl) => {
 
 // 组件挂载时获取数据
 onMounted(() => {
+  getUser() // 获取用户信息
   fetchPublicDrawRecords()
 })
 </script>
 
 <style lang="scss" scoped>
 .gallery-main {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 20px;
+}
 
-  /* 欢迎卡片美化 */
-  .info-card {
-    background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
-    border: none;
-    box-shadow: 0 8px 32px rgba(0, 198, 251, 0.15);
-    padding: 32px;
-    margin-bottom: 32px;
-    border-radius: 24px;
-    position: relative;
-    overflow: hidden;
+/* 欢迎卡片样式升级 */
+.welcome-card {
+  background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+  border: none;
+  box-shadow: 0 20px 40px rgba(107, 115, 255, 0.25);
+  padding: 40px;
+  margin-bottom: 32px;
+  border-radius: 30px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-      transform: rotate(-45deg);
-      pointer-events: none;
-    }
+  /* 炫光效果 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.1) 20%,
+      transparent 60%
+    );
+    animation: rotate 15s linear infinite;
+  }
 
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0, 198, 251, 0.25);
-    }
+  /* 装饰性图形 */
+  &::after {
+    content: '';
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.5;
+  }
 
-    .info-card-content {
-      position: relative;
-      z-index: 1;
+  &:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(107, 115, 255, 0.3);
 
-      .info-text {
+    .welcome-content {
+      .welcome-avatar .welcome-avatar-image {
+        transform: scale(1.1) rotate(5deg);
+        border-color: #fff;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .welcome-text {
         .welcome-title {
-          font-size: 28px;
-          font-weight: 700;
-          color: white;
-          margin: 0 0 8px 0;
-          text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          transform: translateX(10px);
+          text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-
         .welcome-subtitle {
-          font-size: 16px;
-          color: rgba(255,255,255,0.9);
-          margin: 0;
+          transform: translateX(5px);
         }
       }
     }
   }
 
-  /* 控制按钮容器美化 */
-  .controls {
-    background: var(--bg-color);
-    padding: 24px;
-    border-radius: 16px;
-    border: 2px solid var(--el-color-primary-light-8);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-    margin-bottom: 32px;
+  .welcome-content {
+    position: relative;
+    z-index: 1;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    transition: all 0.3s ease;
+    gap: 30px;
 
-    &:hover {
-      transform: translateY(-2px);
-      border-color: var(--el-color-primary);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-    }
-
-    .gallery-type-switch {
-      :deep(.el-radio-group) {
-        display: flex;
-        gap: 12px;
-
-        .el-radio-button__inner {
-          border: 2px solid var(--el-color-primary-light-8);
-          background: transparent;
-          color: var(--text-color);
-          height: 40px;
-          padding: 0 24px;
-          border-radius: 12px;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          line-height: 1;
-          font-weight: 500;
-          min-width: 120px;
-
-          &:hover {
-            border-color: var(--el-color-primary);
-            color: var(--el-color-primary);
-            transform: translateY(-2px);
-          }
-        }
-
-        .el-radio-button__original-radio:checked + .el-radio-button__inner {
-          background: var(--el-color-primary);
-          border-color: var(--el-color-primary);
-          color: white;
-          box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.3);
-        }
+    .welcome-avatar {
+      .welcome-avatar-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 4px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    .sort-buttons {
+    .welcome-text {
+      .welcome-title {
+        font-size: 32px;
+        font-weight: 800;
+        color: white;
+        margin: 0 0 12px 0;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(to right, #fff, rgba(255,255,255,0.8));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 1px;
+      }
+
+      .welcome-subtitle {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        font-weight: 500;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        padding-left: 20px;
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%;
+          width: 12px;
+          height: 12px;
+          background: #fff;
+          border-radius: 50%;
+          transform: translateY(-50%);
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+      }
+    }
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 768px) {
+  .welcome-card {
+    padding: 30px;
+
+    &::after {
+      width: 120px;
+      height: 120px;
+      right: 20px;
+    }
+
+    .welcome-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 20px;
+
+      .welcome-avatar .welcome-avatar-image {
+        width: 70px;
+        height: 70px;
+      }
+
+      .welcome-text {
+        .welcome-title {
+          font-size: 28px;
+        }
+
+        .welcome-subtitle {
+          font-size: 16px;
+          padding-left: 0;
+
+          &::before {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 控制按钮容器 */
+.controls {
+  background: var(--bg-color);
+  padding: 24px;
+  border-radius: 16px;
+  border: 2px solid var(--el-color-primary-light-8);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--el-color-primary);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  }
+
+  .gallery-type-switch {
+    :deep(.el-radio-group) {
       display: flex;
       gap: 12px;
 
-      .sort-button {
-        height: 40px;
-        padding: 0 24px;
+      .el-radio-button__inner {
         border: 2px solid var(--el-color-primary-light-8);
-        border-radius: 12px;
         background: transparent;
         color: var(--text-color);
+        height: 40px;
+        padding: 0 24px;
+        border-radius: 12px;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
-        gap: 8px;
-
-        .el-icon {
-          font-size: 18px;
-        }
+        justify-content: center;
+        line-height: 1;
+        font-weight: 500;
+        min-width: 120px;
 
         &:hover {
           border-color: var(--el-color-primary);
@@ -799,184 +916,206 @@ onMounted(() => {
           transform: translateY(-2px);
         }
       }
+
+      .el-radio-button__original-radio:checked + .el-radio-button__inner {
+        background: var(--el-color-primary);
+        border-color: var(--el-color-primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.3);
+      }
     }
   }
 
-  /* 瀑布流画廊美化 */
-  .masonry-container {
-    column-count: 4;
-    column-gap: 24px;
-    padding: 0 12px;
+  .sort-buttons {
+    display: flex;
+    gap: 12px;
 
-    .masonry-item {
-      break-inside: avoid;
-      margin-bottom: 24px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: var(--bg-color);
+    .sort-button {
+      height: 40px;
+      padding: 0 24px;
       border: 2px solid var(--el-color-primary-light-8);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-      position: relative;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-      &:hover {
-        transform: translateY(-8px);
-        border-color: var(--el-color-primary);
-        box-shadow: 0 16px 48px rgba(0,0,0,0.12);
-
-        img {
-          transform: scale(1.05);
-        }
-
-        .gallery-like-container {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      .el-icon {
+        font-size: 18px;
       }
 
+      &:hover {
+        border-color: var(--el-color-primary);
+        color: var(--el-color-primary);
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+/* 瀑布流画廊 */
+.masonry-container {
+  column-count: 4;
+  column-gap: 24px;
+  padding: 0 12px;
+
+  .masonry-item {
+    break-inside: avoid;
+    margin-bottom: 24px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg-color);
+    border: 2px solid var(--el-color-primary-light-8);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+      transform: translateY(-8px);
+      border-color: var(--el-color-primary);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+
       img {
-        width: 100%;
-        height: auto;
-        display: block;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: scale(1.05);
       }
 
       .gallery-like-container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 16px;
-        background: var(--bg-color);
-        border-top: 2px solid var(--el-color-primary-light-8);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        opacity: 0;
-        transform: translateY(10px);
-        transition: all 0.3s ease;
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-        .user-info {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-
-          .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid var(--el-color-primary-light-5);
-            transition: all 0.3s ease;
-
-            &:hover {
-              transform: scale(1.1);
-              border-color: var(--el-color-primary);
-            }
-          }
-
-          .username {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-color);
-          }
-        }
-
-        .like-info {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-
-          .gallery-like-button {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid var(--el-color-primary-light-8);
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-
-            &:hover {
-              border-color: var(--el-color-primary);
-              background: var(--el-color-primary-light-9);
-              transform: scale(1.1);
-            }
-
-            .el-icon {
-              font-size: 18px;
-              color: var(--el-color-primary);
-            }
-          }
-
-          .like-count {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-color);
-          }
-        }
+      &::after {
+        opacity: 1;
       }
     }
-  }
 
-  /* 空状态美化 */
-  .empty-state {
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-color);
-    border: 2px solid var(--el-color-primary-light-8);
-    border-radius: 16px;
-    padding: 48px;
-
-    :deep(.el-empty) {
-      .el-empty__image {
-        width: 160px;
-        height: 160px;
-      }
-
-      .el-empty__description {
-        margin-top: 24px;
-        font-size: 16px;
-        color: var(--text-color);
-      }
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-  }
-}
 
-/* 响应式适配 */
-@media screen and (max-width: 1440px) {
-  .masonry-container {
-    column-count: 3;
-  }
-}
-
-@media screen and (max-width: 1024px) {
-  .masonry-container {
-    column-count: 2;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .gallery-main {
-    padding: 16px;
-
-    .controls {
-      flex-direction: column;
-      gap: 16px;
+    .gallery-like-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
       padding: 16px;
+      background: transparent;
+      border-top: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      z-index: 1;
 
-      .gallery-type-switch,
-      .sort-buttons {
-        width: 100%;
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .user-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 2px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          transition: all 0.3s ease;
+
+          &:hover {
+            border-color: white;
+          }
+        }
+
+        .username {
+          font-size: 14px;
+          font-weight: 500;
+          color: white;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+      }
+
+      .like-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .gallery-like-button {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.2);
+          border: none;
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.3);
+          }
+
+          .el-icon {
+            font-size: 18px;
+            color: white;
+          }
+        }
+
+        .like-count {
+          font-size: 14px;
+          font-weight: 500;
+          color: white;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
       }
     }
 
-    .masonry-container {
-      column-count: 1;
-      padding: 0;
+    // 添加渐变遮罩
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0.4) 30%,
+        transparent 60%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+  }
+}
+
+/* 空状态 */
+.empty-state {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-color);
+  border: 2px solid var(--el-color-primary-light-8);
+  border-radius: 16px;
+  padding: 48px;
+
+  :deep(.el-empty) {
+    .el-empty__image {
+      width: 160px;
+      height: 160px;
+    }
+
+    .el-empty__description {
+      margin-top: 24px;
+      font-size: 16px;
+      color: var(--text-color);
     }
   }
 }
