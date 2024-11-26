@@ -405,7 +405,7 @@ const fetchPrivateDrawRecords = async () => {
     }
   } catch (error) {
     console.error('API请求失败，错误详情:', error)
-    ElMessage.error('获取私人画廊数据失败')
+    ElMessage.error('获取画廊数据失败')
     drawRecords.value = []
   }
 }
@@ -717,7 +717,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   height: 200px;
-  color: #909399;
+  color: var(--text-color);
   font-size: 16px;
 }
 
@@ -758,7 +758,6 @@ onMounted(() => {
     transform: translateY(-4px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 
-    /* 显示gallery-like-container */
     .gallery-like-container {
       opacity: 1;
       visibility: visible;
@@ -775,11 +774,11 @@ onMounted(() => {
     position: absolute;
     bottom: 10px;
     left: 10px;
-    right: 10px; /* 确保容器有左右间距 */
+    right: 10px;
     display: flex;
-    justify-content: space-between; /* 分隔左右内容 */
+    justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.8); /* 半透明背景 */
+    background: rgba(255, 255, 255, 0.8);
     padding: 5px 10px;
     border-radius: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -831,12 +830,31 @@ onMounted(() => {
   :deep(.el-dialog__body) {
     padding: 0;
   }
+  
+  // 添加弹窗标题和关闭按钮的暗色模式
+  :deep(.el-dialog__header) {
+    background-color: var(--bg-color);
+    border-bottom: 1px solid var(--border-color);
+    
+    .el-dialog__title {
+      color: var(--text-color);
+    }
+    
+    .el-dialog__close {
+      color: var(--text-color);
+      
+      &:hover {
+        color: var(--el-color-primary);
+      }
+    }
+  }
 }
 
 .dialog-content {
   display: flex;
   height: 80vh;
   overflow: hidden;
+  background-color: var(--bg-color); // 添加背景色
 
   .left-section {
     flex: 1;
@@ -844,6 +862,7 @@ onMounted(() => {
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
+    background-color: var(--bg-color); // 添加背景色
     
     .image-container {
       flex: 1;
@@ -856,6 +875,8 @@ onMounted(() => {
         height: calc(100% - 60px);
         object-fit: contain;
         border-radius: 8px;
+        border: none;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
       }
       
       .image-actions {
@@ -863,6 +884,23 @@ onMounted(() => {
         gap: 10px;
         justify-content: center;
         padding: 10px 0;
+        
+        // 按钮在暗色模式下的样式
+        .el-button {
+          background-color: var(--bg-color);
+          border-color: var(--border-color);
+          color: var(--text-color);
+          
+          &:hover {
+            border-color: var(--el-color-primary);
+            color: var(--el-color-primary);
+          }
+          
+          &.el-button--primary {
+            background-color: var(--el-color-primary);
+            color: white;
+          }
+        }
       }
     }
   }
@@ -874,6 +912,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    background-color: var(--bg-color); // 添加背景色
 
     .detail-info {
       h3 {
@@ -894,6 +933,17 @@ onMounted(() => {
           display: flex;
           flex-direction: column;
           gap: 8px;
+          
+          // 输入框暗色模式适配
+          :deep(.el-textarea__inner) {
+            background-color: var(--bg-color);
+            border-color: var(--border-color);
+            color: var(--text-color);
+            
+            &:hover, &:focus {
+              border-color: var(--el-color-primary);
+            }
+          }
         }
       }
     }
@@ -902,6 +952,19 @@ onMounted(() => {
       h3 {
         margin-bottom: 15px;
         color: var(--text-color);
+      }
+      
+      // 评论输入框暗色模式
+      .comment-input {
+        :deep(.el-textarea__inner) {
+          background-color: var(--bg-color);
+          border-color: var(--border-color);
+          color: var(--text-color);
+          
+          &:hover, &:focus {
+            border-color: var(--el-color-primary);
+          }
+        }
       }
     }
   }
@@ -1021,14 +1084,16 @@ onMounted(() => {
   .reply-input {
     margin-top: 10px;
     padding: 10px;
-    background-color: var(--bg-color);
-    border-radius: 4px;
-
-    .reply-actions {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
+    background-color: var(--el-bg-color-overlay);
+    
+    :deep(.el-textarea__inner) {
+      background-color: var(--bg-color);
+      border-color: var(--border-color);
+      color: var(--text-color);
+      
+      &:hover, &:focus {
+        border-color: var(--el-color-primary);
+      }
     }
   }
 }
