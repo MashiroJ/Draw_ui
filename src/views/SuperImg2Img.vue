@@ -337,274 +337,560 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style scoped lang="scss">  
-.draw-form-container {  
-    max-width: 1200px;  
-    margin: 0 auto;  
-    padding: 20px;  
-}  
+<style lang="scss" scoped>
+.draw-form-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
 
-.header {  
-    margin-bottom: 24px;  
-}  
+  /* 标题卡片新设计 */
+  .info-card {
+    background: linear-gradient(120deg, #2b32b2 0%, #1488cc 100%);
+    border: none;
+    box-shadow: 0 8px 32px rgba(43, 50, 178, 0.15);
+    padding: 32px;
+    margin-bottom: 32px;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
 
-.title {  
-    font-size: 24px;  
-    color: var(--text-color);  
-    font-weight: 600;  
-}  
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+      transform: rotate(-45deg);
+      pointer-events: none;
+    }
 
-.content-wrapper {  
-    display: flex;  
-    gap: 24px;  
-    min-height: 600px;  
-}  
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(43, 50, 178, 0.25);
+    }
 
-.left-panel {  
-    flex: 1;  
-    background: var(--bg-color);  
-    padding: 24px;  
-    border-radius: 8px;  
-    border: 1px solid var(--border-color);  
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);  
-    animation: fadeIn 0.3s ease-in-out;  
-}  
+    .info-card-content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
 
-.right-panel {  
-    flex: 1;  
-    background: var(--bg-color);  
-    padding: 24px;  
-    border-radius: 8px;  
-    border: 1px solid var(--border-color);  
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);  
-    display: flex;  
-    align-items: center;  
-    justify-content: center;  
-    animation: fadeIn 0.3s ease-in-out;  
-}  
+      .info-text {
+        .welcome-title {
+          font-size: 28px;
+          font-weight: 700;
+          color: white;
+          margin: 0 0 8px 0;
+          padding: 0;
+          line-height: 1.2;
+          letter-spacing: 1px;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
 
-.form-item {  
-    margin-bottom: 20px;  
-}  
+        .welcome-subtitle {
+          font-size: 16px;
+          color: rgba(255,255,255,0.9);
+          font-weight: 500;
+          margin: 0;
+          padding: 0;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
 
-.form-item label {  
-    display: block;  
-    margin-bottom: 8px;  
-    font-weight: 500;  
-    color: var(--text-color);  
-}  
+  .content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    min-height: 700px;
+    max-height: 800px;
 
-.parameters-grid {  
-    display: grid;  
-    grid-template-columns: repeat(2, 1fr);  
-    gap: 20px;  
-    margin-bottom: 20px;  
-}  
+    /* 左侧表单区域新设计 */
+    .left-panel {
+      background: var(--bg-color);
+      padding: 32px;
+      border-radius: 24px;
+      border: 2px solid var(--el-color-primary-light-8);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
 
-.prompt-input {  
-    width: 100%;  
-    padding: 12px;  
-    border: 1px solid var(--border-color);  
-    border-radius: 4px;  
-    font-size: 14px;  
-    line-height: 1.5;  
-    transition: border-color 0.2s;  
-    resize: vertical;  
-    color: var(--text-color);  
-    background-color: var(--bg-color);  
-}  
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 24px;
+        padding: 2px;
+        background: linear-gradient(120deg, var(--el-color-primary-light-5), var(--el-color-primary-light-8));
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
 
-.prompt-input:focus {  
-    outline: none;  
-    border-color: var(--active-text-color);  
-}  
+      &:hover::before {
+        opacity: 1;
+      }
 
-.form-actions {  
-    display: flex;  
-    align-items: center;  
-    justify-content: space-between;  
-    margin-top: 20px;  
-}  
+      /* 上传区域新设计 */
+      .upload-area {
+        width: 100%;
+        height: 240px;
+        border: 2px dashed var(--el-color-primary-light-5);
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--el-color-primary-light-9);
+        position: relative;
+        overflow: hidden;
 
-.switch-item {  
-    display: flex;  
-    align-items: center;  
-    gap: 12px;  
-}  
+        &:hover {
+          border-color: var(--el-color-primary);
+          background: var(--el-color-primary-light-8);
 
-.submit-btn {  
-    background-color: var(--button-bg-color);  
-    color: var(--button-text-color);  
-    border: none;  
-    padding: 12px 24px;  
-    border-radius: 4px;  
-    cursor: pointer;  
-    font-size: 16px;  
-    transition: background-color 0.2s, color 0.2s;  
-    margin-left: 20px;  
-}  
+          .upload-placeholder {
+            transform: translateY(-2px);
+          }
+        }
 
-.submit-btn:hover:not(:disabled) {  
-    background-color: var(--button-hover-bg-color);  
-}  
+        .upload-placeholder {
+          text-align: center;
+          transition: all 0.3s ease;
 
-.submit-btn:disabled {  
-    background-color: var(--button-disabled-bg-color);  
-    cursor: not-allowed;  
-}  
+          .upload-icon {
+            font-size: 48px;
+            color: var(--el-color-primary);
+            margin-bottom: 16px;
+          }
 
-/* 上传区域样式 */  
-.upload-area {  
-    width: 100%;  
-    height: 200px;  
-    border: 2px dashed var(--border-color);  
-    border-radius: 8px;  
-    cursor: pointer;  
-    transition: border-color 0.3s;  
-    display: flex;  
-    align-items: center;  
-    justify-content: center;  
-    position: relative;  
-    background: var(--bg-color);  
-}  
+          .upload-text {
+            font-size: 16px;
+            color: var(--el-color-primary);
+            margin-bottom: 8px;
+            font-weight: 500;
+          }
 
-.upload-area:hover {  
-    border-color: var(--active-text-color);  
-}  
+          .upload-hint {
+            font-size: 14px;
+            color: var(--el-color-primary-light-3);
+          }
+        }
 
-.upload-placeholder {  
-    text-align: center;  
-    color: var(--text-color);  
-}  
+        .preview-container {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.1);
 
-.upload-icon {  
-    font-size: 48px;  
-    margin-bottom: 10px;  
-    color: var(--text-color);  
-}  
+          .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: var(--el-color-primary-light-9);
+          }
 
-.upload-text {  
-    font-size: 14px;  
-    margin-bottom: 4px;  
-}  
+          .preview-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
 
-.upload-hint {  
-    font-size: 12px;  
-    color: var(--footer-color);  
-}  
+            .el-button {
+              transform: translateY(20px);
+              transition: all 0.3s ease;
+            }
+          }
 
-.preview-container {  
-    width: 100%;  
-    height: 100%;  
-    position: relative;  
-}  
+          &:hover .preview-overlay {
+            opacity: 1;
 
-.preview-image {  
-    width: 100%;  
-    height: 100%;  
-    object-fit: contain;  
-    border-radius: 8px;  
-}  
+            .el-button {
+              transform: translateY(0);
+            }
+          }
+        }
+      }
 
-.preview-overlay {  
-    position: absolute;  
-    top: 0;  
-    left: 0;  
-    right: 0;  
-    bottom: 0;  
-    background: rgba(0, 0, 0, 0.5);  
-    display: flex;  
-    align-items: center;  
-    justify-content: center;  
-    opacity: 0;  
-    transition: opacity 0.3s;  
-    border-radius: 8px;  
-}  
+      /* 其他表单项样式与 SuperText2Img 相同 */
+      .form-item {
+        margin-bottom: 24px;
 
-.preview-container:hover .preview-overlay {  
-    opacity: 1;  
-}  
+        label {
+          display: inline-block;
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--el-color-primary);
+          margin-bottom: 16px;
+          position: relative;
+          padding-left: 16px;
 
-/* Element Plus 组件样式适配 */  
-:deep(.el-select),  
-:deep(.el-input-number),  
-:deep(.el-slider) {  
-    width: 100%;  
-    color: var(--text-color);  
-    background-color: var(--bg-color);  
-    border-color: var(--border-color);  
-}  
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 16px;
+            background: var(--el-color-primary);
+            border-radius: 2px;
+          }
+        }
 
-:deep(.el-select .el-input__inner),  
-:deep(.el-input-number .el-input__inner),  
-:deep(.el-slider .el-slider__input) {  
-    color: var(--text-color);  
-    background-color: var(--bg-color);  
-    border-color: var(--border-color);  
-}  
+        .prompt-input {
+          width: 100%;
+          padding: 20px;
+          border: 2px solid var(--el-color-primary-light-8);
+          border-radius: 16px;
+          font-size: 16px;
+          line-height: 1.6;
+          color: var(--text-color);
+          background-color: var(--bg-color);
+          resize: none;
+          transition: all 0.3s ease;
 
-:deep(.el-select .el-input__inner:focus),  
-:deep(.el-input-number .el-input__inner:focus),  
-:deep(.el-slider .el-slider__input:focus) {  
-    border-color: var(--active-text-color);  
-    outline: none;  
-}  
+          &::placeholder {
+            color: var(--el-color-primary-light-5);
+          }
 
-:deep(.el-slider__bar) {  
-    background-color: var(--active-text-color);  
-}  
+          &:hover {
+            border-color: var(--el-color-primary-light-3);
+          }
 
-:deep(.el-slider__button) {  
-    background-color: var(--active-text-color);  
-    border-color: var(--active-text-color);  
-}  
+          &:focus {
+            outline: none;
+            border-color: var(--el-color-primary);
+            box-shadow: 0 0 0 4px var(--el-color-primary-light-8);
+          }
+        }
+      }
 
-:deep(.el-slider__button:hover) {  
-    background-color: var(--button-hover-bg-color);  
-    border-color: var(--button-hover-bg-color);  
-}  
+      /* 参数设置区域样式与 SuperText2Img 相同 */
+      .parameters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+        padding: 24px;
+        background: var(--el-color-primary-light-9);
+        border-radius: 16px;
+        border: 1px solid var(--el-color-primary-light-5);
 
-@keyframes fadeIn {  
-    from {  
-        opacity: 0;  
-        transform: translateY(10px);  
-    }  
-    to {  
-        opacity: 1;  
-        transform: translateY(0);  
-    }  
-}  
-.info-card {
-    width: 100%;
-    background-color: var(--bg-color);
-    /* 使用CSS变量 */
-    border: 1px solid var(--border-color);
-    /* 使用CSS变量 */
-    border-radius: 8px;
-    padding: 10px;
-    height: 100px;
+        .form-item {
+          margin-bottom: 0;
+
+          :deep(.el-select),
+          :deep(.el-input-number),
+          :deep(.el-slider) {
+            width: 100%;
+
+            .el-input__wrapper {
+              border-radius: 12px;
+              box-shadow: none;
+              border: 2px solid var(--el-color-primary-light-8);
+              background: var(--bg-color);
+              
+              &:hover {
+                border-color: var(--el-color-primary-light-3);
+              }
+              
+              &.is-focus {
+                border-color: var(--el-color-primary);
+                box-shadow: 0 0 0 4px var(--el-color-primary-light-8);
+              }
+            }
+          }
+
+          :deep(.el-slider) {
+            --el-slider-button-size: 20px;
+            --el-slider-height: 8px;
+
+            .el-slider__runway {
+              height: var(--el-slider-height);
+              background: var(--el-color-primary-light-8);
+            }
+
+            .el-slider__bar {
+              height: var(--el-slider-height);
+              background: var(--el-color-primary);
+            }
+
+            .el-slider__button-wrapper {
+              width: var(--el-slider-button-size);
+              height: var(--el-slider-button-size);
+            }
+
+            .el-slider__button {
+              border: none;
+              background: var(--el-color-primary);
+              box-shadow: 0 2px 8px rgba(var(--el-color-primary-rgb), 0.4);
+              transition: transform 0.3s ease;
+
+              &:hover {
+                transform: scale(1.2);
+              }
+            }
+          }
+        }
+      }
+
+      /* 底部操作区域样式与 SuperText2Img 相同 */
+      .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 2px solid var(--el-color-primary-light-8);
+
+        .switch-item {
+          :deep(.el-switch) {
+            --el-switch-on-color: #10b981;
+            --el-switch-off-color: #ef4444;
+            height: 24px;
+            
+            .el-switch__core {
+              border-radius: 24px;
+            }
+
+            .el-switch__label {
+              font-size: 14px;
+              font-weight: 500;
+            }
+          }
+        }
+
+        .submit-btn {
+          background: linear-gradient(120deg, var(--el-color-primary), var(--el-color-primary-light-3));
+          color: white;
+          border: none;
+          padding: 16px 40px;
+          border-radius: 16px;
+          font-size: 18px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+          }
+
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(var(--el-color-primary-rgb), 0.4);
+
+            &::before {
+              transform: translateX(100%);
+              transition: transform 0.8s ease;
+            }
+          }
+
+          &:disabled {
+            background: var(--el-color-primary-light-5);
+            cursor: not-allowed;
+            opacity: 0.7;
+          }
+        }
+      }
+
+      form {
+        height: 100%;
+        overflow-y: auto;
+        padding-right: 16px;
+
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: var(--el-color-primary-light-9);
+          border-radius: 3px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: var(--el-color-primary-light-5);
+          border-radius: 3px;
+          
+          &:hover {
+            background: var(--el-color-primary-light-3);
+          }
+        }
+      }
+    }
+
+    /* 右侧预览区域 */
+    .right-panel {
+      height: 100%;
+      background: var(--bg-color);
+      padding: 32px;
+      border-radius: 24px;
+      border: 2px solid var(--el-color-primary-light-8);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, 
+          var(--el-color-primary-light-9) 0%, 
+          transparent 40%,
+          transparent 60%,
+          var(--el-color-primary-light-9) 100%
+        );
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .image-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+
+        .result-image {
+          max-width: 90%;
+          max-height: 90%;
+          object-fit: contain;
+          border-radius: 16px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+          &:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+          }
+        }
+      }
+
+      .empty-state {
+        color: var(--el-color-primary);
+        font-size: 18px;
+        font-weight: 500;
+        text-align: center;
+        padding: 48px;
+        background: var(--el-color-primary-light-9);
+        border-radius: 16px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+          content: '';
+          position: absolute;
+          width: 200%;
+          height: 200%;
+          background: linear-gradient(
+            45deg,
+            transparent 0%,
+            rgba(var(--el-color-primary-rgb), 0.1) 50%,
+            transparent 100%
+          );
+          animation: shine 3s infinite linear;
+        }
+      }
+    }
+  }
 }
 
-.info-card-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-    padding: 3px;
+@keyframes shine {
+  0% {
+    transform: translateX(-50%) translateY(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-50%) rotate(360deg);
+  }
 }
 
-.welcome-title {
-    font-size: 16px;  
-    font-weight: bold;  
-    color: var(--text-color);  
-    margin: 0;  
-    margin-bottom: 3px;  
+/* 响应式调整 */
+@media screen and (max-width: 1200px) {
+  .content-wrapper {
+    grid-template-columns: 1fr;
+    max-height: none;
+    
+    .left-panel,
+    .right-panel {
+      height: auto;
+      min-height: 600px;
+    }
+  }
 }
 
-.welcome-subtitle {
-    font-size: 12px;  
-    color: var(--text-color);  
-    opacity: 0.8;  
-    margin: 0;  
+@media screen and (max-width: 768px) {
+  .draw-form-container {
+    padding: 16px;
+
+    .info-card {
+      padding: 24px;
+      min-height: 100px;
+
+      .info-card-content {
+        .info-text {
+          .welcome-title {
+            font-size: 24px;
+          }
+
+          .welcome-subtitle {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    .content-wrapper {
+      gap: 16px;
+
+      .left-panel,
+      .right-panel {
+        padding: 20px;
+      }
+
+      .parameters-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+
+      .upload-area {
+        height: 200px;
+      }
+    }
+  }
 }
 </style>

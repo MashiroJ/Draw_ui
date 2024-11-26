@@ -127,7 +127,7 @@
                   <!-- 前端技术 -->
                   <el-col :span="12" :xs="24">
                     <div class="tech-section">
-                      <h3>前端技术</h3>
+                      <h3>前端技</h3>
                       <ul>
                         <li>Vue</li>
                         <li>Pinia</li>
@@ -426,341 +426,221 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .app-container {
-  padding: 20px;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 
+  /* 欢迎卡片新主题 */
+  .welcome-card {
+    background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%); // 新的渐变色
+    border: none;
+    box-shadow: 0 8px 32px rgba(0, 198, 251, 0.15);
+    padding: 32px;
+    margin-bottom: 32px;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+      transform: rotate(-45deg);
+      pointer-events: none;
+    }
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 198, 251, 0.25);
+    }
+
+    .welcome-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+
+      .welcome-avatar {
+        .welcome-avatar-image {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          border: 3px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: scale(1.1);
+            border-color: white;
+          }
+        }
+      }
+
+      .welcome-text {
+        .welcome-title {
+          font-size: 28px;
+          font-weight: 700;
+          color: white;
+          margin: 0 0 8px 0;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-subtitle {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  /* 内容区域网格布局 */
+  .el-row {
+    display: flex;
+    margin: 0 -10px;
+    
+    .el-col {
+      padding: 0 10px;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  /* 卡片通用样式 */
   .box-card {
-    margin-bottom: 20px;
-    background-color: var(--bg-color);
-    /* 使用CSS变量 */
-    color: var(--text-color);
-    /* 使用CSS变量 */
-    border: 1px solid var(--border-color);
-    /* 使用CSS变量 */
-    height: 250px;
+    flex: 1; // 让卡片填充剩余空间
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-color);
+    border-radius: 16px;
+    border: 2px solid rgba(0, 198, 251, 0.1); // 新的边框颜色
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    margin-bottom: 24px;
 
-    /* 覆盖 Element Plus 的 el-card 内部样式 */
+    &:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 198, 251, 0.3);
+      box-shadow: 0 12px 32px rgba(0, 198, 251, 0.12);
+    }
+
     :deep(.el-card__header) {
-      background-color: var(--header-bg);
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-color);
+      padding: 20px 24px;
+      border-bottom: 2px solid rgba(0, 198, 251, 0.1);
+      font-size: 18px;
+      font-weight: 600;
+      color: #005bea; // 新的主题色
     }
 
     :deep(.el-card__body) {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-    }
-  }
-}
-
-.avatar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-
-  .avatar-uploader {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .avatar {
-      width: 125px;
-      height: 125px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--border-color);
-      /* 使用CSS变量 */
-      cursor: pointer;
-      margin-bottom: 10px; // 添加图片与按钮组之间的间距  
-    }
-  }
-
-  .button-group {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 10px;
-
-    @media (max-width: 768px) {
+      flex: 1; // 让卡片内容区域填充剩余空间
+      display: flex;
       flex-direction: column;
-      align-items: center;
+    }
+  }
+
+  /* 积分卡片和技术选型卡片容器 */
+  .el-row:last-child {
+    .el-col {
+      .box-card {
+        height: 100%; // 确保两个卡片等高
+        margin-bottom: 0; // 移除底部间距
+      }
+    }
+  }
+
+  /* 积分卡片 */
+  .points-card {
+    .el-statistic {
+      padding: 24px;
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      :deep(.el-statistic__content) {
+        font-size: 36px;
+        color: #005bea; // 新的主题色
+        font-weight: 600;
+      }
+    }
+
+    .sign-in-section {
+      padding: 24px;
+      margin-top: auto; // 将签到按钮推到底部
 
       .el-button {
-        width: 100%;
+        background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
+        border: none;
+        padding: 12px 36px;
+        font-size: 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 91, 234, 0.3);
+        }
       }
     }
-
-    /* 覆盖 Element Plus 的 el-button 样式 */
-    .el-button {
-      background-color: var(--header-bg);
-      color: var(--text-color);
-      border-color: var(--border-color);
-    }
-
-    .el-button--primary:hover {
-      background-color: var(--menu-hover);
-      border-color: var(--menu-hover);
-      color: var(--text-color);
-    }
-
-    .el-button--success {
-      background-color: var(--header-bg);
-      color: var(--text-color);
-      border-color: var(--border-color);
-    }
-
-    .el-button--success:hover {
-      background-color: var(--menu-hover);
-      border-color: var(--menu-hover);
-      color: var(--text-color);
-    }
-  }
-}
-
-.profile-card {
-  min-height: 521px;
-  background-color: var(--bg-color);
-  /* 使用CSS变量 */
-  color: var(--text-color);
-  /* 使用CSS变量 */
-  border: 1px solid var(--border-color);
-  /* 使用CSS变量 */
-}
-
-.profile-descriptions {
-  margin-top: 20px;
-
-  .el-descriptions__label {
-    width: 100px;
-    color: var(--text-color);
-    /* 使用CSS变量 */
   }
 
-  .el-descriptions__content {
-    color: var(--text-color);
-    /* 使用CSS变量 */
-  }
-}
+  /* 技术选型卡片 */
+  .tech-selection-card {
+    .tech-content {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
 
-.profile-form {
-  max-width: 500px;
-  background-color: var(--bg-color);
-  /* 使用CSS变量 */
-  color: var(--text-color);
-  /* 使用CSS变量 */
-  height: 150px;
+      .tech-section {
+        h3 {
+          color: #005bea; // 新的主题色
+          &::before {
+            background: #00c6fb; // 新的装饰条颜色
+          }
+        }
 
-  .el-form-item {
-    margin-bottom: 20px;
-  }
-
-  /* 覆盖 Element Plus 的 el-form-item label 和 content 颜色 */
-  :deep(.el-form-item__label) {
-    color: var(--text-color);
-    /* 使用CSS变量 */
-  }
-
-  :deep(.el-form-item__content) {
-    color: var(--text-color);
-    /* 使用CSS变量 */
-  }
-}
-
-.form-buttons {
-  text-align: right;
-
-  /* 覆盖 Element Plus 的 el-button 样式 */
-  .el-button {
-    background-color: var(--header-bg);
-    color: var(--text-color);
-    border-color: var(--border-color);
-  }
-
-  .el-button--primary:hover {
-    background-color: var(--menu-hover);
-    border-color: var(--menu-hover);
-    color: var(--text-color);
-  }
-}
-
-.points-card {
-  background-color: var(--bg-color);
-  /* 使用CSS变量 */
-  color: var(--text-color);
-  /* 使用CSS变量 */
-  border: 1px solid var(--border-color);
-  /* 使用CSS变量 */
-
-  .el-statistic {
-    margin-bottom: 80px;
-    color: var(--text-color);
-    /* 使用CSS变量 */
-
-    /* 覆盖 Element Plus 的 el-statistic 内部样式 */
-    :deep(.el-statistic__content),
-    :deep(.el-statistic__value),
-    :deep(.el-statistic__title) {
-      color: var(--text-color);
-      /* 使用CSS变量 */
-    }
-  }
-
-  .sign-in-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .text-center {
-    text-align: center;
-  }
-
-  /* 覆盖 Element Plus 的 el-button 样式 */
-  .el-button {
-    background-color: var(--header-bg);
-    color: var(--text-color);
-    border-color: var(--border-color);
-  }
-
-  .el-button--primary:hover {
-    background-color: var(--menu-hover);
-    border-color: var(--menu-hover);
-    color: var(--text-color);
-  }
-}
-
-/* 技术选型模块样式 */
-.tech-selection-card {
-  background-color: var(--bg-color);
-  /* 使用CSS变量 */
-  color: var(--text-color);
-  /* 使用CSS变量 */
-  border: 1px solid var(--border-color);
-  /* 使用CSS变量 */
-  height: 250px; // 设置固定高度，与个人信息卡片一致  
-
-  .tech-content {
-    .tech-section {
-      h3 {
-        margin-top: 10px;
-        margin-bottom: 10px;
-        color: var(--text-color);
-        /* 使用CSS变量 */
-      }
-
-      ul {
-        list-style-type: disc;
-        padding-left: 20px;
-
-        li {
-          margin-bottom: 5px;
-          color: var(--text-color);
-          /* 使用CSS变量 */
+        ul li::before {
+          background: #00c6fb; // 新的列表标记颜色
         }
       }
     }
   }
 }
 
-@media (max-width: 768px) {
+/* 响应式适配 */
+@media screen and (max-width: 768px) {
+  .app-container {
+    padding: 16px;
 
-  .points-card,
-  .tech-selection-card {
-    margin-bottom: 20px;
+    .el-row {
+      margin: 0;
+      
+      .el-col {
+        padding: 0;
+      }
+    }
+
+    .box-card {
+      margin-bottom: 16px;
+    }
+
+    /* 在移动端保持最后一行卡片的间距 */
+    .el-row:last-child {
+      .el-col:first-child .box-card {
+        margin-bottom: 16px;
+      }
+    }
   }
-}
-
-/* 覆盖 Element Plus 的 el-tabs 样式 */
-:deep(.el-tabs__header) {
-  background-color: var(--header-bg);
-  border-bottom: 1px solid var(--border-color);
-}
-
-:deep(.el-tabs__item) {
-  color: var(--text-color);
-}
-
-:deep(.el-tabs__item.is-active) {
-  color: var(--header-bg);
-}
-
-:deep(.el-tabs__content) {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
-
-
-:deep(.el-statistic__content),
-:deep(.el-statistic__value),
-:deep(.el-statistic__title) {
-  color: var(--text-color);
-}
-
-
-:deep(.el-upload) {
-  background-color: var(--bg-color);
-  border: 1px dashed var(--border-color);
-}
-
-:deep(.el-upload__input) {
-  color: var(--text-color);
-}
-
-.welcome-card {  
-  width: 100%;  
-  background-color: var(--bg-color);  
-  border: 1px solid var(--border-color);  
-  
-  :deep(.el-card__body) {  
-    padding: 10px;  
-  }  
-}  
-
-.welcome-content {  
-  display: flex;  
-  align-items: center;  
-  gap: 20px;  
-  padding: 3px;  
-}  
-
-.welcome-avatar {  
-  .welcome-avatar-image {  
-    width: 50px;  
-    height: 50px;  
-    border-radius: 50%;  
-    object-fit: cover;  
-    border: 2px solid var(--border-color);  
-  }  
-}  
-
-.welcome-text {  
-  .welcome-title {  
-    font-size: 16px;  
-    font-weight: bold;  
-    color: var(--text-color);  
-    margin: 0;  
-    margin-bottom: 3px;  
-  }  
-  
-  .welcome-subtitle {  
-    font-size: 12px;  
-    color: var(--text-color);  
-    opacity: 0.8;  
-    margin: 0;  
-  }  
-}  
-
-/* 响应式布局 */  
-@media (max-width: 768px) {  
-  .welcome-content {  
-    flex-direction: column;  
-    text-align: center;  
-  }  
-  
-  .welcome-text {  
-    margin-top: 5px;  
-  }  
 }
 </style>
