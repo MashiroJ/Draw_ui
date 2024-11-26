@@ -132,14 +132,6 @@
                   </el-button>
                 </div>
               </div>
-              <div class="info-item">
-                <span class="label">生成时间：</span>
-                <span>{{ selectedRecord.createTime }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">生成类型：</span>
-                <span>{{ selectedRecord.generationType || '未知' }}</span>
-              </div>
             </div>
 
             <!-- 评论区 -->
@@ -618,15 +610,50 @@ const copyPrompt = async (prompt) => {
   }
 }
 
-// 添加下载图片方法
-const downloadImage = (imageUrl) => {
-  const link = document.createElement('a')
-  link.href = imageUrl
-  link.download = 'image.png'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  ElMessage.success('开始下载图片')
+// 替换原来的 downloadImage 方法
+const downloadImage = async (imageUrl) => {
+  try {
+    // 显示加载提示
+    const loadingInstance = ElMessage.info({
+      message: '正在准备下载...',
+      duration: 0
+    })
+    
+    // 获取图片数据
+    const response = await fetch(imageUrl)
+    if (!response.ok) {
+      throw new Error('图片下载失败')
+    }
+    
+    // 获取文件名
+    const filename = imageUrl.split('/').pop() || 'image.png'
+    
+    // 转换为 blob
+    const blob = await response.blob()
+    
+    // 创建 blob URL
+    const blobUrl = window.URL.createObjectURL(blob)
+    
+    // 创建临时下载链接
+    const link = document.createElement('a')
+    link.href = blobUrl
+    link.download = filename
+    
+    // 添加到文档并触发点击
+    document.body.appendChild(link)
+    link.click()
+    
+    // 清理
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(blobUrl)
+    
+    // 关闭加载提示
+    loadingInstance.close()
+    ElMessage.success('下载成功')
+  } catch (error) {
+    console.error('下载失败:', error)
+    ElMessage.error('下载失败，请稍后重试')
+  }
 }
 
 // 组件挂载时获取数据
@@ -867,16 +894,6 @@ onMounted(() => {
           display: flex;
           flex-direction: column;
           gap: 8px;
-        }
-      }
-
-      .info-item {
-        margin-bottom: 10px;
-        color: var(--text-color);
-
-        .label {
-          font-weight: 500;
-          margin-right: 8px;
         }
       }
     }
