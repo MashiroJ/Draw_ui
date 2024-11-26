@@ -22,12 +22,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <router-view v-slot="{ Component }">
+    <transition name="fade" mode="out-in">
+      <component :is="Component" />
+    </transition>
+  </router-view>
 </template>
 
-<style>
+<style lang="scss">
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 /* 这里不再需要定义CSS变量，因为它们已在main.scss中统一定义 */
 .theme-toggle {
   position: fixed;
