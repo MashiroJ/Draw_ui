@@ -74,20 +74,228 @@
     </div>
 
     <!-- 详情弹窗 -->
-    <el-dialog v-model="dialogVisible" title="绘图详情" custom-class="enhanced-dialog" :close-on-click-modal="true">
+    <el-dialog 
+      v-model="dialogVisible" 
+      title="绘图详情" 
+      custom-class="enhanced-dialog" 
+      :close-on-click-modal="true"
+      width="80%"
+    >
       <template v-if="selectedRecord">
         <div class="dialog-content">
-          <!-- 左侧：图片和点赞 -->
+          <!-- 左侧：图片展示区 -->
           <div class="left-section">
-            <img :src="selectedRecord.imageUrl" :alt="selectedRecord.prompt" class="dialog-image" />
+            <div class="image-container">
+              <img :src="selectedRecord.imageUrl" :alt="selectedRecord.prompt" class="dialog-image" />
+              <!-- 图片下方的操作栏 -->
+              <div class="image-actions">
+                <el-button
+                  :type="selectedRecord.isLiked ? 'primary' : 'default'"
+                  :icon="selectedRecord.isLiked ? StarFilled : Star"
+                  @click="handleGalleryLike(selectedRecord)"
+                  :loading="selectedRecord.likeLoading"
+                >
+                  {{ selectedRecord.likeCount || 0 }} 点赞
+                </el-button>
+                <el-button 
+                  type="success" 
+                  icon="Download"
+                  @click="downloadImage(selectedRecord.imageUrl)"
+                >
+                  下载图片
+                </el-button>
+              </div>
+            </div>
           </div>
-          <!-- 右侧：详细信息 -->
+
+          <!-- 右侧：详情信息和评论区 -->
           <div class="right-section">
-            <el-descriptions title="详情信息" border column="1">
-              <el-descriptions-item label="提示词">{{ selectedRecord.prompt }}</el-descriptions-item>
-              <el-descriptions-item label="生成时间">{{ selectedRecord.createTime }}</el-descriptions-item>
-              <el-descriptions-item label="生成类型">{{ selectedRecord.generationType || '未知' }}</el-descriptions-item>
-            </el-descriptions>
+            <!-- 详细信息 -->
+            <div class="detail-info">
+              <h3>详细信息</h3>
+              <div class="prompt-section">
+                <div class="prompt-label">提示词</div>
+                <div class="prompt-content">
+                  <el-input
+                    type="textarea"
+                    :rows="2"
+                    v-model="selectedRecord.prompt"
+                    readonly
+                  />
+                  <el-button 
+                    type="primary" 
+                    link 
+                    icon="CopyDocument"
+                    @click="copyPrompt(selectedRecord.prompt)"
+                  >
+                    复制提示词
+                  </el-button>
+                </div>
+              </div>
+              <div class="info-item">
+                <span class="label">生成时间：</span>
+                <span>{{ selectedRecord.createTime }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">生成类型：</span>
+                <span>{{ selectedRecord.generationType || '未知' }}</span>
+              </div>
+            </div>
+
+            <!-- 评论区 -->
+            <div class="comments-section">
+              <h3>评论区</h3>
+              <!-- 评论输入框 -->
+              <div class="comment-input">
+                <el-input
+                  v-model="commentContent"
+                  type="textarea"
+                  :rows="3"
+                  placeholder="写下你的评论..."
+                  :maxlength="200"
+                  show-word-limit
+                />
+                <el-button 
+                  type="primary" 
+                  @click="submitComment"
+                  :loading="commentLoading"
+                  style="margin-top: 10px"
+                >
+                  发表评论
+                </el-button>
+              </div>
+
+              <!-- 评论列表 -->
+              <div class="comments-list">
+                <div v-if="comments.length === 0" class="no-comments">
+                  暂无评论，快来抢沙发吧！
+                </div>
+                <template v-else>
+                  <!-- 遍历主评论（parentId 为 0 的评论） -->
+                  <div v-for="comment in mainComments" :key="comment.id" class="comment-item">
+                    <!-- 主评论内容 -->
+                    <div class="comment-header">
+                      <div class="comment-user">
+                        <img 
+                          :src="comment.userAvatar || defaultAvatar" 
+                          :alt="comment.username" 
+                          class="comment-avatar"
+                        />
+                        <span class="comment-username">{{ comment.username }}</span>
+                      </div>
+                      <div class="comment-time">{{ comment.createTime }}</div>
+                    </div>
+                    <div class="comment-content">{{ comment.content }}</div>
+                    <div class="comment-actions">
+                      <el-button
+                        :type="comment.isLiked ? 'primary' : 'default'"
+                        :icon="comment.isLiked ? StarFilled : Star"
+                        circle
+                        size="small"
+                        @click="handleCommentLike(comment)"
+                        :loading="comment.likeLoading"
+                      />
+                      <span class="like-count">{{ comment.likeCount || 0 }}</span>
+                      <el-button
+                        type="text"
+                        size="small"
+                        @click="handleReply(comment)"
+                      >
+                        回复
+                      </el-button>
+                    </div>
+                    
+                    <!-- 回复输入框 -->
+                    <div v-if="replyTo?.id === comment.id" class="reply-input">
+                      <el-input
+                        v-model="replyContent"
+                        type="textarea"
+                        :rows="2"
+                        :placeholder="`回复 ${comment.username}：`"
+                        :maxlength="200"
+                        show-word-limit
+                      />
+                      <div class="reply-actions">
+                        <el-button type="primary" @click="submitComment" :loading="commentLoading">
+                          发表回复
+                        </el-button>
+                        <el-button @click="cancelReply">取消</el-button>
+                      </div>
+                    </div>
+
+                    <!-- 显示该评论的所有回复 -->
+                    <div v-if="getCommentReplies(comment.id).length > 0" class="reply-list">
+                      <div v-for="reply in getCommentReplies(comment.id)" 
+                           :key="reply.id" 
+                           class="reply-item"
+                      >
+                        <div class="comment-header">
+                          <div class="comment-user">
+                            <img 
+                              :src="reply.userAvatar || defaultAvatar" 
+                              :alt="reply.username" 
+                              class="comment-avatar"
+                            />
+                            <span class="comment-username">{{ reply.username }}</span>
+                            <el-icon><ArrowRight /></el-icon>
+                            <span class="reply-to">{{ reply.replyUsername }}</span>
+                          </div>
+                          <div class="comment-time">{{ reply.createTime }}</div>
+                        </div>
+                        <div class="comment-content">{{ reply.content }}</div>
+                        <div class="comment-actions">
+                          <el-button
+                            :type="reply.isLiked ? 'primary' : 'default'"
+                            :icon="reply.isLiked ? StarFilled : Star"
+                            circle
+                            size="small"
+                            @click="handleCommentLike(reply)"
+                            :loading="reply.likeLoading"
+                          />
+                          <span class="like-count">{{ reply.likeCount || 0 }}</span>
+                          <el-button
+                            type="text"
+                            size="small"
+                            @click="handleReply(reply)"
+                          >
+                            回复
+                          </el-button>
+                        </div>
+                        
+                        <!-- 回复的回复输入框 -->
+                        <div v-if="replyTo?.id === reply.id" class="reply-input">
+                          <el-input
+                            v-model="replyContent"
+                            type="textarea"
+                            :rows="2"
+                            :placeholder="`回复 ${reply.username}：`"
+                            :maxlength="200"
+                            show-word-limit
+                          />
+                          <div class="reply-actions">
+                            <el-button type="primary" @click="submitComment" :loading="commentLoading">
+                              发表回复
+                            </el-button>
+                            <el-button @click="cancelReply">取消</el-button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <!-- 分页 -->
+              <el-pagination
+                v-if="total > pageSize"
+                :current-page="currentPage"
+                :page-size="pageSize"
+                :total="total"
+                @current-change="handlePageChange"
+                layout="prev, pager, next"
+                class="comment-pagination"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -96,9 +304,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, reactive } from 'vue'
+import { ref, onMounted, watch, reactive, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Star, StarFilled, Timer } from '@element-plus/icons-vue'
+import { Star, StarFilled, Timer, ArrowRight, Download, CopyDocument } from '@element-plus/icons-vue'
 import {
   listAllDrawRecords,
   listDrawRecordsByUserId,
@@ -107,6 +315,7 @@ import {
 } from '@/api/drawRecords'
 import { toggleLike } from '@/api/drawLike'
 import { getUserInfoById } from '@/api/user'
+import { addComment, getCommentPage, likeComment, unlikeComment } from '@/api/drawComment'
 
 // 导入默认头像
 import defaultAvatarImage from '@/assets/default-avatar.png'
@@ -121,6 +330,24 @@ const drawRecords = ref([])
 const dialogVisible = ref(false)
 const selectedRecord = ref(null)
 const authorsMap = reactive({}) // 用于存储作者信息
+const comments = ref([])
+const commentContent = ref('')
+const commentLoading = ref(false)
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const replyTo = ref(null) // 存储要回复的评论信息
+const replyContent = ref('') // 回复的内容
+
+// 计算主评论（parentId 为 0 的评论）
+const mainComments = computed(() => {
+  return comments.value.filter(comment => comment.parentId === 0)
+})
+
+// 获取某条评论的所有回复
+const getCommentReplies = (parentId) => {
+  return comments.value.filter(comment => comment.parentId === parentId)
+}
 
 // 监听画廊类型变化
 watch(galleryType, (newType) => {
@@ -294,6 +521,112 @@ const handleGalleryLike = async (item) => {
 const openDialog = async (record) => {
   selectedRecord.value = record
   dialogVisible.value = true
+  currentPage.value = 1
+  await fetchComments(record.id)
+}
+
+// 获取评论
+const fetchComments = async (drawId) => {
+  try {
+    const response = await getCommentPage(drawId, currentPage.value, pageSize.value)
+    if (response.code === 200) {
+      comments.value = response.data.records.map(comment => ({
+        ...comment,
+        likeLoading: false
+      }))
+      total.value = response.data.total
+    }
+  } catch (error) {
+    console.error('获取评论失败:', error)
+    ElMessage.error('获取评论失败')
+  }
+}
+
+// 添加处理回复的方法
+const handleReply = (comment) => {
+  replyTo.value = comment
+  replyContent.value = ''
+}
+
+// 取消回复
+const cancelReply = () => {
+  replyTo.value = null
+  replyContent.value = ''
+}
+
+// 修改提交评论的方法，支持回复功能
+const submitComment = async () => {
+  const content = replyTo.value ? replyContent.value : commentContent.value
+  if (!content.trim()) {
+    ElMessage.warning('请输入评论内容')
+    return
+  }
+  
+  commentLoading.value = true
+  try {
+    const commentData = {
+      drawId: selectedRecord.value.id,
+      content: content,
+      parentId: replyTo.value ? replyTo.value.id : 0,
+      replyUserId: replyTo.value ? replyTo.value.userId : 0
+    }
+    
+    const response = await addComment(commentData)
+    if (response.code === 200) {
+      ElMessage.success(replyTo.value ? '回复成功' : '评论成功')
+      commentContent.value = ''
+      replyContent.value = ''
+      replyTo.value = null
+      await fetchComments(selectedRecord.value.id)
+    }
+  } catch (error) {
+    console.error('论失败:', error)
+    ElMessage.error('评论失败')
+  } finally {
+    commentLoading.value = false
+  }
+}
+
+// 评论点赞
+const handleCommentLike = async (comment) => {
+  if (comment.likeLoading) return
+  
+  comment.likeLoading = true
+  try {
+    const response = await (comment.isLiked ? unlikeComment : likeComment)(comment.id)
+    if (response.code === 200) {
+      comment.isLiked = !comment.isLiked
+      comment.likeCount = comment.isLiked ? (comment.likeCount + 1) : (comment.likeCount - 1)
+      ElMessage.success(comment.isLiked ? '点赞成功' : '已取消点赞')
+    }
+  } catch (error) {
+    console.error('操作失败:', error)
+    ElMessage.error('操作失败')
+  } finally {
+    comment.likeLoading = false
+  }
+}
+
+// 添加复制提示词方法
+const copyPrompt = async (prompt) => {
+  try {
+    await navigator.clipboard.writeText(prompt)
+    ElMessage.success('提示词已复制到剪贴板')
+  } catch (err) {
+    console.error('复制失败:', err)
+    ElMessage.error('复制失败')
+  }
+}
+
+// 添加下载图片方法
+const downloadImage = (imageUrl) => {
+  const link = document.createElement('a')
+  link.href = imageUrl
+  link.download = 'image.png'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  ElMessage.success('开始下载图片')
 }
 
 // 组件挂载时获取数据
@@ -315,7 +648,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 20px;
 
-  /* 响应式调整 */
+  /* 应式调整 */
   @media screen and (max-width: 768px) {
     flex-direction: column;
     align-items: stretch;
@@ -467,50 +800,94 @@ onMounted(() => {
 }
 
 /* 更新弹窗样式 */
-.enhanced-dialog .el-dialog__header {
-  background-color: #f5f7fa;
-  border-bottom: 1px solid #ebeef5;
-}
-
-.enhanced-dialog .el-dialog__body {
-  padding: 20px;
+.enhanced-dialog {
+  :deep(.el-dialog__body) {
+    padding: 0;
+  }
 }
 
 .dialog-content {
   display: flex;
-  flex-direction: row;
-  gap: 20px;
+  height: 80vh;
+  overflow: hidden;
 
-  @media screen and (max-width: 768px) {
+  .left-section {
+    flex: 1;
+    padding: 20px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
     flex-direction: column;
-    gap: 15px;
+    
+    .image-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      
+      .dialog-image {
+        width: 100%;
+        height: calc(100% - 60px);
+        object-fit: contain;
+        border-radius: 8px;
+      }
+      
+      .image-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        padding: 10px 0;
+      }
+    }
   }
-}
 
-.left-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
+  .right-section {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 
-.dialog-image {
-  width: 100%;
-  max-width: 500px;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+    .detail-info {
+      h3 {
+        margin-bottom: 15px;
+        color: var(--text-color);
+      }
 
-.right-section {
-  flex: 1;
-}
+      .prompt-section {
+        margin-bottom: 15px;
 
-.el-descriptions {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        .prompt-label {
+          font-weight: 500;
+          margin-bottom: 8px;
+          color: var(--text-color);
+        }
+
+        .prompt-content {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+
+      .info-item {
+        margin-bottom: 10px;
+        color: var(--text-color);
+
+        .label {
+          font-weight: 500;
+          margin-right: 8px;
+        }
+      }
+    }
+
+    .comments-section {
+      h3 {
+        margin-bottom: 15px;
+        color: var(--text-color);
+      }
+    }
+  }
 }
 
 /* 信息卡片样式 */
@@ -546,5 +923,118 @@ onMounted(() => {
   color: var(--text-color);
   opacity: 0.8;
   margin: 0;
+}
+
+/* 在现有样式后添加 */
+.comments-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.comment-input {
+  margin-bottom: 20px;
+}
+
+.comments-list {
+  .no-comments {
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.6;
+    padding: 20px 0;
+  }
+}
+
+.comment-item {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border-color);
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .comment-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .comment-username {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+
+  .comment-time {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.6;
+  }
+
+  .comment-content {
+    margin: 10px 0;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  .comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .like-count {
+    font-size: 14px;
+    color: var(--text-color);
+  }
+
+  .reply-to {
+    color: var(--active-text-color);
+    font-size: 14px;
+  }
+
+  .reply-input {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: var(--bg-color);
+    border-radius: 4px;
+
+    .reply-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+  }
+}
+
+.comment-pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.reply-list {
+  margin-left: 20px;
+  margin-top: 10px;
+  padding-left: 20px;
+  border-left: 2px solid var(--border-color);
+}
+
+.reply-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 </style>
