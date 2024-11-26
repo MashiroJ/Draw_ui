@@ -112,6 +112,9 @@ import { getUserInfoById } from '@/api/user'
 import defaultAvatarImage from '@/assets/default-avatar.png'
 const defaultAvatar = defaultAvatarImage
 
+// 引入 userinfo store
+import { useUserInfoStore } from '@/stores/userinfo'
+
 // 状态定义
 const galleryType = ref('public')
 const drawRecords = ref([])
@@ -152,15 +155,23 @@ const fetchPublicDrawRecords = async () => {
 
 // 获取私人画廊数据
 const fetchPrivateDrawRecords = async () => {
-  const userIdFromLocal = localStorage.getItem('userId') // 示例，实际请根据项目情况获取
-  if (!userIdFromLocal) {
-    ElMessage.warning('请先登录')
-    galleryType.value = 'public'
+  const userInfoStore = useUserInfoStore()
+  const userId = userInfoStore.userInfo?.id
+  
+  console.log('当前 userInfo:', userInfoStore.userInfo)
+  console.log('当前用户 id:', userId)
+
+  if (!userId) {
+    ElMessage.warning('无法获取用户信息')
+    drawRecords.value = []
     return
   }
 
   try {
-    const response = await listDrawRecordsByUserId(userIdFromLocal)
+    console.log('准备发送请求，用户id:', userId)
+    const response = await listDrawRecordsByUserId(userId)
+    console.log('API响应数据:', response)
+    
     if (response.code === 200 && response.data) {
       drawRecords.value = response.data.map(record => ({
         ...record,
@@ -168,14 +179,14 @@ const fetchPrivateDrawRecords = async () => {
         likeCount: record.likeCount || 0,
         isLiked: record.isLiked || false,
         likeLoading: false,
-        userId: record.userId || null // 确保 userId 存在
+        userId: userId
       }))
       ElMessage.success(`成功获取 ${drawRecords.value.length} 条私人记录`)
       await fetchAuthorsInfo(drawRecords.value)
     }
   } catch (error) {
+    console.error('API请求失败，错误详情:', error)
     ElMessage.error('获取私人画廊数据失败')
-    console.error('获取私人画廊数据失败:', error)
     drawRecords.value = []
   }
 }
