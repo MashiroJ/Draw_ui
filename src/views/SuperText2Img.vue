@@ -14,29 +14,31 @@
         <div class="content-wrapper">
             <!-- 左侧表单区域 -->
             <div class="left-panel">
-                <form @submit.prevent="handleSubmit">
+                <div class="form-container">
                     <!-- 提示词输入 -->
                     <div class="form-item">
                         <label for="prompt">提示词</label>
-                        <textarea
+                        <el-input
+                            type="textarea"
                             id="prompt"
                             v-model="formData.drawDto.prompt"
                             rows="6"
                             class="prompt-input"
                             placeholder="请输入提示词..."
-                        ></textarea>
+                        />
                     </div>
 
                     <!-- 反向提示词输入 -->
                     <div class="form-item">
                         <label for="negativePrompt">反向提示词</label>
-                        <textarea
+                        <el-input
+                            type="textarea"
                             id="negativePrompt"
                             v-model="formData.drawDto.negativePrompt"
                             rows="4"
                             class="prompt-input"
                             placeholder="请输入反向提示词..."
-                        ></textarea>
+                        />
                     </div>
 
                     <!-- 参数设置区域 -->
@@ -163,11 +165,11 @@
                                 inactive-text="私有"
                             />
                         </div>
-                        <button type="submit" class="submit-btn" :disabled="loading">
+                        <el-button class="submit-btn" type="primary" :disabled="loading" @click="handleSubmit">
                             {{ loading ? '生成中...' : '生成图像' }}
-                        </button>
+                        </el-button>
                     </div>
-                </form>
+                </div>
             </div>
 
             <!-- 右侧图片显示区域 -->
@@ -213,7 +215,7 @@ const formData = reactive({
 
 const handleSubmit = async () => {
     if (!formData.drawDto.prompt.trim()) {
-        ElMessage.warning('请输���提示词');
+        ElMessage.warning('请输提示词');
         return;
     }
 
@@ -390,30 +392,31 @@ const handleSubmit = async () => {
           }
         }
 
-        .prompt-input {
-          width: 100%;
-          padding: 20px;
-          border: 2px solid var(--el-color-primary-light-8);
-          border-radius: 16px;
-          font-size: 16px;
-          line-height: 1.6;
-          color: var(--text-color);
-          background-color: var(--bg-color);
-          resize: none;
-          transition: all 0.3s ease;
+        :deep(.el-textarea) {
+          .el-textarea__inner {
+            padding: 20px;
+            border: 2px solid var(--el-color-primary-light-8);
+            border-radius: 16px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            min-height: 200px;
+            box-shadow: none;
+            transition: all 0.3s ease;
 
-          &::placeholder {
-            color: var(--el-color-primary-light-5);
-          }
+            &::placeholder {
+              color: var(--el-color-primary-light-5);
+            }
 
-          &:hover {
-            border-color: var(--el-color-primary-light-3);
-          }
+            &:hover {
+              border-color: var(--el-color-primary-light-3);
+            }
 
-          &:focus {
-            outline: none;
-            border-color: var(--el-color-primary);
-            box-shadow: 0 0 0 4px var(--el-color-primary-light-8);
+            &:focus {
+              border-color: var(--el-color-primary);
+              box-shadow: 0 0 0 4px var(--el-color-primary-light-8);
+            }
           }
         }
       }
