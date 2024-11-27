@@ -13,3 +13,13 @@ export const saveOrUpdateMenu = (menuData) => {
 export const deleteMenu = (id) => {
 	return request.delete('/system/menu/removeById', { params: { id } });
 };
+
+// 更新菜单状态
+export const updateMenuStatus = (id, status) => {
+	return request.put('/system/menu/updateStatus', { id, status });
+};
+
+// 更新菜单可见性
+export const updateMenuVisible = (id, isVisible) => {
+	return request.put('/system/menu/updateVisible', { id, isVisible });
+};
