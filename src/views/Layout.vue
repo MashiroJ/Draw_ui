@@ -61,6 +61,9 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
+                <el-dropdown-item command="profile" :icon="User">
+                  个人中心
+                </el-dropdown-item>
                 <el-dropdown-item command="logout" :icon="SwitchButton">
                   退出登录
                 </el-dropdown-item>
@@ -117,17 +120,14 @@ const themeStore = useThemeStore();
 const imgUrl = ref('');
 imgUrl.value = userInfoStore.userInfo.avatarUrl || avatar;
 
-// 菜单图标映射
-const iconMap = {
-  'HomeFilled': Management,
-  'User': User,
-  'Promotion': Promotion,
-  'Menu': EditPen,
-  'Gallery': Management,
-  'Text': User,
-  'Image': Crop,
-  'Error': SwitchButton
-};
+// 导入所有 Element Plus 图标
+import * as ElementPlusIcons from '@element-plus/icons-vue';
+
+// 创建图标映射对象
+const iconMap = {};
+for (const [key, component] of Object.entries(ElementPlusIcons)) {
+  iconMap[key] = component;
+}
 
 // 菜单状态
 const menuList = ref([]);
@@ -159,22 +159,35 @@ const fetchDynamicMenus = async () => {
   }
 };
 
-// 获取菜单对应的图标
+// 修改获取菜单图标的方法
 const getMenuIcon = (iconName) => {
-  return iconMap[iconName] || Management;
+  // 如果没有图标名称，返回默认图标
+  if (!iconName) return ElementPlusIcons.Menu;
+  // 返回对应的图标组件，如果不存在则返回默认图标
+  return iconMap[iconName] || ElementPlusIcons.Menu;
 };
 
-// 注销处理
+// 修改命令处理函数
 const handleCommand = async (command) => {
-  if (command === 'logout') {
-    try {
-      await userLogoutService();
-      tokenStore.removeToken();
-      userInfoStore.removeUserInfo();
-      router.push('/login');
-    } catch (error) {
-      ElMessage.error('注销失败，请稍后重试');
-    }
+  switch (command) {
+    case 'profile':
+      router.push('/');
+      break;
+    case 'logout':
+      try {
+        // 先清除状态
+        tokenStore.removeToken();
+        userInfoStore.removeUserInfo();
+        // 再调用登出接口
+        await userLogoutService();
+        // 最后跳转
+        router.push('/login');
+        // 强制刷新页面
+        window.location.reload();
+      } catch (error) {
+        ElMessage.error('注销失败，请稍后重试');
+      }
+      break;
   }
 };
 

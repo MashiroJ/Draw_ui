@@ -1,18 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// 导入组件  
 import LoginVue from '@/views/Login.vue';
 import LayoutVue from '@/views/Layout.vue';
 import { useTokenStore } from '@/stores/token';
 import { ElNotification } from 'element-plus';
 
-// 定义路由关系  
 const routes = [
   {
     path: '/login',
     component: LoginVue,
   },
   {
-    path: '/404',  // 独立的404路由  
+    path: '/404',
     component: () => import('@/views/404.vue')
   },
   {
@@ -30,20 +28,17 @@ const routes = [
       { path: '/Gallery', component: () => import('@/views/Gallery.vue') }
     ]
   },
-  // 添加通配符路由，匹配所有未定义的路由  
   {
     path: '/:pathMatch(.*)*',
     redirect: '/404'
   }
 ];
 
-// 创建路由器  
 const router = createRouter({
   history: createWebHistory(),
   routes: routes
 });
 
-// 在路由守卫中  
 router.beforeEach((to, from, next) => {
   const tokenStore = useTokenStore();
   console.log('路由守卫检查，Token:', tokenStore.token);
