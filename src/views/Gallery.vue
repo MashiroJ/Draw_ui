@@ -92,14 +92,6 @@
               <img :src="selectedRecord.imageUrl" :alt="selectedRecord.prompt" class="dialog-image" />
               <!-- 图片下方的操作栏 -->
               <div class="image-actions">
-                <el-button
-                  :type="selectedRecord.isLiked ? 'primary' : 'default'"
-                  :icon="selectedRecord.isLiked ? StarFilled : Star"
-                  @click="handleGalleryLike(selectedRecord)"
-                  :loading="selectedRecord.likeLoading"
-                >
-                  {{ selectedRecord.likeCount || 0 }} 点赞
-                </el-button>
                 <el-button 
                   type="success" 
                   icon="Download"
@@ -108,6 +100,15 @@
                   下载图片
                 </el-button>
               </div>
+              <!-- 删除按钮移到右下角 -->
+              <el-button
+                v-if="galleryType === 'private'"
+                class="delete-btn"
+                type="danger"
+                :icon="Delete"
+                circle
+                @click="handleDeleteRecord(selectedRecord)"
+              />
             </div>
           </div>
 
@@ -300,13 +301,14 @@
 
 <script setup>
 import { ref, onMounted, watch, reactive, computed } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Star, StarFilled, Timer, ArrowRight, Download, CopyDocument } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Star, StarFilled, Timer, ArrowRight, Download, CopyDocument, Delete } from '@element-plus/icons-vue'
 import {
   listAllDrawRecords,
   listDrawRecordsByUserId,
   listDrawRecordsSortedByLikes,
-  listDrawRecordsSortedByLatest
+  listDrawRecordsSortedByLatest,
+  removeDrawRecord
 } from '@/api/drawRecords'
 import { toggleLike } from '@/api/drawLike'
 import { getUserInfoById } from '@/api/user'
@@ -685,6 +687,32 @@ const downloadImage = async (imageUrl) => {
     ElMessage.error('下载失败，请稍后重试')
   }
 }
+
+// 添加删除处理函数
+const handleDeleteRecord = async (record) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这张图片吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    });
+    
+    const response = await removeDrawRecord(record.id);
+    if (response.code === 200) {
+      ElMessage.success('删除成功');
+      dialogVisible.value = false; // 关闭详情弹窗
+      // 从列表中移除已删除的图片
+      drawRecords.value = drawRecords.value.filter(item => item.id !== record.id);
+    } else {
+      ElMessage.error(response.message || '删除失败');
+    }
+  } catch (error) {
+    if (error !== 'cancel') { // 排除用户取消的情况
+      console.error('删除失败:', error);
+      ElMessage.error('删除失败，请重试');
+    }
+  }
+};
 
 // 组件挂载时获取数据
 onMounted(() => {
@@ -1120,28 +1148,95 @@ onMounted(() => {
   }
 }
 
-/* 更新弹窗样式 */
+/* 新弹窗样式 */
 .enhanced-dialog {
-  :deep(.el-dialog__body) {
-    padding: 0;
-  }
-  
-  // 添加弹窗标题和关闭按钮的暗色模式
-  :deep(.el-dialog__header) {
+  :deep(.el-dialog) {
     background-color: var(--bg-color);
-    border-bottom: 1px solid var(--border-color);
-    
-    .el-dialog__title {
-      color: var(--text-color);
-    }
-    
-    .el-dialog__close {
-      color: var(--text-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    overflow: hidden;
+
+    /* 标题区域 */
+    .el-dialog__header {
+      background-color: var(--bg-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 20px 24px;
+      margin: 0;
       
-      &:hover {
-        color: var(--el-color-primary);
+      .el-dialog__title {
+        color: var(--text-color);
+        font-size: 18px;
+        font-weight: 600;
+      }
+      
+      .el-dialog__headerbtn {
+        width: 32px;
+        height: 32px;
+        top: 16px;
+        right: 16px;
+
+        .el-dialog__close {
+          color: var(--text-color);
+          font-size: 20px;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            color: var(--el-color-primary);
+            transform: rotate(90deg);
+          }
+        }
       }
     }
+
+    /* 内容区域 */
+    .el-dialog__body {
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    /* 底部区域 */
+    .el-dialog__footer {
+      background-color: var(--bg-color);
+      border-top: 1px solid var(--border-color);
+      padding: 16px 24px;
+
+      .dialog-footer {
+        .el-button {
+          border-radius: 8px;
+          padding: 8px 20px;
+          transition: all 0.3s ease;
+
+          &:not(.el-button--primary) {
+            border-color: var(--border-color);
+            color: var(--text-color);
+            background-color: var(--bg-color);
+
+            &:hover {
+              border-color: var(--el-color-primary);
+              color: var(--el-color-primary);
+            }
+          }
+
+          &.el-button--primary {
+            background-color: var(--el-color-primary);
+            border-color: var(--el-color-primary);
+
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.4);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* 遮罩层样式 */
+  :deep(.el-overlay) {
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
   }
 }
 
@@ -1149,7 +1244,7 @@ onMounted(() => {
   display: flex;
   height: 80vh;
   overflow: hidden;
-  background-color: var(--bg-color); // 添加背景色
+  background-color: var(--bg-color);
 
   .left-section {
     flex: 1;
@@ -1157,7 +1252,7 @@ onMounted(() => {
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    background-color: var(--bg-color); // 添加背景色
+    background-color: var(--bg-color);
     
     .image-container {
       flex: 1;
@@ -1171,31 +1266,7 @@ onMounted(() => {
         object-fit: contain;
         border-radius: 8px;
         border: none;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-      }
-      
-      .image-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        padding: 10px 0;
-        
-        // 按钮在暗色模式下的样式
-        .el-button {
-          background-color: var(--bg-color);
-          border-color: var(--border-color);
-          color: var(--text-color);
-          
-          &:hover {
-            border-color: var(--el-color-primary);
-            color: var(--el-color-primary);
-          }
-          
-          &.el-button--primary {
-            background-color: var(--el-color-primary);
-            color: white;
-          }
-        }
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
       }
     }
   }
@@ -1207,61 +1278,8 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    background-color: var(--bg-color); // 添加背景色
-
-    .detail-info {
-      h3 {
-        margin-bottom: 15px;
-        color: var(--text-color);
-      }
-
-      .prompt-section {
-        margin-bottom: 15px;
-
-        .prompt-label {
-          font-weight: 500;
-          margin-bottom: 8px;
-          color: var(--text-color);
-        }
-
-        .prompt-content {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          
-          // 输入框暗色模式适配
-          :deep(.el-textarea__inner) {
-            background-color: var(--bg-color);
-            border-color: var(--border-color);
-            color: var(--text-color);
-            
-            &:hover, &:focus {
-              border-color: var(--el-color-primary);
-            }
-          }
-        }
-      }
-    }
-
-    .comments-section {
-      h3 {
-        margin-bottom: 15px;
-        color: var(--text-color);
-      }
-      
-      // 评论输入框暗色模式
-      .comment-input {
-        :deep(.el-textarea__inner) {
-          background-color: var(--bg-color);
-          border-color: var(--border-color);
-          color: var(--text-color);
-          
-          &:hover, &:focus {
-            border-color: var(--el-color-primary);
-          }
-        }
-      }
-    }
+    background-color: var(--bg-color);
+    border-left: 1px solid var(--border-color);
   }
 }
 
@@ -1412,6 +1430,43 @@ onMounted(() => {
 
   &:last-child {
     border-bottom: none;
+  }
+}
+
+.image-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  .dialog-image {
+    width: 100%;
+    height: calc(100% - 60px);
+    object-fit: contain;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .image-actions {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .delete-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 10;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
   }
 }
 </style>
