@@ -41,15 +41,27 @@
                     <!-- 提示词输入 -->
                     <div class="form-item">
                         <label for="prompt">提示词</label>
-                        <textarea id="prompt" v-model="formData.drawDto.prompt" rows="6" class="prompt-input"
-                            placeholder="请输入提示词..."></textarea>
+                        <el-input
+                            type="textarea"
+                            id="prompt"
+                            v-model="formData.drawDto.prompt"
+                            rows="6"
+                            class="prompt-input"
+                            placeholder="请输入提示词..."
+                        />
                     </div>
 
                     <!-- 反向提示词输入 -->
                     <div class="form-item">
                         <label for="negativePrompt">反向提示词</label>
-                        <textarea id="negativePrompt" v-model="formData.drawDto.negativePrompt" rows="4"
-                            class="prompt-input" placeholder="请输入反向提示词..."></textarea>
+                        <el-input
+                            type="textarea"
+                            id="negativePrompt"
+                            v-model="formData.drawDto.negativePrompt"
+                            rows="4"
+                            class="prompt-input"
+                            placeholder="请输入反向提示词..."
+                        />
                     </div>
 
                     <!-- 参数设置区域 -->
