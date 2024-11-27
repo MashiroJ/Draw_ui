@@ -10,6 +10,7 @@ import { createPinia } from 'pinia';
 import VueCropper from 'vue-cropper';
 import 'element-plus/theme-chalk/dark/css-vars.css'; // Element Plus 暗色主题变量
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -24,5 +25,19 @@ app.use(pinia);
 app.use(ElementPlus, { locale: zhCn });
 app.use(router);
 app.use(VueCropper);
+
+// 初始化主题
+const initTheme = () => {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+}
+
+// 注册所有图标
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component);
+}
+
+// 初始化主题
+initTheme();
 
 app.mount('#app');

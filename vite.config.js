@@ -24,8 +24,9 @@ export default defineConfig({
 						rewrite:
 							(path) => path.replace(/^\/api/, '')//将原有请求路径中的api替换为''
 					}
-			}
-			
+			},
+			// host: '0.0.0.0', // 允许外部访问
+			// port: 5173,
 		}
 	}
 )
