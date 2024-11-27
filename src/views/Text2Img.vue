@@ -13,11 +13,17 @@
         <div class="content-wrapper">
             <!-- 左侧表单区域 -->
             <div class="left-panel">
-                <form @submit.prevent="handleSubmit">
+                <div class="form-container">
                     <div class="form-item">
                         <label for="prompt">提示词</label>
-                        <textarea id="prompt" v-model="formData.prompt" rows="13" class="prompt-input"
-                            placeholder="请输入提示词..."></textarea>
+                        <el-input
+                            type="textarea"
+                            id="prompt"
+                            v-model="formData.prompt"
+                            rows="13"
+                            class="prompt-input"
+                            placeholder="请输入提示词..."
+                        />
                     </div>
 
                     <!-- 底部操作区域：包含开关和按钮 -->
@@ -26,11 +32,11 @@
                             <el-switch v-model="formData.isPublic" :active-value="1" :inactive-value="0"
                                 active-text="公开" inactive-text="私有" />
                         </div>
-                        <button type="submit" class="submit-btn" :disabled="loading">
+                        <el-button class="submit-btn" type="primary" :disabled="loading" @click="handleSubmit">
                             {{ loading ? '生成中...' : '生成图像' }}
-                        </button>
+                        </el-button>
                     </div>
-                </form>
+                </div>
             </div>
 
             <!-- 右侧图片显示区域 -->
@@ -219,6 +225,8 @@ const handleSubmit = async () => {
           background-color: var(--bg-color);
           resize: none;
           transition: all 0.3s ease;
+          outline: none;
+          min-height: 200px;
 
           &::placeholder {
             color: var(--el-color-primary-light-5);
@@ -229,7 +237,6 @@ const handleSubmit = async () => {
           }
 
           &:focus {
-            outline: none;
             border-color: var(--el-color-primary);
             box-shadow: 0 0 0 4px var(--el-color-primary-light-8);
           }
