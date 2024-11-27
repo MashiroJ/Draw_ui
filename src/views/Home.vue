@@ -585,15 +585,62 @@ onMounted(() => {
 
       .tech-section {
         h3 {
-          color: #005bea; // 新的主题色
+          color: var(--el-color-primary);
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 16px;
+          position: relative;
+          padding-left: 16px;
 
           &::before {
-            background: #00c6fb; // 新的装饰条颜色
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 16px;
+            background: var(--el-color-primary);
+            border-radius: 2px;
           }
         }
 
-        ul li::before {
-          background: #00c6fb; // 新的列表标记颜色
+        ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+
+          li {
+            color: var(--text-color);
+            font-size: 14px;
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 20px;
+            transition: all 0.3s ease;
+
+            &::before {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 6px;
+              height: 6px;
+              border-radius: 50%;
+              background: var(--el-color-primary-light-5);
+              transition: all 0.3s ease;
+            }
+
+            &:hover {
+              color: var(--el-color-primary);
+              transform: translateX(4px);
+
+              &::before {
+                background: var(--el-color-primary);
+                transform: translateY(-50%) scale(1.2);
+              }
+            }
+          }
         }
       }
     }
@@ -621,6 +668,68 @@ onMounted(() => {
     .el-row:last-child {
       .el-col:first-child .box-card {
         margin-bottom: 16px;
+      }
+    }
+  }
+}
+
+.avatar-container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+
+  .avatar-uploader {
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--el-color-primary-light-5);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+        border-color: var(--el-color-primary);
+      }
+    }
+  }
+
+  .button-group {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+
+    .el-button {
+      flex: 0 0 auto;
+      min-width: 120px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-size: 14px;
+
+      /* 选择图片按钮 */
+      &[type="primary"] {
+        background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
+        border: none;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 198, 251, 0.3);
+        }
+      }
+
+      /* 上传头像按钮 */
+      &[type="success"] {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
       }
     }
   }

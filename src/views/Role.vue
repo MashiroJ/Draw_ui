@@ -334,6 +334,7 @@ getRoles();
 
   /* 对话框美化 */
   :deep(.el-dialog) {
+    background-color: var(--bg-color) !important;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -342,7 +343,7 @@ getRoles();
       padding: 20px 24px;
       margin: 0;
       border-bottom: 1px solid var(--border-color);
-      background: var(--bg-color);
+      background-color: var(--bg-color);
 
       .el-dialog__title {
         font-size: 18px;
@@ -353,44 +354,29 @@ getRoles();
 
     .el-dialog__body {
       padding: 24px;
-      background: var(--bg-color);
+      background-color: var(--bg-color);
 
       .el-form-item {
-        margin-bottom: 20px;
+        margin-bottom: 24px;
 
-        .el-input__inner {
-          border-radius: 8px;
-          transition: all 0.3s ease;
-
-          &:hover, &:focus {
-            border-color: var(--el-color-primary);
-            box-shadow: 0 0 0 2px var(--el-color-primary-light-8);
-          }
+        .el-form-item__label {
+          color: var(--text-color);
+          padding-bottom: 8px;
         }
-      }
 
-      /* Checkbox 组美化 */
-      .el-checkbox-group {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 12px;
-        padding: 16px;
-        border-radius: 8px;
-        background: var(--el-bg-color-overlay);
-        border: 1px solid var(--border-color);
+        .el-input__wrapper {
+          background-color: var(--bg-color);
+          border: 2px solid var(--border-color);
+          box-shadow: none !important;
+          width: 100%;
 
-        .el-checkbox {
-          margin-right: 0;
-          padding: 8px;
-          border-radius: 6px;
-          transition: all 0.3s ease;
-
-          &:hover {
-            background: var(--el-color-primary-light-9);
-          }
-
-          .el-checkbox__label {
+          .el-input__inner {
             color: var(--text-color);
+            background-color: var(--bg-color);
+
+            &::placeholder {
+              color: var(--el-text-color-placeholder);
+            }
           }
         }
       }
@@ -398,18 +384,8 @@ getRoles();
 
     .el-dialog__footer {
       padding: 16px 24px;
-      background: var(--bg-color);
+      background-color: var(--bg-color);
       border-top: 1px solid var(--border-color);
-
-      .el-button {
-        padding: 8px 20px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-
-        &:hover {
-          transform: translateY(-2px);
-        }
-      }
     }
   }
 }

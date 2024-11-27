@@ -90,13 +90,18 @@
 
     <!-- 新增/修改用户对话框 -->
     <el-dialog :title="formTitle" v-model="dialogVisible" width="500px">
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
+        <!-- 用户名 -->
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名" />
         </el-form-item>
+        
+        <!-- 密码 -->
         <el-form-item label="密码" prop="password" v-if="isAdd">
           <el-input v-model="form.password" placeholder="请输入密码" show-password />
         </el-form-item>
+        
+        <!-- 手机号码 -->
         <el-form-item label="手机号码" prop="phone">
           <el-input v-model="form.phone" placeholder="请输入手机号码" />
         </el-form-item>
@@ -441,42 +446,137 @@ onMounted(() => {
 
   /* 搜索表单美化 */
   .el-form {
-    background: var(--bg-color);
+    display: flex;
+    align-items: center;
+    gap: 16px;
     padding: 20px;
+    background: var(--bg-color);
     border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    border: 2px solid var(--border-color);
     margin-bottom: 24px;
-    border: 1px solid var(--border-color);
 
+    /* 表单项布局 */
     .el-form-item {
-      margin-bottom: 16px;
-      
+      margin-bottom: 0 !important; // 覆盖默认的底部间距
+      flex: 1; // 让表单项平均分配空间
+      min-width: 200px; // 设置最小宽度
+
+      /* 标签样式 */
+      :deep(.el-form-item__label) {
+        color: var(--text-color);
+      }
+
+      /* 按钮组容器 */
       &:last-child {
-        margin-bottom: 0;
+        flex: 0 0 auto; // 按钮组不参与平均分配
+        min-width: auto; // 移除最小宽度限制
+        display: flex;
+        gap: 8px;
+        margin-left: auto; // 推到右侧
+
+        .el-button {
+          padding: 12px 20px;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+          }
+
+          /* 搜索按钮特殊样式 */
+          &[type="primary"] {
+            background: linear-gradient(45deg, var(--el-color-primary), var(--el-color-primary-light-3));
+            border: none;
+            
+            &:hover {
+              box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.3);
+            }
+          }
+        }
       }
+    }
 
-      :deep(.el-input__inner) {
-        border-radius: 8px;
-        transition: all 0.3s ease;
+    /* 输入框和选择框的通用样式 */
+    :deep(.el-input__wrapper),
+    :deep(.el-select .el-input__wrapper) {
+      background-color: var(--bg-color);
+      border: 2px solid var(--border-color);
+      box-shadow: none !important;
+      transition: all 0.3s ease;
 
-        &:hover, &:focus {
-          border-color: var(--el-color-primary);
-          box-shadow: 0 0 0 2px var(--el-color-primary-light-8);
+      /* 输入框文字和占位符 */
+      .el-input__inner {
+        color: var(--text-color);
+        background-color: var(--bg-color);
+
+        &::placeholder {
+          color: var(--el-text-color-placeholder);
         }
       }
 
-      :deep(.el-select) {
-        width: 100%;
+      /* 前缀和后缀图标 */
+      .el-input__prefix,
+      .el-input__suffix {
+        color: var(--text-color);
       }
 
-      .el-button {
-        padding: 8px 20px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+      /* 悬浮和焦点状态 */
+      &:hover {
+        border-color: var(--el-color-primary-light-5);
+      }
 
-        &:hover {
-          transform: translateY(-2px);
+      &.is-focus {
+        border-color: var(--el-color-primary);
+        box-shadow: 0 0 0 2px var(--el-color-primary-light-8) !important;
+      }
+    }
+
+    /* 下拉选择框特殊样式 */
+    :deep(.el-select-dropdown) {
+      background-color: var(--bg-color);
+      border: 2px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      .el-scrollbar {
+        background-color: var(--bg-color);
+      }
+
+      .el-select-dropdown__item {
+        color: var(--text-color);
+        
+        &.hover, &:hover {
+          background-color: var(--el-color-primary-light-9);
         }
+
+        &.selected {
+          background-color: var(--el-color-primary-light-8);
+          color: var(--el-color-primary);
+          font-weight: bold;
+        }
+      }
+
+      .el-select-dropdown__empty {
+        color: var(--text-color);
+        opacity: 0.7;
+      }
+    }
+  }
+
+  /* 响应式处理 */
+  @media screen and (max-width: 1200px) {
+    .el-form {
+      flex-wrap: wrap;
+      
+      .el-form-item {
+        min-width: calc(50% - 8px); // 两列布局
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .el-form {
+      .el-form-item {
+        min-width: 100%; // 单列布局
       }
     }
   }
@@ -563,6 +663,7 @@ onMounted(() => {
 
   /* 对话框美化 */
   :deep(.el-dialog) {
+    background-color: var(--bg-color) !important;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -571,7 +672,7 @@ onMounted(() => {
       padding: 20px 24px;
       margin: 0;
       border-bottom: 1px solid var(--border-color);
-      background: var(--bg-color);
+      background-color: var(--bg-color);
 
       .el-dialog__title {
         font-size: 18px;
@@ -582,31 +683,38 @@ onMounted(() => {
 
     .el-dialog__body {
       padding: 24px;
-      background: var(--bg-color);
+      background-color: var(--bg-color);
 
       .el-form-item {
-        margin-bottom: 20px;
+        margin-bottom: 24px;
 
-        .el-input__inner {
-          border-radius: 8px;
+        .el-form-item__label {
+          color: var(--text-color);
+          padding-bottom: 8px;
+        }
+
+        .el-input__wrapper {
+          background-color: var(--bg-color);
+          border: 2px solid var(--border-color);
+          box-shadow: none !important;
+          width: 100%;
+
+          .el-input__inner {
+            color: var(--text-color);
+            background-color: var(--bg-color);
+
+            &::placeholder {
+              color: var(--el-text-color-placeholder);
+            }
+          }
         }
       }
     }
 
     .el-dialog__footer {
       padding: 16px 24px;
-      background: var(--bg-color);
+      background-color: var(--bg-color);
       border-top: 1px solid var(--border-color);
-
-      .el-button {
-        padding: 8px 20px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-
-        &:hover {
-          transform: translateY(-2px);
-        }
-      }
     }
   }
 }
