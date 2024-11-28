@@ -1,11 +1,11 @@
 <template>  
   <el-card class="page-container">  
     <template #header>  
-      <el-card class="info-card" style="margin-bottom: 20px;">  
+      <el-card class="info-card welcome-card" style="margin-bottom: 20px;">  
         <div class="info-card-content">  
           <div class="info-text">  
             <h2 class="welcome-title">角色管理</h2>  
-            <p class="welcome-subtitle">权限分配与管理</p>  
+            <p class="welcome-subtitle">角色分配与管理</p>  
           </div>  
           <el-button type="primary" icon="el-icon-plus" size="small" @click="handleAdd">新增角色</el-button>  
         </div>  
@@ -243,39 +243,82 @@ getRoles();
 
   /* 标题卡片美化 */
   .info-card {
-    background: linear-gradient(135deg, var(--el-color-primary-light-7) 0%, var(--el-color-primary-light-9) 100%);
+    background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
     border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    height: auto;
-    padding: 20px 24px;
-    margin-bottom: 24px;
-    transition: all 0.3s ease;
-    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 198, 251, 0.15);
+    padding: 32px;
+    margin-bottom: 32px;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+      transform: rotate(-45deg);
+      pointer-events: none;
+    }
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 198, 251, 0.25);
     }
 
     .info-card-content {
+      position: relative;
+      z-index: 1;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      height: 100%;
+      min-height: 56px;
 
       .info-text {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        justify-content: center;
+
         .welcome-title {
-          font-size: 24px;
-          font-weight: 600;
-          margin-bottom: 8px;
-          background: linear-gradient(45deg, var(--el-color-primary) 0%, var(--el-color-primary-light-3) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          font-size: 28px;
+          font-weight: 700;
+          color: white;
+          margin: 0;
+          padding: 0;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          line-height: 1.2;
         }
 
         .welcome-subtitle {
-          font-size: 14px;
-          color: var(--text-color);
-          opacity: 0.8;
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          padding: 0;
+          line-height: 1.2;
+        }
+      }
+
+      .el-button {
+        align-self: center;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 24px;
+        height: fit-content;
+        transition: all 0.3s ease;
+        margin: 0;
+        white-space: nowrap;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: translateY(-2px);
         }
       }
     }
