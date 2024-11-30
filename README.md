@@ -1,29 +1,64 @@
-# big-event
+# AI绘画管理系统
 
-This template should help get you started developing with Vue 3 in Vite.
+一个基于Vue 3 + Element Plus的AI绘画管理系统前端项目。
 
-## Recommended IDE Setup
+## 功能特性
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+- 用户管理
+  - 用户的增删改查
+  - 用户状态管理
+  - 用户角色分配
 
-## Customize configuration
+- 角色管理
+  - 角色的增删改查
+  - 角色状态管理
+  - 角色权限分配
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+- 菜单管理
+  - 菜单的增删改查
+  - 菜单状态管理
+  - 菜单图标配置
+  - 菜单排序功能
 
-## Project Setup
+- 画廊管理
+  - 公共/私人画廊切换
+  - 图片瀑布流展示
+  - 图片点赞功能
+  - 评论互动系统
+  - 图片下载功能
 
-```sh
-npm install
+## 技术栈
+
+- Vue 3
+- Vue Router
+- Pinia
+- Element Plus
+- Axios
+- Sass
+
+## 开发环境
+
+- Node.js >= 16
+- npm >= 7
+
+## 安装和运行
+
+1. 克隆项目
+```
+git clone https://github.com/MashiroJ/Draw_ui.git
+
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
+2. 安装依赖
+```
+npm install
+```
+3. 运行开发服务器
+```
 npm run dev
 ```
 
-### Compile and Minify for Production
-
-```sh
+4. 构建生产版本
+```
 npm run build
 ```
