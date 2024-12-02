@@ -37,6 +37,26 @@
           <div class="logo"></div>
         </div>
         <div class="header-right">
+          <!-- 积分显示和签到按钮 -->
+          <div class="points-container">
+            <el-tooltip content="我的积分" placement="bottom">
+              <div class="points-display">
+                <el-icon><Coin /></el-icon>
+                <span class="points-value">{{ points }}</span>
+              </div>
+            </el-tooltip>
+            <el-button 
+              class="sign-in-btn"
+              :type="hasSignedIn ? 'success' : 'primary'"
+              :disabled="hasSignedIn"
+              @click="handleSignIn"
+              :loading="signingIn"
+            >
+              {{ hasSignedIn ? '已签到' : '签到' }}
+            </el-button>
+          </div>
+
+          <!-- 主题切换开关 -->
           <div class="theme-switch" @click="toggleTheme">
             <div class="switch-track" :class="{ 'is-dark': themeStore.isDark }">
               <div class="switch-handle">
@@ -49,9 +69,7 @@
               </div>
             </div>
           </div>
-          <div class="username">
-            {{ userInfoStore.userInfo.username }}
-          </div>
+
           <el-dropdown placement="bottom-end" @command="handleCommand">
             <span class="el-dropdown__box">
               <el-avatar :src="imgUrl" />
@@ -97,7 +115,8 @@ import {
   Moon,
   Sunny,
   Fold,
-  Expand
+  Expand,
+  Coin
 } from '@element-plus/icons-vue';
 import { ref, onMounted, computed, nextTick } from 'vue';
 import avatar from '@/assets/default.png';
@@ -109,6 +128,7 @@ import { ElMessage } from 'element-plus';
 import { useMenuListService } from '@/api/menu';
 import { getUserMenus } from '@/api/user';
 import { useThemeStore } from '@/stores/theme';
+import { signIn as signInApi, getPoints } from '@/api/points';
 
 // 路由和状态管理
 const router = useRouter();
@@ -194,6 +214,48 @@ const handleCommand = async (command) => {
 // 添加加载状态控制
 const isLoading = ref(true);
 
+// 积分相关状态
+const points = ref(0)
+const hasSignedIn = ref(false)
+const signingIn = ref(false)
+
+// 获取用户积分
+const fetchPoints = async () => {
+  try {
+    const response = await getPoints();
+    if (response && response.data) {
+      points.value = response.data;
+    } else {
+      ElMessage.error('获取积分失败');
+    }
+  } catch (error) {
+    console.error('获取积分失败:', error);
+    ElMessage.error('获取积分失败');
+  }
+};
+
+// 处理签到
+const handleSignIn = async () => {
+  if (hasSignedIn.value || signingIn.value) return;
+  
+  signingIn.value = true;
+  try {
+    const response = await signInApi();
+    if (response && response.code === 200) {
+      ElMessage.success('签到成功，积分已更新');
+      hasSignedIn.value = true;
+      await fetchPoints(); // 重新获取最新积分
+    } else {
+      ElMessage.error(response.message || '签到失败');
+    }
+  } catch (error) {
+    console.error('签到失败:', error);
+    ElMessage.error(error.response?.data?.message || '签到失败，请重试');
+  } finally {
+    signingIn.value = false;
+  }
+};
+
 // 修改 onMounted
 onMounted(async () => {
   // 先获取菜单
@@ -203,6 +265,8 @@ onMounted(async () => {
   setTimeout(() => {
     isLoading.value = false;
   }, 1500);
+
+  await fetchPoints()
 });
 
 // 主题切换逻辑
@@ -434,13 +498,55 @@ const textColor = computed(() => 'var(--text-color)');
         justify-content: flex-end;
         gap: 20px;
 
-        .username {
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--text-color);
+        .points-container {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-right: 20px;
+          
+          .points-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--el-color-primary-light-9);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            
+            .el-icon {
+              font-size: 18px;
+              color: var(--el-color-primary);
+            }
+            
+            .points-value {
+              font-size: 16px;
+              font-weight: 600;
+              color: var(--el-color-primary);
+            }
+            
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.1);
+            }
+          }
+          
+          .sign-in-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            
+            &:not(:disabled):hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.2);
+            }
+            
+            &.is-disabled {
+              cursor: not-allowed;
+              opacity: 0.7;
+            }
+          }
         }
 
-        /* 主题切换开关美化 */
         .theme-switch {
           .switch-track {
             width: 56px;

@@ -76,7 +76,14 @@
                                 active-text="公开" inactive-text="私有" />
                         </div>
                         <el-button class="submit-btn" type="primary" :disabled="loading" @click="handleSubmit">
-                            {{ loading ? '生成中...' : '生成图像' }}
+                            <template #icon>
+                                <el-icon v-if="loading"><Loading /></el-icon>
+                            </template>
+                            <span>{{ loading ? '生成中...' : '生成图像' }}</span>
+                            <span class="points-cost">
+                                <el-icon><Coin /></el-icon>
+                                1
+                            </span>
                         </el-button>
                     </div>
                 </div>
@@ -97,6 +104,7 @@
 import { ref, reactive } from 'vue';
 import { text2img } from '@/api/draw';
 import { ElMessage } from 'element-plus';
+import { Coin } from '@element-plus/icons-vue'
 
 // 主题存储（虽然不直接使用，但确保样式依赖CSS变量）
 import { useThemeStore } from '@/stores/theme';
@@ -355,6 +363,20 @@ const handleSubmit = async () => {
             background: var(--el-color-primary-light-5);
             cursor: not-allowed;
             opacity: 0.7;
+          }
+
+          .points-cost {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+            padding-left: 8px;
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            
+            .el-icon {
+              font-size: 16px;
+            }
           }
         }
       }

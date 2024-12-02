@@ -71,7 +71,7 @@
                             </el-select>
                         </div>
 
-                        <!-- 模型选择 -->
+                        <!-- 模型���择 -->
                         <div class="form-item">
                             <label>模型选择</label>
                             <el-select v-model="formData.checkpoint" placeholder="请选择模型">
@@ -172,7 +172,14 @@
                             />
                         </div>
                         <el-button class="submit-btn" type="primary" :disabled="loading" @click="handleSubmit">
-                            {{ loading ? '生成中...' : '生成图像' }}
+                            <template #icon>
+                                <el-icon v-if="loading"><Loading /></el-icon>
+                            </template>
+                            <span>{{ loading ? '生成中...' : '生成图像' }}</span>
+                            <span class="points-cost">
+                                <el-icon><Coin /></el-icon>
+                                3
+                            </span>
                         </el-button>
                     </div>
                 </div>

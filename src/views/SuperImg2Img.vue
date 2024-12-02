@@ -189,9 +189,22 @@
                             <el-switch v-model="formData.drawDto.isPublic" :active-value="1" :inactive-value="0"
                                 active-text="公开" inactive-text="私有" />
                         </div>
-                        <button type="submit" class="submit-btn" :disabled="loading">
-                            {{ loading ? '生成中...' : '生成图像' }}
-                        </button>
+                        <el-button 
+                            class="submit-btn"
+                            type="primary" 
+                            :loading="loading" 
+                            :disabled="loading"
+                            @click="handleSubmit"
+                        >
+                            <template #icon>
+                                <el-icon v-if="loading"><Loading /></el-icon>
+                            </template>
+                            <span>{{ loading ? '生成中...' : '生成图像' }}</span>
+                            <span class="points-cost">
+                                <el-icon><Coin /></el-icon>
+                                4
+                            </span>
+                        </el-button>
                     </div>
                 </form>
             </div>
@@ -213,7 +226,7 @@
 import { ref, reactive } from 'vue';
 import { superImg2img } from '@/api/draw';
 import { ElMessage, ElIcon, ElButton } from 'element-plus';
-import { Upload } from '@element-plus/icons-vue';
+import { Upload, Loading, Coin } from '@element-plus/icons-vue';
 
 // 响应式状态
 const loading = ref(false);
@@ -301,34 +314,14 @@ const handleSubmit = async () => {
         return;
     }
 
-    // 确保数值参数有效
-    const steps = parseInt(formData.drawDto.steps);
-    const cfg = parseFloat(formData.drawDto.cfg);
-    const denoise = parseFloat(formData.drawDto.denoise);
-
-    if (isNaN(steps) || steps < 1 || steps > 100) {
-        ElMessage.warning('步数必须在1-100之间');
-        return;
-    }
-
-    if (isNaN(cfg) || cfg < 1 || cfg > 20) {
-        ElMessage.warning('CFG值必须在1-20之间');
-        return;
-    }
-
-    if (isNaN(denoise) || denoise < 0 || denoise > 1) {
-        ElMessage.warning('去噪值必须在0-1之间');
-        return;
-    }
-
     loading.value = true;
     try {
         const res = await superImg2img(
             {
                 ...formData.drawDto,
-                steps: steps,
-                cfg: cfg,
-                denoise: denoise,
+                steps: formData.drawDto.steps,
+                cfg: formData.drawDto.cfg,
+                denoise: formData.drawDto.denoise,
             },
             formData.imageSize,
             formData.checkpoint,
@@ -732,6 +725,20 @@ const handleSubmit = async () => {
             background: var(--el-color-primary-light-5);
             cursor: not-allowed;
             opacity: 0.7;
+          }
+
+          .points-cost {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+            padding-left: 8px;
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            
+            .el-icon {
+              font-size: 16px;
+            }
           }
         }
       }

@@ -67,9 +67,16 @@
                             <el-switch v-model="formData.isPublic" :active-value="1" :inactive-value="0"
                                 active-text="公开" inactive-text="私有" />
                         </div>
-                        <el-button type="primary" :loading="loading" :disabled="!uploadImage || !formData.prompt.trim()"
+                        <el-button type="primary" :loading="loading" :disabled="loading"
                             @click="handleSubmit">
-                            {{ loading ? '生成中...' : '生成图像' }}
+                            <template #icon>
+                                <el-icon v-if="loading"><Loading /></el-icon>
+                            </template>
+                            <span>{{ loading ? '生成中...' : '生成图像' }}</span>
+                            <span class="points-cost">
+                                <el-icon><Coin /></el-icon>
+                                2
+                            </span>
                         </el-button>
                     </div>
                 </form>
@@ -95,7 +102,7 @@
 import { ref, reactive } from 'vue'
 import { img2img } from '@/api/draw'
 import { ElMessage } from 'element-plus'
-import { Upload, Picture } from '@element-plus/icons-vue'
+import { Upload, Picture, Loading, Coin } from '@element-plus/icons-vue'
 
 // 主题存储
 import { useThemeStore } from '@/stores/theme'
@@ -144,7 +151,7 @@ const handleFile = (file) => {
 
     // 验证文件大小（限制为 10MB）  
     if (file.size > 10 * 1024 * 1024) {
-        ElMessage.error('图片大小不能超过10MB')
+        ElMessage.error('图���大小不能超过10MB')
         return
     }
 
@@ -195,7 +202,7 @@ const handleSubmit = async () => {
         }
     } catch (error) {
         console.error('Error:', error);
-        ElMessage.error('服务出错，请稍后重试');
+        ElMessage.error('��务出错，请稍后重试');
     } finally {
         loading.value = false;
     }
@@ -645,6 +652,24 @@ const handleSubmit = async () => {
       .right-panel {
         padding: 20px;
       }
+    }
+  }
+}
+
+.submit-btn {
+  /* 其他样式保持不变 */
+
+  .points-cost {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 14px;
+    
+    .el-icon {
+      font-size: 16px;
     }
   }
 }
