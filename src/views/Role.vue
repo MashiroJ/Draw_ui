@@ -210,7 +210,6 @@ const handleEdit = (row) => {
   form.description = row.description;
   form.menuIds = [];
   dialogVisible.value = true;
-  viewRoleMenus(row);
 };
 
 // 删除角色

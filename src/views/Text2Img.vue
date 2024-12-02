@@ -26,6 +26,49 @@
                         />
                     </div>
 
+                    <!-- 添加模型选择 -->
+                    <div class="form-item">
+                        <label>模型选择</label>
+                        <el-select v-model="formData.checkpoint" placeholder="请选择模型">
+                            <el-option-group label="二次元系列">
+                                <el-option label="AOM3A1B" :value="1" />
+                                <el-option label="Counterfeit V2.5" :value="2" />
+                            </el-option-group>
+                            <el-option-group label="写实系列">
+                                <el-option label="majicMIX alpha 麦橘男团" :value="3" />
+                                <el-option label="majicMIX realistic 麦橘写实" :value="4" />
+                            </el-option-group>
+                        </el-select>
+                    </div>
+
+                    <!-- 在模型选择后添加尺寸选择 -->
+                    <div class="form-item">
+                        <label>图片尺寸</label>
+                        <el-select v-model="formData.imageSize" placeholder="请选择尺寸">
+                            <el-option-group label="方形">
+                                <el-option label="256x256" :value="1" />
+                                <el-option label="384x384" :value="2" />
+                                <el-option label="512x512" :value="3" />
+                            </el-option-group>
+                            <el-option-group label="横版 3:2">
+                                <el-option label="384x256" :value="11" />
+                                <el-option label="512x384" :value="12" />
+                            </el-option-group>
+                            <el-option-group label="横版 16:9">
+                                <el-option label="448x256" :value="21" />
+                                <el-option label="512x288" :value="22" />
+                            </el-option-group>
+                            <el-option-group label="竖版 2:3">
+                                <el-option label="256x384" :value="31" />
+                                <el-option label="384x512" :value="32" />
+                            </el-option-group>
+                            <el-option-group label="竖版 9:16">
+                                <el-option label="256x448" :value="41" />
+                                <el-option label="288x512" :value="42" />
+                            </el-option-group>
+                        </el-select>
+                    </div>
+
                     <!-- 底部操作区域：包含开关和按钮 -->
                     <div class="form-actions">
                         <div class="switch-item">
@@ -64,6 +107,8 @@ const generatedImageUrl = ref('');
 const formData = reactive({
     prompt: '',
     isPublic: 1, // 默认为公开
+    checkpoint: 1, // 默认选择 AOM3A1B
+    imageSize: 3, // 默认选择 512x512
 });
 
 const handleSubmit = async () => {
@@ -74,7 +119,11 @@ const handleSubmit = async () => {
 
     loading.value = true;
     try {
-        const res = await text2img(formData);
+        const res = await text2img({
+            prompt: formData.prompt,
+            isPublic: formData.isPublic
+        }, formData.checkpoint, formData.imageSize);
+        
         if (res.code === 200) {
             ElMessage.success('图像生成成功');
             generatedImageUrl.value = res.data;

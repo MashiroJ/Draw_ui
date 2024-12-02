@@ -75,8 +75,14 @@
                         <div class="form-item">
                             <label>模型选择</label>
                             <el-select v-model="formData.checkpoint" placeholder="请选择模型">
-                                <el-option label="AOM3A1B" :value="1" />
-                                <el-option label="Counterfeit V2.5" :value="2" />
+                                <el-option-group label="二次元系列">
+                                    <el-option label="AOM3A1B" :value="1" />
+                                    <el-option label="Counterfeit V2.5" :value="2" />
+                                </el-option-group>
+                                <el-option-group label="写实系列">
+                                    <el-option label="majicMIX alpha 麦橘男团" :value="3" />
+                                    <el-option label="majicMIX realistic 麦橘写实" :value="4" />
+                                </el-option-group>
                             </el-select>
                         </div>
 
@@ -200,8 +206,8 @@ const generatedImageUrl = ref('')
 // 表单数据
 const formData = reactive({
     drawDto: {
-        prompt: '',
-        negativePrompt: 'badhandv4, EasyNegative, verybadimagenegative_v1.3,illustration, 3d, sepia, painting, cartoons, sketch, (worst quality:1.74), (low quality:1.74), (normal quality:1.44), lowres, bad anatomy, normal quality, ((monochrome)), ((grayscale)), ((letters)), ((english)), capital.',
+        prompt: '1girl,sweater,white background,',
+        negativePrompt: '(worst quality:2),(low quality:2),(normal quality:2),lowres,watermark,',
         steps: 20,
         cfg: 7,
         denoise: 0.7,

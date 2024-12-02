@@ -3,25 +3,36 @@ import request from '@/utils/request';
 /**
  * 文生图提交任务
  * @param {Object} drawDto - 绘图参数对象
+ * @param {number} checkpoint - 检查点参数（整数代码）
+ * @param {number} imageSize - 图片尺寸参数（整数代码）
  * @returns {Promise} - 返回一个包含请求结果的 Promise 对象
  */
-export const text2img = (drawDto) => {
-    return request.post('/system/draw/text2img', drawDto);
+export const text2img = (drawDto, checkpoint, imageSize) => {
+    return request.post('/system/draw/text2img', drawDto, {
+        params: {
+            checkpoint: checkpoint,
+            imageSize: imageSize
+        }
+    });
 };
 
 /**
  * 图生图提交任务
  * @param {Object} drawDto - 绘图参数对象
- * @param {File} uploadImage - 可选的上传图片文件
+ * @param {File} uploadImage - 上传的图片文件
+ * @param {number} checkpoint - 检查点参数（整数代码）
  * @returns {Promise} - 返回一个包含请求结果的 Promise 对象
  */
-export const img2img = (drawDto, uploadImage) => {
+export const img2img = (drawDto, uploadImage, checkpoint) => {
     const formData = new FormData();
     formData.append('drawDto', JSON.stringify(drawDto));
     if (uploadImage) {
         formData.append('uploadImage', uploadImage);
     }
     return request.post('/system/draw/img2img', formData, {
+        params: {
+            checkpoint: checkpoint
+        },
         headers: {
             'Content-Type': 'multipart/form-data',
         },

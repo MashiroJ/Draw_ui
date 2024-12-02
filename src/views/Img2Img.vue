@@ -39,6 +39,21 @@
                         </div>
                     </div>
 
+                    <!-- 模型选择区域 -->
+                    <div class="form-item">
+                        <label>模型选择</label>
+                        <el-select v-model="formData.checkpoint" placeholder="请选择模型">
+                            <el-option-group label="二次元系列">
+                                <el-option label="AOM3A1B" :value="1" />
+                                <el-option label="Counterfeit V2.5" :value="2" />
+                            </el-option-group>
+                            <el-option-group label="写实系列">
+                                <el-option label="majicMIX alpha 麦橘男团" :value="3" />
+                                <el-option label="majicMIX realistic 麦橘写实" :value="4" />
+                            </el-option-group>
+                        </el-select>
+                    </div>
+
                     <!-- 提示词输入区域 -->
                     <div class="form-item">
                         <label for="prompt">提示词</label>
@@ -95,7 +110,8 @@ const previewImage = ref('')
 
 const formData = reactive({
     prompt: '',
-    isPublic: 1
+    isPublic: 1,
+    checkpoint: 1,
 })
 
 // 触发文件选择  
@@ -151,41 +167,39 @@ const removeImage = () => {
 
 // 提交表单  
 const handleSubmit = async () => {
-    if (!uploadImage.value) {
-        ElMessage.warning('请先上传图片')
-        return
-    }
-
     if (!formData.prompt.trim()) {
-        ElMessage.warning('请输入提示词')
-        return
+        ElMessage.warning('请输入提示词');
+        return;
     }
 
-    loading.value = true
+    if (!uploadImage.value) {
+        ElMessage.warning('请上传一张图片');
+        return;
+    }
+
+    loading.value = true;
     try {
-        // 构建请求数据  
-        const drawDto = {
-            prompt: formData.prompt.trim(),
+        const res = await img2img({
+            prompt: formData.prompt,
             isPublic: formData.isPublic
-        }
-
-        const res = await img2img(drawDto, uploadImage.value)
-
+        }, uploadImage.value, formData.checkpoint);
+        
         if (res.code === 200) {
-            ElMessage.success('图像生成成功')
-            generatedImageUrl.value = res.data
-            // 清空提示词，保留其他设置  
-            formData.prompt = ''
+            ElMessage.success('图像生成成功');
+            generatedImageUrl.value = res.data;
+            formData.prompt = '';
+            // 清空上传的图片和预览
+            removeImage();
         } else {
-            ElMessage.error(res.message || '生成失败，请重试')
+            ElMessage.error(res.message || '生成失败，请重试');
         }
     } catch (error) {
-        console.error('Error:', error)
-        ElMessage.error('服务出错，请稍后重试')
+        console.error('Error:', error);
+        ElMessage.error('服务出错，请稍后重试');
     } finally {
-        loading.value = false
+        loading.value = false;
     }
-}  
+};  
 </script>
 
 <style lang="scss" scoped>
