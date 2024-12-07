@@ -7,7 +7,6 @@
             <h2 class="welcome-title">角色管理</h2>  
             <p class="welcome-subtitle">角色分配与管理</p>  
           </div>  
-          <el-button type="primary" icon="el-icon-plus" size="small" @click="handleAdd">新增角色</el-button>  
         </div>  
       </el-card>  
     </template>  
@@ -33,13 +32,12 @@
       <el-table-column label="操作" align="center" width="200" class="small-padding fixed-width">
         <template #default="{ row }">
           <el-button :icon="Edit" circle plain type="primary" @click="handleEdit(row)" />
-          <el-button :icon="Delete" circle plain type="danger" @click="handleDelete(row)" />
           <el-button :icon="Menu" circle plain type="info" @click="viewRoleMenus(row)" />
         </template>
       </el-table-column>
     </el-table>
 
-    <!-- 新增/修改角色对话框 -->
+    <!-- 修改角色对话框 -->
     <el-dialog :title="formTitle" v-model="dialogVisible" width="500px">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
         <el-form-item label="角色名称" prop="name">
@@ -102,7 +100,7 @@ const getRoles = async () => {
     const result = await getRoleList();
     roles.value = result.data || [];
   } catch (error) {
-    ElNotification.error('获取角色数据失败');
+    ElNotification.error('获��角色数据失败');
   } finally {
     loading.value = false;
   }
@@ -122,7 +120,6 @@ const handleStatusChange = async (row) => {
 
 // 新增/修改角色对话框
 const dialogVisible = ref(false);
-const isAdd = ref(true);
 const formTitle = ref('');
 const form = reactive({
   id: null,
@@ -167,11 +164,11 @@ const submitForm = () => {
       if (valid) {
         try {
           await saveOrUpdateRole(form);
-          ElNotification.success(isAdd.value ? '新增角色成功' : '修改角色成功');
+          ElNotification.success('修改角色成功');
           dialogVisible.value = false;
           getRoles();
         } catch (error) {
-          ElNotification.error(isAdd.value ? '新增角色失败' : '修改角色失败');
+          ElNotification.error('修改角色失败');
         }
       }
     });
@@ -190,43 +187,14 @@ const saveRolePermissions = async () => {
   }
 };
 
-// 打开新增角色对话框
-const handleAdd = () => {
-  isAdd.value = true;
-  formTitle.value = '新增角色';
-  form.id = null;
-  form.name = '';
-  form.description = '';
-  form.menuIds = [];
-  dialogVisible.value = true;
-};
-
 // 打开编辑角色对话框
 const handleEdit = (row) => {
-  isAdd.value = false;
   formTitle.value = '修改角色';
   form.id = row.id;
   form.name = row.name;
   form.description = row.description;
   form.menuIds = [];
   dialogVisible.value = true;
-};
-
-// 删除角色
-const handleDelete = async (row) => {
-  await ElMessageBox.confirm('此操作将永久删除该角色, 是否继续?', '提示', {
-    confirmButtonText: '继续',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    try {
-      await deleteRole(row.id);
-      ElNotification.success('删除成功');
-      getRoles();
-    } catch (error) {
-      ElNotification.error('删除失败');
-    }
-  });
 };
 
 // 页面初始化
