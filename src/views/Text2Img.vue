@@ -69,7 +69,7 @@
                         </el-select>
                     </div>
 
-                    <!-- 底部操作区域：包含开关和按钮 -->
+                    <!-- 底部操作区域：按钮 -->
                     <div class="form-actions">
                         <div class="switch-item">
                             <el-switch v-model="formData.isPublic" :active-value="1" :inactive-value="0"
@@ -82,7 +82,17 @@
                             <span>{{ loading ? '生成中...' : '生成图像' }}</span>
                             <span class="points-cost">
                                 <el-icon><Coin /></el-icon>
-                                1
+                                <span :class="{ 'line-through': isMember }">2积分</span>
+                                <span class="member-price">
+                                    <template v-if="isMember">
+                                        <span class="discount-tag">(会员5折)</span>
+                                        <span>1积分</span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="discount-tag line-through">(会员5折)</span>
+                                        <span class="line-through">1积分</span>
+                                    </template>
+                                </span>
                             </span>
                         </el-button>
                     </div>
@@ -101,14 +111,37 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed, onMounted, inject } from 'vue';
 import { text2img } from '@/api/draw';
 import { ElMessage } from 'element-plus';
-import { Coin } from '@element-plus/icons-vue'
+import { Coin } from '@element-plus/icons-vue';
+import { useUserInfoStore } from '@/stores/userinfo';
+import { getUserRoles } from '@/api/user';
 
-// 主题存储（虽然不直接使用，但确保样式依赖CSS变量）
+// 主题存储（虽然不直接使用，但确保式依CSS变量）
 import { useThemeStore } from '@/stores/theme';
 const themeStore = useThemeStore();
+const userInfoStore = useUserInfoStore();
+
+const roleGroup = ref('');
+
+// 获取用户角色
+const getUser = async () => {
+    const userId = userInfoStore.userInfo.id;
+    try {
+        const response = await getUserRoles(userId);
+        roleGroup.value = response.data;
+        console.log(roleGroup.value);
+    } catch (error) {
+        console.error('获取用户角色失败:', error);
+        ElMessage.error('获取用户角色失败');
+    }
+};
+
+// 判断是否是会员
+const isMember = computed(() => {
+    return roleGroup.value === '会员用户';
+});
 
 const loading = ref(false);
 const generatedImageUrl = ref('');
@@ -118,6 +151,9 @@ const formData = reactive({
     checkpoint: 1, // 默认选择 AOM3A1B
     imageSize: 3, // 默认选择 512x512
 });
+
+// 获取父组件Layout的引用
+const layoutRef = inject('layoutRef');
 
 const handleSubmit = async () => {
     if (!formData.prompt.trim()) {
@@ -136,6 +172,10 @@ const handleSubmit = async () => {
             ElMessage.success('图像生成成功');
             generatedImageUrl.value = res.data;
             formData.prompt = '';
+            // 确保 layoutRef 存在且调用方法
+            if (layoutRef.value) {
+                await layoutRef.value.updatePoints();
+            }
         } else {
             ElMessage.error(res.message || '生成失败，请重试');
         }
@@ -146,6 +186,10 @@ const handleSubmit = async () => {
         loading.value = false;
     }
 };
+
+onMounted(() => {
+    getUser();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -514,6 +558,21 @@ const handleSubmit = async () => {
       .right-panel {
         padding: 20px;
       }
+    }
+  }
+}
+
+.points-cost {
+  .line-through {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+  
+  .member-price {
+    .discount-tag {
+      color: #ff4d4f;
+      font-size: 12px;
+      font-weight: bold;
     }
   }
 }

@@ -1,6 +1,6 @@
 <!-- App.vue -->
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, provide } from 'vue';
 
 // 主题状态
 const isDarkTheme = ref(false);
@@ -19,12 +19,15 @@ onMounted(() => {
   isDarkTheme.value = savedTheme === 'dark'; // 判断是否为暗色主题
   document.documentElement.setAttribute('data-theme', isDarkTheme.value ? 'dark' : 'light');
 });
+
+const layoutRef = ref(null);
+provide('layoutRef', layoutRef);
 </script>
 
 <template>
   <router-view v-slot="{ Component }">
     <transition name="fade" mode="out-in">
-      <component :is="Component" />
+      <component :is="Component" ref="layoutRef" />
     </transition>
   </router-view>
 </template>

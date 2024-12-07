@@ -67,15 +67,30 @@
                             <el-switch v-model="formData.isPublic" :active-value="1" :inactive-value="0"
                                 active-text="公开" inactive-text="私有" />
                         </div>
-                        <el-button type="primary" :loading="loading" :disabled="loading"
-                            @click="handleSubmit">
+                        <el-button 
+                            class="submit-btn"
+                            type="primary" 
+                            :loading="loading" 
+                            :disabled="loading"
+                            @click="handleSubmit"
+                        >
                             <template #icon>
                                 <el-icon v-if="loading"><Loading /></el-icon>
                             </template>
                             <span>{{ loading ? '生成中...' : '生成图像' }}</span>
                             <span class="points-cost">
                                 <el-icon><Coin /></el-icon>
-                                2
+                                <span :class="{ 'line-through': isMember }">2积分</span>
+                                <span class="member-price">
+                                    <template v-if="isMember">
+                                        <span class="discount-tag">(会员5折)</span>
+                                        <span>1积分</span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="discount-tag line-through">(会员5折)</span>
+                                        <span class="line-through">1积分</span>
+                                    </template>
+                                </span>
                             </span>
                         </el-button>
                     </div>
@@ -99,14 +114,40 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onMounted, inject } from 'vue'
 import { img2img } from '@/api/draw'
 import { ElMessage } from 'element-plus'
 import { Upload, Picture, Loading, Coin } from '@element-plus/icons-vue'
-
-// 主题存储
+import { usePointsStore } from '@/stores/points'
 import { useThemeStore } from '@/stores/theme'
+import { getUserRoles } from '@/api/user'
+import { useUserInfoStore } from '@/stores/userinfo'
+
 const themeStore = useThemeStore()
+const userInfoStore = useUserInfoStore()
+
+const roleGroup = ref('')
+
+// 获取用户角色
+const getUser = async () => {
+    const userId = userInfoStore.userInfo.id
+    try {
+        const response = await getUserRoles(userId)
+        roleGroup.value = response.data
+    } catch (error) {
+        console.error('获取用户角色失败:', error)
+        ElMessage.error('获取用户角色失败')
+    }
+}
+
+// 判断是否是会员
+const isMember = computed(() => {
+    return roleGroup.value === '会员用户'
+})
+
+onMounted(() => {
+    getUser()
+})
 
 // 响应式状态  
 const loading = ref(false)
@@ -120,6 +161,11 @@ const formData = reactive({
     isPublic: 1,
     checkpoint: 1,
 })
+
+const pointsStore = usePointsStore()
+
+// 获取父组件Layout的引用
+const layoutRef = inject('layoutRef');
 
 // 触发文件选择  
 const triggerFileInput = () => {
@@ -151,7 +197,7 @@ const handleFile = (file) => {
 
     // 验证文件大小（限制为 10MB）  
     if (file.size > 10 * 1024 * 1024) {
-        ElMessage.error('图���大小不能超过10MB')
+        ElMessage.error('图片大小不能超过10MB')
         return
     }
 
@@ -197,12 +243,16 @@ const handleSubmit = async () => {
             formData.prompt = '';
             // 清空上传的图片和预览
             removeImage();
+            // 确保 layoutRef 存在且调用方法
+            if (layoutRef.value) {
+                await layoutRef.value.updatePoints();
+            }
         } else {
             ElMessage.error(res.message || '生成失败，请重试');
         }
     } catch (error) {
         console.error('Error:', error);
-        ElMessage.error('��务出错，请稍后重试');
+        ElMessage.error('服务出错，请稍后重试');
     } finally {
         loading.value = false;
     }
@@ -332,7 +382,7 @@ const handleSubmit = async () => {
           }
         }
 
-        /* 上传区域样式 */
+        /* 上传区样式 */
         .upload-area {
           width: 100%;
           height: 240px;
@@ -657,20 +707,79 @@ const handleSubmit = async () => {
 }
 
 .submit-btn {
-  /* 其他样式保持不变 */
+  background: linear-gradient(120deg, var(--el-color-primary), var(--el-color-primary-light-3));
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-width: 200px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(var(--el-color-primary-rgb), 0.4);
+
+    &::before {
+      transform: translateX(100%);
+      transition: transform 0.8s ease;
+    }
+  }
+
+  &:disabled {
+    background: var(--el-color-primary-light-5);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 
   .points-cost {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    margin-left: 8px;
-    padding-left: 8px;
+    gap: 8px;
+    margin-left: 12px;
+    padding-left: 12px;
     border-left: 1px solid rgba(255, 255, 255, 0.3);
     font-size: 14px;
+    white-space: nowrap;
     
-    .el-icon {
-      font-size: 16px;
+    .original-price {
+      text-decoration: line-through;
+      opacity: 0.8;
     }
+    
+    .member-price {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .discount-tag {
+        color: #ff4d4f;
+        font-size: 12px;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.points-cost {
+  .line-through {
+    text-decoration: line-through;
+    opacity: 0.6;
   }
 }
 </style>

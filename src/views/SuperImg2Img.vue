@@ -192,7 +192,6 @@
                         <el-button 
                             class="submit-btn"
                             type="primary" 
-                            :loading="loading" 
                             :disabled="loading"
                             @click="handleSubmit"
                         >
@@ -202,7 +201,17 @@
                             <span>{{ loading ? '生成中...' : '生成图像' }}</span>
                             <span class="points-cost">
                                 <el-icon><Coin /></el-icon>
-                                4
+                                <span :class="{ 'line-through': isMember }">4积分</span>
+                                <span class="member-price">
+                                    <template v-if="isMember">
+                                        <span class="discount-tag">(会员5折)</span>
+                                        <span>2积分</span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="discount-tag line-through">(会员5折)</span>
+                                        <span class="line-through">2积分</span>
+                                    </template>
+                                </span>
                             </span>
                         </el-button>
                     </div>
@@ -223,10 +232,36 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed, onMounted, inject } from 'vue';
 import { superImg2img } from '@/api/draw';
 import { ElMessage, ElIcon, ElButton } from 'element-plus';
 import { Upload, Loading, Coin } from '@element-plus/icons-vue';
+import { useUserInfoStore } from '@/stores/userinfo';
+import { getUserRoles } from '@/api/user';
+
+const userInfoStore = useUserInfoStore();
+const roleGroup = ref('');
+
+// 获取用户角色
+const getUser = async () => {
+    const userId = userInfoStore.userInfo.id;
+    try {
+        const response = await getUserRoles(userId);
+        roleGroup.value = response.data;
+    } catch (error) {
+        console.error('获取用户角色失败:', error);
+        ElMessage.error('获取用户角色失败');
+    }
+};
+
+// 判断是否是会员
+const isMember = computed(() => {
+    return roleGroup.value === '会员用户';
+});
+
+onMounted(() => {
+    getUser();
+});
 
 // 响应式状态
 const loading = ref(false);
@@ -302,6 +337,9 @@ const removeImage = () => {
     }
 };
 
+// 获取父组件Layout的引用
+const layoutRef = inject('layoutRef');
+
 // 提交表单
 const handleSubmit = async () => {
     if (!formData.drawDto.prompt.trim()) {
@@ -333,8 +371,13 @@ const handleSubmit = async () => {
         if (res.code === 200) {
             ElMessage.success('图像生成成功');
             generatedImageUrl.value = res.data;
+            formData.drawDto.prompt = '';
             // 清空上传的图片和预览
             removeImage();
+            // 确保 layoutRef 存在且调用方法
+            if (layoutRef.value) {
+                await layoutRef.value.updatePoints();
+            }
         } else {
             ElMessage.error(res.message || '生成失败，请重试');
         }
@@ -917,4 +960,21 @@ const handleSubmit = async () => {
     }
   }
 }
+
+.points-cost {
+  .line-through {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+  
+  .member-price {
+    .discount-tag {
+      color: #ff4d4f;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
+}
 </style>
+</```
+rewritten_file>

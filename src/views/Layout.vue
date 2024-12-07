@@ -8,7 +8,7 @@
     </div>
   </div>
 
-  <el-container class="layout-container" :class="{ 'fade-in': !isLoading }">
+  <el-container ref="layoutRef" class="layout-container" :class="{ 'fade-in': !isLoading }">
     <!-- 左侧菜单 -->
     <el-aside :width="isCollapsed ? '64px' : '200px'">
       <div class="aside-header">
@@ -118,7 +118,7 @@ import {
   Expand,
   Coin
 } from '@element-plus/icons-vue';
-import { ref, onMounted, computed, nextTick } from 'vue';
+import { ref, onMounted, computed, nextTick, defineExpose } from 'vue';
 import avatar from '@/assets/default.png';
 import { userLogoutService } from '@/api/login';
 import { useTokenStore } from '@/stores/token';
@@ -129,12 +129,14 @@ import { useMenuListService } from '@/api/menu';
 import { getUserMenus } from '@/api/user';
 import { useThemeStore } from '@/stores/theme';
 import { signIn as signInApi, getPoints } from '@/api/points';
+import { usePointsStore } from '@/stores/points';
 
 // 路由和状态管理
 const router = useRouter();
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
 const themeStore = useThemeStore();
+const pointsStore = usePointsStore();
 
 // 头像处理
 const imgUrl = ref('');
@@ -215,7 +217,7 @@ const handleCommand = async (command) => {
 const isLoading = ref(true);
 
 // 积分相关状态
-const points = ref(0)
+const points = computed(() => pointsStore.points);
 const hasSignedIn = ref(false)
 const signingIn = ref(false)
 
@@ -224,7 +226,7 @@ const fetchPoints = async () => {
   try {
     const response = await getPoints();
     if (response && response.data) {
-      points.value = response.data;
+      pointsStore.setPoints(response.data);
     } else {
       ElMessage.error('获取积分失败');
     }
@@ -244,7 +246,7 @@ const handleSignIn = async () => {
     if (response && response.code === 200) {
       ElMessage.success('签到成功，积分已更新');
       hasSignedIn.value = true;
-      await fetchPoints(); // 重新获取最新积分
+      await fetchPoints();
     } else {
       ElMessage.error(response.message || '签到失败');
     }
@@ -261,12 +263,23 @@ onMounted(async () => {
   // 先获取菜单
   await fetchDynamicMenus();
   
+  // 获取初始积分
+  await fetchPoints();
+  
   // 延迟一下以展示加载动画
   setTimeout(() => {
     isLoading.value = false;
   }, 1500);
+});
 
-  await fetchPoints()
+// 提供给其他组件使用的更新积分方法
+const updatePoints = () => {
+  fetchPoints();
+};
+
+// 暴露方法供其他组件使用
+defineExpose({
+  updatePoints
 });
 
 // 主题切换逻辑

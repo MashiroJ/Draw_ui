@@ -71,7 +71,7 @@
                             </el-select>
                         </div>
 
-                        <!-- 模型���择 -->
+                        <!-- 模型选择 -->
                         <div class="form-item">
                             <label>模型选择</label>
                             <el-select v-model="formData.checkpoint" placeholder="请选择模型">
@@ -178,7 +178,17 @@
                             <span>{{ loading ? '生成中...' : '生成图像' }}</span>
                             <span class="points-cost">
                                 <el-icon><Coin /></el-icon>
-                                3
+                                <span :class="{ 'line-through': isMember }">4积分</span>
+                                <span class="member-price">
+                                    <template v-if="isMember">
+                                        <span class="discount-tag">(会员5折)</span>
+                                        <span>2积分</span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="discount-tag line-through">(会员5折)</span>
+                                        <span class="line-through">2积分</span>
+                                    </template>
+                                </span>
                             </span>
                         </el-button>
                     </div>
@@ -199,13 +209,16 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onMounted, inject } from 'vue'
 import { superText2img } from '@/api/draw'
 import { ElMessage } from 'element-plus'
-
-// 主题存储（虽然不直接使用，但确保样式依赖CSS变量）
+import { usePointsStore } from '@/stores/points'
 import { useThemeStore } from '@/stores/theme'
+import { getUserRoles } from '@/api/user'
+import { useUserInfoStore } from '@/stores/userinfo'
+
 const themeStore = useThemeStore()
+const userInfoStore = useUserInfoStore()
 
 const loading = ref(false)
 const generatedImageUrl = ref('')
@@ -226,9 +239,37 @@ const formData = reactive({
     scheduler: 1     // 默认 NORMAL 的 code 是 1
 })
 
+const pointsStore = usePointsStore()
+
+const roleGroup = ref('')
+
+// 获取用户角色
+const getUser = async () => {
+    const userId = userInfoStore.userInfo.id
+    try {
+        const response = await getUserRoles(userId)
+        roleGroup.value = response.data
+    } catch (error) {
+        console.error('获取用户角色失败:', error)
+        ElMessage.error('获取用户角色失败')
+    }
+}
+
+// 判断是否是会员
+const isMember = computed(() => {
+    return roleGroup.value === '会员用户'
+})
+
+onMounted(() => {
+    getUser()
+})
+
+// 获取父组件Layout的引用
+const layoutRef = inject('layoutRef');
+
 const handleSubmit = async () => {
     if (!formData.drawDto.prompt.trim()) {
-        ElMessage.warning('请输提示词');
+        ElMessage.warning('请输入提示词');
         return;
     }
 
@@ -256,7 +297,7 @@ const handleSubmit = async () => {
     try {
         const res = await superText2img(
             {
-                ...formData.drawDto,
+                ...formData.drawDto,  // 包含 prompt, negativePrompt, steps, cfg, denoise, isPublic
                 steps: steps,
                 cfg: cfg,
                 denoise: denoise
@@ -266,10 +307,15 @@ const handleSubmit = async () => {
             formData.sampler,
             formData.scheduler
         );
-
+        
         if (res.code === 200) {
             ElMessage.success('图像生成成功');
             generatedImageUrl.value = res.data;
+            formData.drawDto.prompt = '';
+            // 确保 layoutRef 存在且调用方法
+            if (layoutRef.value) {
+                await layoutRef.value.updatePoints();
+            }
         } else {
             ElMessage.error(res.message || '生成失败，请重试');
         }
@@ -532,7 +578,7 @@ const handleSubmit = async () => {
           background: linear-gradient(120deg, var(--el-color-primary), var(--el-color-primary-light-3));
           color: white;
           border: none;
-          padding: 16px 40px;
+          padding: 16px 24px;
           border-radius: 16px;
           font-size: 18px;
           font-weight: 600;
@@ -540,6 +586,7 @@ const handleSubmit = async () => {
           transition: all 0.3s ease;
           position: relative;
           overflow: hidden;
+          min-width: 200px;
 
           &::before {
             content: '';
@@ -566,6 +613,34 @@ const handleSubmit = async () => {
             background: var(--el-color-primary-light-5);
             cursor: not-allowed;
             opacity: 0.7;
+          }
+
+          .points-cost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            white-space: nowrap;
+            
+            .original-price {
+              text-decoration: line-through;
+              opacity: 0.8;
+            }
+            
+            .member-price {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              
+              .discount-tag {
+                color: #ff4d4f;
+                font-size: 12px;
+                font-weight: bold;
+              }
+            }
           }
         }
       }
@@ -709,6 +784,13 @@ const handleSubmit = async () => {
         padding: 16px;
       }
     }
+  }
+}
+
+.points-cost {
+  .line-through {
+    text-decoration: line-through;
+    opacity: 0.6;
   }
 }
 </style>
