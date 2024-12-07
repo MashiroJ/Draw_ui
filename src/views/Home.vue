@@ -39,7 +39,7 @@
                 <svg-icon icon-class="user" /> {{ user.userName }}
               </el-descriptions-item>
               <el-descriptions-item label="手机号码">
-                <svg-icon icon-class="phone" /> {{ user.phonenumber }}
+                <svg-icon icon-class="phone" /> {{ user.phone }}
               </el-descriptions-item>
               <el-descriptions-item label="所属角色">
                 <svg-icon icon-class="peoples" /> {{ roleGroup }}
@@ -65,14 +65,21 @@
             <el-tab-pane label="基本资料" name="userinfo">
               <el-form ref="userInfoFormRef" :model="userForm" :rules="userRules" label-width="100px"
                 class="profile-form">
+                <!-- 隐藏的 ID 字段，用于提交时携带用户 ID -->
+                <el-form-item prop="id" style="display: none;">
+                  <el-input v-model="userForm.id" type="hidden" />
+                </el-form-item>
+
                 <el-form-item label="用户名称" prop="userName">
                   <el-input v-model="userForm.userName" maxlength="30" disabled />
                 </el-form-item>
-                <el-form-item label="手机号码" prop="phonenumber">
-                  <el-input v-model="userForm.phonenumber" maxlength="11" />
+                <el-form-item label="手机号码" prop="phone">
+                  <el-input v-model="userForm.phone" maxlength="11" />
                 </el-form-item>
                 <el-form-item class="form-buttons">
-                  <el-button type="primary" :loading="isSubmittingUserInfo" @click="submitUserInfo">保存</el-button>
+                  <el-button type="primary" :loading="isSubmittingUserInfo" @click="submitUserInfo">
+                    保存
+                  </el-button>
                   <el-button @click="close">关闭</el-button>
                 </el-form-item>
               </el-form>
@@ -89,7 +96,9 @@
                   <el-input v-model="pwdForm.confirmPassword" placeholder="请确认新密码" type="password" show-password />
                 </el-form-item>
                 <el-form-item class="form-buttons">
-                  <el-button type="primary" :loading="isSubmittingPwd" @click="submitPwd">保存</el-button>
+                  <el-button type="primary" :loading="isSubmittingPwd" @click="submitPwd">
+                    保存
+                  </el-button>
                   <el-button @click="close">关闭</el-button>
                 </el-form-item>
               </el-form>
@@ -198,12 +207,14 @@ const uploadRef = ref(null);
 const imgUrl = ref('');
 const selectedFile = ref(null);
 
+// 修改 userForm，添加 id 字段并将 phonenumber 改为 phone
 const userForm = reactive({
+  id: '',        // 新增 id 字段
   userName: '',
-  phonenumber: '',
+  phone: '',     // 修改 phonenumber 为 phone
 });
 const userRules = reactive({
-  phonenumber: [
+  phone: [        // 修改 phonenumber 为 phone
     { required: true, message: '手机号码不能为空', trigger: 'blur' },
     {
       pattern: /^1[3-9]\d{9}$/,
@@ -256,13 +267,15 @@ const isSubmittingUserInfo = ref(false);
 const getUser = async () => {
   const userInfo = userInfoStore.userInfo;
   user.userName = userInfo.username || '';
-  user.phonenumber = userInfo.phone || '';
+  user.phone = userInfo.phone || '';
   user.createTime = userInfo.createTime || '';
   user.updateTime = userInfo.updateTime || '';
   user.avatar = userInfo.avatarUrl || defaultAvatar;
 
+  // 填充 userForm
+  userForm.id = userInfo.id;
   userForm.userName = user.userName;
-  userForm.phonenumber = user.phonenumber;
+  userForm.phone = userInfo.phone || '';
 
   imgUrl.value = user.avatar || defaultAvatar;
 
@@ -304,7 +317,7 @@ const handleSignIn = async () => {
     }
   } catch (error) {
     console.error('签到失败:', error);
-    ElMessage.error(error.response?.data?.message || '签到失败，请重试');
+    ElMessage.error(error.response?.data?.message || '签���失败，请重试');
   } finally {
     isSigningIn.value = false;
   }
@@ -360,8 +373,8 @@ const submitUserInfo = () => {
       try {
         await updateUser(userForm);
         ElMessage.success('修改成功');
-        user.phonenumber = userForm.phonenumber;
-        userInfoStore.setUserInfo({ ...userInfoStore.userInfo, phone: userForm.phonenumber });
+        user.phone = userForm.phone; // 修改 phonenumber 为 phone
+        userInfoStore.setUserInfo({ ...userInfoStore.userInfo, phone: userForm.phone });
       } catch (error) {
         ElMessage.error('修改失败，请重试');
         console.error('修改用户信息失败:', error);
@@ -394,7 +407,7 @@ const submitPwd = () => {
           ElMessage.error(response.message || '密码修改失败，请重试');
         }
       } catch (error) {
-        ElMessage.error(error.response?.data?.message || '修改失败，请检查旧密码是否正确');
+        ElMessage.error(error.response?.data?.message || '修改失败���请检查旧密码是否正确');
         console.error('修改密码失败:', error);
       } finally {
         isSubmittingPwd.value = false;
@@ -408,7 +421,7 @@ const close = () => {
   if (activeTab.value === 'userinfo') {
     userInfoFormRef.value.resetFields();
     userForm.userName = user.userName;
-    userForm.phonenumber = user.phonenumber;
+    userForm.phone = user.phone; // 修改 phonenumber 为 phone
   } else if (activeTab.value === 'resetPwd') {
     pwdFormRef.value.resetFields();
     pwdForm.oldPassword = '';
@@ -714,7 +727,7 @@ onMounted(() => {
       &[type="primary"] {
         background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
         border: none;
-        
+
         &:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(0, 198, 251, 0.3);
@@ -725,7 +738,7 @@ onMounted(() => {
       &[type="success"] {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         border: none;
-        
+
         &:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
