@@ -64,6 +64,43 @@
           <div class="form-item">
             <label for="prompt">提示词</label>
             <el-input v-model="formData.prompt" type="textarea" :rows="10" placeholder="请输入提示词，描述您想要生成的图片内容..." />
+            <!-- 添加提示词标签组 -->
+            <div class="prompt-tags">
+              <el-tabs v-model="activeTagGroup">
+                <el-tab-pane label="风格" name="style">
+                  <div class="tags-container">
+                    <el-tag v-for="tag in styleTags" :key="tag" class="prompt-tag" @click="addPrompt(tag)"
+                      :effect="'light'" :color="themeStore.isDark ? '#1a1a1a' : '#f0f0f0'">
+                      {{ tag }}
+                    </el-tag>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane label="常用" name="quality">
+                  <div class="tags-container">
+                    <el-tag v-for="tag in qualityTags" :key="tag" class="prompt-tag" @click="addPrompt(tag)"
+                      :effect="'light'" :color="themeStore.isDark ? '#1a1a1a' : '#f0f0f0'">
+                      {{ tag }}
+                    </el-tag>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane label="衣物" name="clothing">
+                  <div class="tags-container">
+                    <el-tag v-for="tag in clothingTags" :key="tag" class="prompt-tag" @click="addPrompt(tag)"
+                      :effect="'light'" :color="themeStore.isDark ? '#1a1a1a' : '#f0f0f0'">
+                      {{ tag }}
+                    </el-tag>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane label="场景" name="scene">
+                  <div class="tags-container">
+                    <el-tag v-for="tag in sceneTags" :key="tag" class="prompt-tag" @click="addPrompt(tag)"
+                      :effect="'light'" :color="themeStore.isDark ? '#1a1a1a' : '#f0f0f0'">
+                      {{ tag }}
+                    </el-tag>
+                  </div>
+                </el-tab-pane>
+              </el-tabs>
+            </div>
           </div>
 
           <!-- 底部操作区域 -->
@@ -264,7 +301,83 @@ const handleSubmit = async () => {
   } finally {
     loading.value = false;
   }
-};  
+};
+
+// 添加标签相关的响应式数据
+const activeTagGroup = ref('style')
+
+// 风格标签
+const styleTags = [
+  '杰作',
+  '最佳质量',
+  '黑白',
+  '白色背景',
+  '超高分辨率'
+]
+
+// 常用标签
+const qualityTags = [
+  '1个女孩',
+  '1个男孩',
+  '细节丰富',
+  '精致的脸',
+  '微笑',
+  '站姿',
+  '坐姿'
+]
+
+// 添加衣物标签数组
+const clothingTags = [
+  '连衣裙',
+  '西装',
+  '衬衫',
+  'T恤',
+  '牛仔裤',
+  '短裙',
+  '长裙',
+  '运动服',
+  '制服',
+  '礼服',
+  '毛衣',
+  '风衣'
+]
+
+// 添加场景标签数组
+const sceneTags = [
+  '在海边',
+  '在街道',
+  '在公园',
+  '在图书馆',
+  '在教室',
+  '在办公室',
+  '在地铁站',
+  '在商场',
+  '在森林',
+  '在山顶',
+  '在花园',
+  '在雨中',
+  '在雪地'
+]
+
+// 添加提示词的方法
+const addPrompt = (tag) => {
+  const currentPrompt = formData.prompt.trim()
+  // 检查标签是否已存在
+  if (currentPrompt.includes(tag)) {
+    return
+  }
+  // 添加标签时处理逗号
+  if (currentPrompt) {
+    // 检查最后一个字符是否为逗号
+    if (currentPrompt.endsWith(',')) {
+      formData.prompt = currentPrompt + ' ' + tag
+    } else {
+      formData.prompt = currentPrompt + ', ' + tag
+    }
+  } else {
+    formData.prompt = tag
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -792,5 +905,64 @@ const handleSubmit = async () => {
 .member-model-disabled {
   text-decoration: line-through;
   color: #ff4d4f;
+}
+
+.prompt-tags {
+  margin-top: 16px;
+
+  .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 4px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--el-color-primary-light-5);
+      border-radius: 3px;
+    }
+  }
+
+  .prompt-tag {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+:deep(.el-tabs__header) {
+  margin-bottom: 12px;
+}
+
+:deep(.el-tabs__nav-wrap::after) {
+  height: 1px;
+  background-color: var(--el-color-primary-light-8);
+}
+
+:deep(.el-tabs__active-bar) {
+  background-color: var(--el-color-primary);
+}
+
+:deep(.el-tabs__item) {
+  color: var(--text-color);
+
+  &.is-active {
+    color: var(--el-color-primary);
+  }
+
+  &:hover {
+    color: var(--el-color-primary);
+  }
 }
 </style>
