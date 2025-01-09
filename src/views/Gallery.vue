@@ -99,6 +99,13 @@
                 >
                   下载图片
                 </el-button>
+                <el-button
+                  type="primary"
+                  icon="Share"
+                  @click="shareImage(selectedRecord.imageUrl)"
+                >
+                  分享图片
+                </el-button>
               </div>
               <!-- 删除按钮移到右下角 -->
               <el-button
@@ -302,7 +309,7 @@
 <script setup>
 import { ref, onMounted, watch, reactive, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Star, StarFilled, Timer, ArrowRight, Download, CopyDocument, Delete } from '@element-plus/icons-vue'
+import { Star, StarFilled, Timer, ArrowRight, Download, CopyDocument, Delete, Share } from '@element-plus/icons-vue'
 import {
   listAllDrawRecords,
   listDrawRecordsByUserId,
@@ -713,6 +720,17 @@ const handleDeleteRecord = async (record) => {
     }
   }
 };
+
+// 添加分享图片方法
+const shareImage = async (imageUrl) => {
+  try {
+    await navigator.clipboard.writeText(imageUrl)
+    ElMessage.success('图片链接已复制到剪贴板')
+  } catch (err) {
+    console.error('复制失败:', err)
+    ElMessage.error('复制失败')
+  }
+}
 
 // 组件挂载时获取数据
 onMounted(() => {
@@ -1466,6 +1484,24 @@ onMounted(() => {
     &:hover {
       opacity: 1;
       transform: scale(1.1);
+    }
+  }
+}
+
+.image-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px; // 添加按钮之间的间距
+  padding: 10px 0;
+
+  .el-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    &:hover {
+      transform: translateY(-2px);
+      transition: transform 0.3s ease;
     }
   }
 }
