@@ -18,6 +18,22 @@
           <!-- 提示词输入 -->
           <div class="form-item">
             <label for="prompt">提示词</label>
+            <div class="prompt-template-selector">
+              <el-select v-model="selectedTemplate" placeholder="选择提示词模板" @change="handleTemplateChange"
+                class="template-select">
+                <el-option-group label="人物模板">
+                  <el-option v-for="item in characterTemplates" :key="item.value" :label="item.label"
+                    :value="item.value" />
+                </el-option-group>
+                <el-option-group label="场景模板">
+                  <el-option v-for="item in sceneTemplates" :key="item.value" :label="item.label" :value="item.value" />
+                </el-option-group>
+                <el-option-group label="风格模板">
+                  <el-option v-for="item in styleTemplates" :key="item.value" :label="item.label" :value="item.value" />
+                </el-option-group>
+              </el-select>
+            </div>
+            <!-- 原有的提示词输入框 -->
             <el-input type="textarea" id="prompt" v-model="formData.drawDto.prompt" rows="6" class="prompt-input"
               placeholder="请输入提示词..." />
           </div>
@@ -263,6 +279,67 @@ onMounted(() => {
 
 // 获取父组件Layout的引用
 const layoutRef = inject('layoutRef');
+
+const selectedTemplate = ref('')
+
+// 提示词模板数据
+const characterTemplates = [
+  {
+    label: '动漫少女',
+    value: '1girl, solo, beautiful detailed eyes, detailed face, cute, young, kawaii'
+  },
+  {
+    label: '英俊男性',
+    value: '1boy, handsome male, mature, detailed face, masculine'
+  },
+  {
+    label: '儿童',
+    value: 'child, cute, innocent, young, cheerful, playful'
+  }
+]
+
+const sceneTemplates = [
+  {
+    label: '自然风景',
+    value: 'landscape, nature, trees, mountains, clouds, beautiful sky, scenic'
+  },
+  {
+    label: '城市街景',
+    value: 'cityscape, urban, buildings, street view, modern city, architectural'
+  },
+  {
+    label: '梦幻场景',
+    value: 'fantasy landscape, magical, ethereal, dreamy, mystical atmosphere'
+  }
+]
+
+const styleTemplates = [
+  {
+    label: '水彩画风',
+    value: 'watercolor, soft colors, artistic, painting style, colorful'
+  },
+  {
+    label: '赛博朋克',
+    value: 'cyberpunk, neon lights, futuristic, sci-fi, high tech, dark atmosphere'
+  },
+  {
+    label: '二次元风格',
+    value: 'anime style, cel shading, vibrant colors, 2D, illustration'
+  }
+]
+
+// 处理模板选择
+const handleTemplateChange = (value) => {
+  if (value) {
+    // 如果原有提示词不为空,则在末尾添加逗号
+    const currentPrompt = formData.drawDto.prompt.trim()
+    formData.drawDto.prompt = currentPrompt
+      ? `${currentPrompt}, ${value}`
+      : value
+    // 重置选择器
+    selectedTemplate.value = ''
+  }
+}
 
 const handleSubmit = async () => {
   if (!formData.drawDto.prompt.trim()) {
@@ -792,5 +869,33 @@ const handleSubmit = async () => {
 .member-model-disabled {
   text-decoration: line-through;
   color: #ff4d4f;
+}
+
+.prompt-template-selector {
+  margin-bottom: 12px;
+
+  .template-select {
+    width: 100%;
+
+    :deep(.el-input__wrapper) {
+      border-radius: 12px;
+      box-shadow: none;
+      border: 2px solid var(--el-color-primary-light-8);
+      background: var(--bg-color);
+
+      &:hover {
+        border-color: var(--el-color-primary-light-3);
+      }
+
+      &.is-focus {
+        border-color: var(--el-color-primary);
+        box-shadow: 0 0 0 4px var(--el-color-primary-light-8);
+      }
+    }
+  }
+}
+
+.prompt-input {
+  margin-top: 8px;
 }
 </style>
