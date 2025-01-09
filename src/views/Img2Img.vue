@@ -44,17 +44,17 @@
             <label>模型选择</label>
             <el-select v-model="formData.checkpoint" placeholder="请选择模型">
               <el-option-group label="二次元系列">
-                <el-option label="AOM3A1B" :value="1" />
-                <el-option label="Counterfeit V2.5" :value="2" />
+                <el-option label="AOM3A1B 二次元风格" :value="1" />
+                <el-option label="Counterfeit V2.5 背景写实风格" :value="2" />
               </el-option-group>
               <el-option-group label="写实系列">
-                <el-option label="majicMIX alpha 麦橘男团" :value="3" />
-                <el-option label="majicMIX realistic 麦橘写实" :value="4" />
+                <el-option label="majicMIX alpha 写实风格男" :value="3" />
+                <el-option label="majicMIX realistic 写实风格女" :value="4" />
               </el-option-group>
-              <el-option-group label="会员系列（以下模型为会员专属）">
-                <el-option label="AnimeKawa" :value="5" :disabled="isNormalUser"
+              <el-option-group label="会员系列（以下模型只为会员用户开放）">
+                <el-option label="AnimeKawa 动漫风格" :value="5" :disabled="isNormalUser"
                   :class="{ 'member-model-disabled': isNormalUser }" />
-                <el-option label="illustration 卡通插画" :value="6" :disabled="isNormalUser"
+                <el-option label="illustration 插画风格" :value="6" :disabled="isNormalUser"
                   :class="{ 'member-model-disabled': isNormalUser }" />
               </el-option-group>
             </el-select>
