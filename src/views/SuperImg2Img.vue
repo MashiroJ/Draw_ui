@@ -294,10 +294,10 @@ const formData = reactive({
     denoise: 0.7,
     isPublic: 1,
   },
-  imageSize: 3, // 默认 SQUARE_512 的 code 是 3
-  checkpoint: 1, // 默认 AOM3A1B 的 code 是 1
-  sampler: 1, // 默认 EULER 的 code 是 1
-  scheduler: 1, // 默认 NORMAL 的 code 是 1
+  imageSize: 3,
+  checkpoint: 1,
+  sampler: 1,
+  scheduler: 1,
 });
 
 // 触发文件选择
@@ -354,23 +354,12 @@ const removeImage = () => {
 // 获取父组件Layout的引用
 const layoutRef = inject('layoutRef');
 
-// 提示词模板数据
-const characterTemplates = [
-  {
-    label: '动漫少女',
-    value: '1girl, solo, beautiful detailed eyes, detailed face, cute, young, kawaii'
-  },
-  {
-    label: '英俊男性',
-    value: '1boy, handsome male, mature, detailed face, masculine'
-  },
-  {
-    label: '儿童',
-    value: 'child, cute, innocent, young, cheerful, playful'
-  }
-]
-
+//提示词模板数据
 const sceneTemplates = [
+  {
+    label: '圣诞节',
+    value: 'christmas,gift box,christmas tree,red dress,simple background,blonde hair,in winter'
+  },
   {
     label: '自然风景',
     value: 'landscape, nature, trees, mountains, clouds, beautiful sky, scenic'
@@ -383,6 +372,7 @@ const sceneTemplates = [
     label: '梦幻场景',
     value: 'fantasy landscape, magical, ethereal, dreamy, mystical atmosphere'
   }
+
 ]
 
 const styleTemplates = [
@@ -397,6 +387,14 @@ const styleTemplates = [
   {
     label: '二次元风格',
     value: 'anime style, cel shading, vibrant colors, 2D, illustration'
+  },
+  {
+    label: '插画风格',
+    value: 'masterpiece,best quality,8K,official art,ultra high res,illustration'
+  },
+  {
+    label: '动画风格',
+    value: 'white background,white and black'
   }
 ]
 

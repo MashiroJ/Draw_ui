@@ -294,11 +294,15 @@ const characterTemplates = [
   },
   {
     label: '儿童',
-    value: 'child, cute, innocent, young, cheerful, playful'
+    value: '1child, cute, innocent, young, cheerful, playful'
   }
 ]
 
 const sceneTemplates = [
+  {
+    label: '圣诞节',
+    value: 'christmas,gift box,christmas tree,red dress,simple background,blonde hair,in winter'
+  },
   {
     label: '自然风景',
     value: 'landscape, nature, trees, mountains, clouds, beautiful sky, scenic'
@@ -311,6 +315,7 @@ const sceneTemplates = [
     label: '梦幻场景',
     value: 'fantasy landscape, magical, ethereal, dreamy, mystical atmosphere'
   }
+
 ]
 
 const styleTemplates = [
@@ -325,6 +330,14 @@ const styleTemplates = [
   {
     label: '二次元风格',
     value: 'anime style, cel shading, vibrant colors, 2D, illustration'
+  },
+  {
+    label: '插画风格',
+    value: 'masterpiece,best quality,8K,official art,ultra high res,illustration'
+  },
+  {
+    label: '动画风格',
+    value: 'white background,white and black'
   }
 ]
 
